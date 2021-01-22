@@ -10,10 +10,12 @@ using Newtonsoft.Json;						// Serializzazione in Json
 
 namespace Circ
 	{
-	public class Ramo : Elemento, IDraw, IID
+	public class Ramo : Elemento, IDraw
 		{
 		uint[] n;					// ID dei nodi di partenza ed arrivo
 		Nodo[] nd;					// Nodi di partenza ed arrivo
+
+		Point pc;					// Centro, cordinata di schermo, scalata
 		/// <summary>
 		/// Costruttore
 		/// </summary>
@@ -36,8 +38,15 @@ namespace Circ
 		[JsonIgnore]
 		public Nodo Nd2 {get{return nd[1];} set{nd[1]=value;}}
 
+		[JsonIgnore]
+		public override Point Center
+			{
+			get {return pc;}
+			}
+
 		#endregion
-		public override void Draw(Vista v)
+
+		public override void Regen(Vista v)
 			{
 			Point2D p1 = nd[0].P;
 			Point2D p2 = nd[1].P;
@@ -45,13 +54,36 @@ namespace Circ
 				{
 				Point pv1 = v.Scala(p1);
 				Point pv2 = v.Scala(p2);
-				Point c = Center(v);
-				v.AddDL(this,Def.Shape.Ramo, Def.Colori.Red, pv1.X, pv1.Y, pv2.X, pv2.Y, c.X, c.Y);
+				pc = v.Scala(Point2D.Midpoint(nd[0].P,nd[1].P));
+				v.AddDL(this,Def.Shape.Ramo, Def.Colori.Red, pc.X, pc.Y);
 				}
 			}
-		public override Point Center(Vista v)
+
+		public override Def.ClipFlag Clip(Vista v)
 			{
-			return v.Scala(Point2D.Midpoint(nd[0].P,nd[1].P));
+			Def.ClipFlag clip1 = Nd1.Clipped;
+			Def.ClipFlag clip2 = Nd2.Clipped;
+
+			if( (clip1 | clip2) == Def.ClipFlag.Inside)			// Entrambi gli estremi all'interno (bitwise OR è zero): no clip
+				{
+				Clipped = Def.ClipFlag.Inside;
+				}
+			else if((clip1 & clip2) != Def.ClipFlag.Inside)		//	Bitwise AND non è zero: condividono una area esterna: clip
+				{
+				Clipped = Def.ClipFlag.Outside;
+				}
+			else
+				{
+				Clipped = Def.ClipFlag.Inside;					// Clip parziale. Non si esegue il clipping sui double, ...
+				}												// ...ma si lascia fare a Windows.Graphics, su coordiante intere, più veloce
+
+			return Clipped;
+			}
+
+		public override void Draw(Graphics g, Pen pn, Brush br, Font fn)
+			{
+			g.DrawLine(pn, nd[0].Ps, nd[1].Ps);
+			g.DrawString(ID.ToString(), fn, br,pc.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2,pc.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2);
 			}
 		}	// Fine classe Ramo
 	}

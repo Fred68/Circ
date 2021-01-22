@@ -92,8 +92,8 @@ namespace Circ
 			bok.Width = bcn.Width = Def.FONT_D_SIZE * 7;
 			bok.Text = "OK";
 			bcn.Text = "Cancel";
-			bok.Location =	new Point(10, Def.FONT_D_SIZE*2*(numRighe+1));
-			bcn.Location =	new Point(10 + Def.FONT_D_SIZE * 8 , Def.FONT_D_SIZE*2*(numRighe+1));
+			bok.Location =	new Point(10, Def.FONT_D_SIZE*2*(numRighe+2));
+			bcn.Location =	new Point(10 + Def.FONT_D_SIZE * 8 , Def.FONT_D_SIZE*2*(numRighe+2));
 			this.Controls.Add(bok);
 			this.Controls.Add(bcn);
 

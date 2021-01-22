@@ -11,8 +11,8 @@ namespace Circ
 		{
 		
 		Def.Stat stat;
-		Def.Stat oper;
-		
+		bool dragging;
+
 		public Def.Stat Stato
 			{
 			get
@@ -25,13 +25,25 @@ namespace Circ
 				LOG.Write($"Stato()={stat.ToString()}");
 				#endif
 				stat = value;
+				dragging = false;		// Ad ogni cambio di stato, disattiva sempre il dragging
+				}
+			}
+		public bool Dragging
+			{
+			get
+				{
+				return dragging;
+				}
+			set
+				{
+				dragging = value;
 				}
 			}
 
 		public StatoAttivo()
 			{
 			stat = Def.Stat.Vista;
-			oper = Def.Stat.None;
+			dragging = false;
 			}
 
 		}

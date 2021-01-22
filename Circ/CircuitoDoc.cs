@@ -22,6 +22,8 @@ namespace Circ
 
 		public readonly List<Elemento> selezionati;		// Lista elementi selezionati
 
+		#warning IMPORTANTE: SPOSTARE TUTTE LE MODIFICHE AI DATI SOTTO DOCUMENTO (per impostare il flag privato _isModied)
+
 		#region PROPRIETÀ PER SERIALIZZAZIONE
 
 		public Dati Dati
@@ -45,9 +47,14 @@ namespace Circ
 			_isModified = false;
 			}
 		
-		public bool IsModified()
+
+		public bool IsModified
 			{
-			return _isModified;
+			get {return _isModified;}
+			set {							// Ammette soltanto di attivare _isModified, non di azzerarlo !
+				if(value == true)
+					_isModified = true;
+				}
 			}
 
 		public void Chiudi()
@@ -134,8 +141,7 @@ namespace Circ
 		/// <returns></returns>
 		public Elemento AddNodo(Point2D p)
 			{
-			Nodo n = new Nodo();
-			n.P = p;
+			Nodo n = new Nodo(p);
 			if(!dati.Add(n))
 				{
 				return null;
@@ -190,6 +196,7 @@ namespace Circ
 				}
 			selezionati.Clear();
 			}
+
 
 		}	// Fine classe CircuitoDoc
 

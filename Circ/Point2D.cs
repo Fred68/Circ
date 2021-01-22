@@ -20,20 +20,20 @@ namespace Circ
 		/// <summary>
 		/// Costruttori
 		/// </summary>
+		#region COSTRUTTORI
 		public Point2D()	{ x=0; y=0; }
 		public Point2D(double x, double y)
 			{
 			this.x = x;
 			this.y = y;
 			}
+		#endregion
 
 		public static Point2D Zero = new Point2D(0,0);					// Costante
-
 		public override string ToString()
 			{
 			return $"[{x.ToString("G",CultureInfo.InvariantCulture)},{y.ToString("G",CultureInfo.InvariantCulture)}]";
-			}
-
+			}							// ToString()
 		public static Point2D operator +(Point2D sx, Point2D dx)		// Somma
 			{
 			return new Point2D(dx.x + sx.x, dx.y + sx.y);
@@ -66,6 +66,14 @@ namespace Circ
 			{
 			return new Point2D(sx.x*dx.x, sx.y*dx.y);
 			}
+		public static Point2D operator *(Point2D sx, Point dx)			// Prodotto  Punto * Point (int)
+			{
+			return new Point2D(sx.x*dx.X, sx.y*dx.Y);
+			}
+		public static Point2D operator *(Point sx, Point2D dx)			// Prodotto   Point (int) * Punto
+			{
+			return new Point2D(sx.X*dx.X, sx.Y*dx.Y);
+			}
 		public static Point2D operator /(Point2D sx, double dx)			// Quoziente Punto / numero
 		    {
 			if (System.Math.Abs(dx) <= Def.EPSILON)
@@ -76,9 +84,15 @@ namespace Circ
 			}
 		public static Point2D operator /(Point2D sx, Point2D dx)		// Quoziente Punto / Punto
 			{
-			if((dx.x <= Def.EPSILON)||(dx.Y <= Def.EPSILON))
+			if((dx.x <= Def.EPSILON)||(dx.y <= Def.EPSILON))
 				throw new DivideByZeroException();	
 			return new Point2D(sx.x/dx.x, sx.y/dx.y);
+			}
+		public static Point2D operator /(Point2D sx, Point dx)			// Quoziente Punto / Point (int)
+			{
+			if((dx.X == 0)||(dx.Y == 0))
+				throw new DivideByZeroException();	
+			return new Point2D(sx.x/dx.X, sx.y/dx.Y);
 			}
 		public static double Mod(Point2D p)								// Modulo
 			{
@@ -98,10 +112,7 @@ namespace Circ
 			{
 			return new Point((int)p.x,(int)p.y);
 			}				
-
 		
 		}
 
-
-	
 	}

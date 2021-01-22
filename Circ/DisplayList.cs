@@ -85,7 +85,7 @@ namespace Circ
 			if(brush.Length != Enum.GetNames(typeof(Def.Colori)).Length)
 				throw new Exception("Brush array and Color enum do not match");
 
-			com = new Command[Def.MAXFREE];				// Array
+			com = new Command[Def.FREE_MAX];				// Array
 			#if(DEBUG)
 			LOG.Write($"DisplayList.Command[{com.Length}]");
 			#endif
@@ -137,22 +137,18 @@ namespace Circ
 		/// <param name="y1">...e Y</param>
 		/// <param name="x2">Secondo punto: X...</param>
 		/// <param name="y2">...e Y</param>
-		public void Add(Elemento element, Def.Shape shape, Def.Colori colour, int x1, int y1, int x2, int y2, int cx, int cy)
+		public void Add(Elemento element, Def.Shape shape, Def.Colori colour, int cx, int cy)
 			{
 			com[count].elemento = element;
 			com[count].shape = shape;
 			com[count].colour = colour;
-			com[count].p1.X = x1;
-			com[count].p1.Y = y1;
-			com[count].p2.X = x2;
-			com[count].p2.Y = y2;
 			com[count].center.X = cx;
 			com[count].center.Y = cy;
 			if(element!=null)				
 				count++;				// Aggiunge all'array solo le l'elemento non è nullo
-			if(com.Length - count < Def.MINFREE)
+			if(com.Length - count < Def.FREE_MIN)
 				{
-				Array.Resize<Command>(ref com, count + Def.MAXFREE);
+				Array.Resize<Command>(ref com, count + Def.FREE_MAX);
 				#if(DEBUG)
 				LOG.Write($"DisplayList.Command[{com.Length}]+");
 				#endif
@@ -175,9 +171,9 @@ namespace Circ
 			{
 			count = 0;
 			indxList.Clear();
-			if(com.Length > Def.MAXFREE)
+			if(com.Length > Def.FREE_MAX)
 				{
-				Array.Resize<Command>(ref com, Def.MAXFREE);
+				Array.Resize<Command>(ref com, Def.FREE_MAX);
 				#if(DEBUG)
 				LOG.Write($"DisplayList.Command[{com.Length}]-");
 				#endif
@@ -217,22 +213,9 @@ namespace Circ
 							}
 						}
 					}
-				switch (com[i].shape)
-					{
-					case Def.Shape.Nodo:
-						g.DrawEllipse(pen[colour], com[i].p1.X, com[i].p1.Y, com[i].p2.X - com[i].p1.X, com[i].p2.Y - com[i].p1.Y);
-						g.DrawString(com[i].elemento.ID.ToString(), font[0], brush[colour],com[i].center.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2,com[i].center.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2);;
-						break;
-					case Def.Shape.Cornice:
-						g.DrawRectangle(pen[colour], com[i].p1.X, com[i].p1.Y, com[i].p2.X - com[i].p1.X, com[i].p2.Y - com[i].p1.Y);
-						break;
-					case Def.Shape.Ramo:
-						g.DrawLine(pen[colour], com[i].p1, com[i].p2);
-						g.DrawString(com[i].elemento.ID.ToString(), font[0], brush[colour],com[i].center.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2,com[i].center.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2);
-						break;
-					default:
-						break;
-					}
+
+				com[i].elemento.Draw(g, pen[colour], brush[colour], font[0]);		// Disegna l'elemento su schermo graphics
+
 				}
 			return indxList.Count;
 			}

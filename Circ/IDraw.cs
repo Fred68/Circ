@@ -4,8 +4,9 @@ namespace Circ
 	{
 	interface IDraw
 		{
-		void Draw(Vista v);			// Funzione per disegnare l'oggetto in una vista
-		Point Center(Vista v);		// Coordinate del centro (su schermo)
-		bool Selected {get;}		// Selezionato
+		void Regen(Vista v);			// Funzione per inserire l'oggetto nella display-list di una vista
+		void Draw(Graphics g, Pen pn, Brush br, Font fn);			// Funzione per disegnare l'oggetto
+		Point Center {get; }			// Proprietà centro dell'oggetto
+		Def.ClipFlag Clip(Vista v);		// Calcola il clipping
 		}
 	}

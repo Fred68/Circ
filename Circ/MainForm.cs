@@ -26,10 +26,11 @@ namespace Circ
 		Dictionary<string,TsBarRef> ts;						// Dati delle toolbar (per costruire il menù)
 		readonly EventHandler menuClickHandler;				// Handler unico dei click per i comandi del menù
 		
-		Point dragIni;								// Punto inizio drag/pan
+		Point dragIniRel;							// Punto inizio drag relativo (azzerato in Pan ad ogni mouse move=
+		Point dragIniFix;							// Punto inizio drag fisso
 
-		
-		#warning Funzioni per spostare i nodi.
+		Point pini,pfin,pold;						// Punti per disegno dinamico linea si schermo
+		bool firstLine;
 
 
 		#region COSTRUTTORE E INIZIALIZZAZIONE
@@ -104,6 +105,9 @@ namespace Circ
 			drwPanel.Dock = DockStyle.Fill;						// Estende il pannello
 			drwPanel.BackColor = Def.ColourBackground;
 
+			pini = pfin = pold = new Point(0,0);
+			firstLine = true;
+
 			this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.drwPanel_Wheel);		// L'evento MouseWheel è catturato dal Form principale
 
 			#if(DEBUG)
@@ -113,7 +117,7 @@ namespace Circ
 			#endif
 
 			UpdateMenus();										// Aggiorna i menù
-			timerUpdate.Interval = Def.TOOL_REFRESH_TIMER;		// Refresh del controllo se il documento è da salvare
+			timerUpdate.Interval = Def.TIMER_REFRESH;		// Refresh del controllo se il documento è da salvare
 			UpdateToolStrips();									// Aggiorna le barre
 			
 			// MessageBox.Show((Point2D.Zero + new Point2D(Math.PI/2, -1.5)).ToString());
@@ -301,7 +305,7 @@ namespace Circ
 			#endif
 			if(doc != null)
 				{
-				if(doc.IsModified())
+				if(doc.IsModified)
 					{
 					if(MessageBox.Show($"Salvare il documento {doc.Dati.Nome} ?","Salvataggio documento",MessageBoxButtons.YesNo) == DialogResult.Yes)
 						{
@@ -359,7 +363,7 @@ namespace Circ
 			if(doc != null)
 				{
 				this.Text = doc.Dati.Nome;
-				if(doc.IsModified())
+				if(doc.IsModified)
 					this.Text += '*';
 				}
 			}
@@ -452,6 +456,602 @@ namespace Circ
 				}
 			}
 
+		private void SpostaSelezionati()
+			{
+			if(doc != null)
+				{
+				InputForm.InputData[] dat = new InputForm.InputData[] {
+													new InputForm.InputData("Delta X", Def.InputType.Double, "0"),
+													new InputForm.InputData("Delta Y", Def.InputType.Double, "0")
+													};
+				InputForm inpf = new InputForm("Sposta elementi selezionati", ref dat);
+
+				if(inpf.ShowDialog() == DialogResult.OK)
+					{
+					double x,y;
+					if( double.TryParse(dat[0].Contenuto, out x) && double.TryParse(dat[1].Contenuto, out y))
+						{
+						doc.Dati.MuoviSelezionati(new Point2D(x,y));
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
+						}
+						
+					}
+				}
+			}
+
+		/// <summary>
+		/// Elimina gli elementi selezionati
+		/// </summary>
+		private void EliminaSelezionati()
+			{
+			if(doc != null)
+					{
+					Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
+					if(MessageBox.Show($"Eliminare:\n{t.Item1} nodi\n{t.Item2} rami\nselezionati ?","Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
+						{
+						doc.Dati.EliminaSelezionati();
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
+						}
+					}
+			}
+
+		/// <summary>
+		/// Rinumera l'ID dell'elemento selezionato
+		/// </summary>
+		private void Rinumera()
+			{
+			if(doc != null)
+				{
+				List<Elemento> lsel = doc.Dati.GetSelezionati(true);
+				if(lsel.Count == 1)
+					{
+					Elemento x = lsel[0];
+
+					InputForm.InputData[] dat = new InputForm.InputData[] {
+													new InputForm.InputData("Id vecchio", Def.InputType.Int, x.ID.ToString(), true),
+													new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
+													};
+					InputForm inpf = new InputForm("Rinumera ID", ref dat);
+
+					if(inpf.ShowDialog() == DialogResult.OK)
+						{
+						int n;
+						if(int.TryParse(dat[1].Contenuto, out n))
+							{
+							if(x is Nodo)
+								{
+								doc.Dati.RinumeraIDnodo(x.ID, (uint)n);
+								}
+							else if(x is Ramo)
+								{
+								doc.Dati.RinumeraIDramo(x.ID, (uint)n);
+								}
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
+							}
+						}
+					}
+				else
+					{
+					if(lsel.Count == 0)
+						{
+						MessageBox.Show("Selezionare un elemento");
+						}
+					else
+						{
+						MessageBox.Show("Selezionare un solo elemento");
+						}
+					}
+				}
+			}
+
+		private void CoordinateNodo()
+			{
+			if(doc != null)
+				{
+				bool ok = false;
+				List<Elemento> lsel = doc.Dati.GetSelezionati(true);
+				if(lsel.Count == 1)
+					{
+					Elemento e = lsel[0];
+					if(e is Nodo)
+						{
+						InputForm.InputData[] dat = new InputForm.InputData[] {
+														new InputForm.InputData("X", Def.InputType.Double, ((Nodo)e).P.X.ToString()),
+														new InputForm.InputData("Y", Def.InputType.Double, ((Nodo)e).P.Y.ToString())
+														};
+						InputForm inpf = new InputForm("Coordinate nodo", ref dat);
+
+						if(inpf.ShowDialog() == DialogResult.OK)
+							{
+							double x, y;
+							if(double.TryParse(dat[0].Contenuto, out x) && double.TryParse(dat[1].Contenuto, out y))
+								{
+								((Nodo)e).P.X = x;
+								((Nodo)e).P.Y = y;
+								doc.IsModified=true;
+								vista.SetOutdatedDL();
+								vista.RegenDL(true);
+								}
+							else
+								{
+								MessageBox.Show("Errore nelle coordinate");
+								}
+							}
+						}
+					else
+						{
+						MessageBox.Show("Selezionare un nodo");
+						}
+					}
+				else
+					{
+					MessageBox.Show("Selezionare un solo nodo");
+					}
+				}
+			}
+
+
+		/// <summary>
+		/// Compatta gli ID di nodi e rami
+		/// </summary>
+		private void CompattaID()
+			{
+			bool ok = true;
+			if(doc != null)
+				{
+				ok = doc.Dati.CompattaID();
+				if(!ok)
+					MessageBox.Show("Errore durante la rinumerazione");
+				}
+			vista.SetOutdatedDL();
+			vista.RegenDL(true);
+			}
+
+		/// <summary>
+		/// Seleziona o deseleziona tutti gli elementi
+		/// </summary>
+		/// <param name="select">seleziona o deseleziona</param>
+		/// <param name="st">Stato attuale usato come filtro: nodi o rami; se Edit: tutti</param>
+		/// <param name="doc">documento</param>
+		private void SelectAll(bool select, Def.Stat st, CircuitoDoc doc)
+			{
+			if(doc != null)
+				{
+				Def.Stat previousSt = doc.Dati.ViewFilter;			// Memorizza il filtro preesistente
+				doc.Dati.ViewFilter = st;							// Filtro = stato attuale: Nodi o Rami					
+				if(st == Def.Stat.Edit)
+					doc.Dati.ViewFilter = Def.Stat.Tutti;			// Stato Edit: filtro Tutti
+				foreach(Elemento el in doc.Dati.Elementi())
+					{
+					el.Selected = select;
+					}
+				 doc.Dati.ViewFilter = previousSt;					// Lo ripristina
+				}
+			}
+
+		/// <summary>
+		/// Paint
+		/// </summary>
+		private void drwPanel_Paint(object sender, PaintEventArgs e)
+			{
+			if(doc != null)
+				{
+				#if(DEBUG)
+				LOG.Write("drwPanel_Paint()", 2);
+				#endif
+				vista.RegenDL(true);
+				}
+			}
+
+		/// <summary>
+		/// Resize
+		/// </summary>
+		private void drwPanel_Resize(object sender, EventArgs e)
+			{
+			#if(DEBUG)
+			LOG.Write("drwPanel_Resize()");
+			#endif
+			vista.Resize();
+			vista.RegenDL(true);
+			}
+
+		/// <summary>
+		/// Mouse move
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e">e.X, e.Y sono le coordinate del mouse</param>
+		private void drwPanel_MouseMove(object sender, MouseEventArgs e)
+			{
+			switch(stato.Stato)
+				{
+				case Def.Stat.Vista:
+					{
+					if(stato.Dragging)
+						{
+						#if(DEBUG)
+						LOG.Write("drwPanel_MouseMove():case Def.Stat.Vista + dragging", 2);
+						#endif
+
+						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
+
+						Point delta = new Point(e.Location.X - dragIniRel.X, e.Location.Y - dragIniRel.Y);
+						
+						Point2D pan = vista.ScalaVettore(delta);
+
+						vista.SetCursor(false);					// Disabilita evidenziazione degli elementi
+						vista.Pan(pan);
+						vista.RegenDL(true);
+						dragIniRel = e.Location;
+						vista.SetCursor(false);					// Disabilita evidenziazione
+						}
+					}
+					break;
+				case Def.Stat.Edit:
+					{
+					if(stato.Dragging)
+						{
+						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
+						}
+					else
+						{
+						vista.SetCursor(true, e.Location.X, e.Location.Y);	// Abilita evidenziazione degli elementi vicini al cursore
+						vista.Redraw(false);
+						}
+					}
+					break;
+				case Def.Stat.Rami:
+					{
+					vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi vicini al cursore
+					vista.Redraw(false);
+					}
+					break;
+				case Def.Stat.Nodi:
+					{
+					vista.SetCursor(false);		// Disabilita evidenziazione
+					}
+					break;
+				}
+
+			Point2D p;							// Aggiorna le ccordinate del cursore. Se dragging: mostra il vettore di spostamento
+			if(stato.Dragging)					// Trascinamento: scala il vettore
+				{
+				p = vista.ScalaVettore(new Point(e.X - dragIniFix.X , e.Y - dragIniFix.Y));
+				}
+			else								// Movimento normale: scala il punto del cursore
+				{
+				p = vista.Scala(new Point(e.X, e.Y));
+				}
+			xPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("X:{0:0.###}", p.X)}";
+			yPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("Y:{0:0.###}", p.Y)}";
+			}
+
+		/// <summary>
+		/// Disegna in inverso una linea fino al mouse
+		/// Non usare: crea caos se si esce dalla finestra
+		/// </summary>
+		/// <param name="loc"></param>
+		private void DrawScreenReverseLine(Point loc)
+			{
+			pfin = new Point(loc.X + drwPanel.Location.X, loc.Y + drwPanel.Location.Y);
+			if(firstLine)
+				{
+				pini = new Point(dragIniFix.X + drwPanel.Location.X, dragIniFix.Y + drwPanel.Location.Y);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.Blue);
+				}
+			else
+				{
+				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pold), Color.White);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.White);
+				}
+			pold = pfin;
+			firstLine = false;
+			}
+
+		/// <summary>
+		/// Mouse click
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e">Contiene i dati dell'evento</param>
+		private void drwPanel_MouseClick(object sender, MouseEventArgs e)
+			{
+			switch(stato.Stato)
+				{
+				case Def.Stat.Vista:
+					{
+					}
+					break;
+				case Def.Stat.Nodi:
+					{
+					#if(DEBUG)
+					LOG.Write("drwPanel_MouseClick():case Def.Stat.Nodi");
+					#endif
+					if(e.Button == MouseButtons.Left)
+						{
+						if(doc != null)
+							doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
+						}
+					}
+					break;
+				case Def.Stat.Rami:
+					{
+					#if(DEBUG)
+					LOG.Write("drwPanel_MouseClick():case Def.Stat.Rami");
+					#endif
+					if(e.Button == MouseButtons.Left)
+						{
+						vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi vicini al cursore
+						vista.Redraw(false);
+						if(doc != null)
+							doc.SelectLastElement(vista);
+						}
+					}
+					break;
+				case Def.Stat.Edit:
+					{
+					#if(DEBUG)
+					LOG.Write("drwPanel_MouseClick():case Def.Stat.Edit");
+					#endif
+					if(e.Button == MouseButtons.Left)
+						{
+						vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Tutti);	// Abilita evidenziazione degli elementi vicini al cursore
+						vista.Redraw(false);
+						if(doc != null)
+							doc.SelectLastElement(vista);
+						}
+					}
+					break;
+				}
+			}
+
+		/// <summary>
+		/// Mouse down (inizio trascinamento)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void drwPanel_MouseDown(object sender, MouseEventArgs e)
+			{
+			switch(stato.Stato)
+				{
+				case Def.Stat.Vista:
+					{
+					#if(DEBUG)
+					LOG.Write("drwPanel_MouseDown():case Def.Stat.View");
+					#endif
+					if(e.Button == MouseButtons.Left)
+						{
+						dragIniRel = dragIniFix = e.Location;
+						stato.Dragging = true;
+						firstLine = true;
+						if(doc != null)
+							doc.Dati.ViewFilter = Def.Stat.Nodi;
+						UpdateToolStrips();
+						}
+					}
+					break;
+				case Def.Stat.Nodi:
+					{
+					
+					}
+					break;
+				case Def.Stat.Rami:
+					{
+					
+					}
+					break;
+				case Def.Stat.Edit:
+					{
+					#if(DEBUG)
+					LOG.Write("drwPanel_MouseDown():case Def.Stat.Edit");
+					#endif
+					if(e.Button == MouseButtons.Left)
+						{
+						dragIniRel = dragIniFix = e.Location;
+						stato.Dragging = true;
+						firstLine = true;
+						UpdateToolStrips();
+						}
+					}
+					break;
+				}
+			}
+
+		/// <summary>
+		/// Mouse up (fine trascinamento)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void drwPanel_MouseUp(object sender, MouseEventArgs e)
+			{
+			if((stato.Dragging) && (stato.Stato == Def.Stat.Edit))		
+				{												 
+				if((Math.Abs(e.Location.X - dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - dragIniFix.Y) < Def.DRG_MIN))
+					stato.Dragging = false;
+				}
+
+			switch(stato.Stato)
+				{
+				case Def.Stat.Vista:
+					{
+					if(stato.Dragging)
+						{
+						#if(DEBUG)
+						LOG.Write("drwPanel_MouseUp():case Def.Stat.Pan");
+						#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							stato.Stato = Def.Stat.Vista;
+							Point2D p;
+							p = vista.ScalaVettore(new Point(e.X - dragIniFix.X , e.Y - dragIniFix.Y));
+
+							dragIniRel.X = dragIniRel.Y = dragIniFix.X = dragIniFix.Y = 0;
+							if(doc != null)
+								doc.Dati.ViewFilter = Def.Stat.Nodi | Def.Stat.Rami;
+							UpdateToolStrips();
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
+							}
+						}
+					}
+					break;
+				case Def.Stat.Nodi:
+					{
+					
+					}
+					break;
+				case Def.Stat.Rami:
+					{
+					
+					}
+					break;
+				case Def.Stat.Edit:
+					{
+					if(stato.Dragging)
+						{
+						if((Math.Abs(e.Location.X - dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - dragIniFix.Y) < Def.DRG_MIN))
+							{
+							stato.Stato = Def.Stat.Edit;		// Annulla il dragging se lo spostamento è piccolo per distinguere un click da un drag.
+							vista.RegenDL(false);
+							}
+						else
+							{
+							#if(DEBUG)
+							LOG.Write("drwPanel_MouseUp():case Def.Stat.Move");
+							#endif
+							if(e.Button == MouseButtons.Left)
+								{
+								stato.Stato = Def.Stat.Edit;
+								Point2D p;
+								p = vista.ScalaVettore(new Point(e.X - dragIniFix.X , e.Y - dragIniFix.Y));
+								dragIniRel.X = dragIniRel.Y = dragIniFix.X = dragIniFix.Y = 0;
+								if(doc != null)
+									{
+									doc.Dati.MuoviSelezionati(p);
+									}
+								UpdateToolStrips();
+							
+								}
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
+							}
+						}
+					}
+					break;
+				}
+			}
+
+		/// <summary>
+		/// Moude wheel
+		/// Esegue Zoom +/- in modalità Vista
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void drwPanel_Wheel(object sender, MouseEventArgs e)
+			{
+			if(doc != null)
+				{
+				switch(stato.Stato)
+					{
+					case Def.Stat.Vista:
+						{
+						#if(DEBUG)
+						LOG.Write("drwPanel_Wheel():case Def.Stat.Vista");
+						#endif
+
+					
+						if((e.Delta > 0)||(e.Delta < 0))
+							{
+							vista.Zoom(Math.Pow(Def.ZOOM_STEP,e.Delta/SystemInformation.MouseWheelScrollDelta));
+							vista.RegenDL(true);
+							}
+						}
+						break;
+					}
+				}
+			}
+
+
+
+		#region TEST
+
+		private void rinumeraNodoToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			InputForm.InputData[] dat = new InputForm.InputData[] {
+																new InputForm.InputData("Id vecchio", Def.InputType.Int, "0"),
+																new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
+															};
+			InputForm inpf = new InputForm("Rinumera nodo",ref dat);
+			if(inpf.ShowDialog() == DialogResult.OK)
+				{
+				if(doc != null)
+					{
+					int v,n;
+					if(
+						int.TryParse(dat[0].Contenuto, out v)
+						&&
+						int.TryParse(dat[1].Contenuto, out n) )
+						{
+						doc.Dati.RinumeraIDnodo((uint)v, (uint)n);
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
+						}
+
+					}
+				}
+			}
+
+
+
+		private void rinumeraRamoToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			InputForm.InputData[] dat = new InputForm.InputData[] {
+																new InputForm.InputData("Id vecchio", Def.InputType.Int, "0"),
+																new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
+															};
+			InputForm inpf = new InputForm("Rinumera ramo",ref dat);
+			if(inpf.ShowDialog() == DialogResult.OK)
+				{
+				if(doc != null)
+					{
+					int v,n;
+					if(
+						int.TryParse(dat[0].Contenuto, out v)
+						&&
+						int.TryParse(dat[1].Contenuto, out n) )
+						{
+						doc.Dati.RinumeraIDramo((uint)v, (uint)n);
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
+						}
+
+					}
+				}
+			}
+
+		private void testDialogToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			InputForm.InputData[] dat = new InputForm.InputData[] {
+																new InputForm.InputData("Testo", Def.InputType.String, "Uno"),
+																new InputForm.InputData("Intero", Def.InputType.Int, "20"),
+																new InputForm.InputData("Reale", Def.InputType.Double, "234.789"),
+															};
+			InputForm inpf = new InputForm("Titolo",ref dat);
+			if(inpf.ShowDialog() == DialogResult.OK)
+				{
+				StringBuilder strb = new StringBuilder();
+				foreach(InputForm.InputData ind in dat)
+					strb.Append($"{ind.Messaggio}[{ind.Tipo.ToString()}]: {ind.Contenuto}\n");
+				MessageBox.Show(strb.ToString());
+				}
+			}
+
+		#endregion
+
+		
 		#region HANDLER DI MENU E PULSANTI
 
 		private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -627,470 +1227,35 @@ namespace Circ
 			{
 			EliminaSelezionati();
 			}
-		#endregion
 
-		/// <summary>
-		/// Elimina gli elementi selezionati
-		/// </summary>
-		private void EliminaSelezionati()
+		private void eliminaToolStripMenuItem_Click(object sender, EventArgs e)
 			{
-			if(doc != null)
-					{
-					Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
-					if(MessageBox.Show($"Eliminare{t.Item1} nodi e {t.Item2} rami selezionati ?","Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
-						{
-						doc.Dati.EliminaSelezionati();
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-					}
+			EliminaSelezionati();
 			}
 
-		/// <summary>
-		/// Rinumera l'ID dell'elemento selezionato
-		/// </summary>
-		private void Rinumera()
+		private void spostaToolStripMenuItem_Click(object sender, EventArgs e)
 			{
-			if(doc != null)
-				{
-				List<Elemento> lsel = doc.Dati.GetSelezionati(true);
-				if(lsel.Count == 1)
-					{
-					Elemento x = lsel[0];
-
-					InputForm.InputData[] dat = new InputForm.InputData[] {
-													new InputForm.InputData("Id vecchio", Def.InputType.Int, x.ID.ToString(), true),
-													new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
-													};
-					InputForm inpf = new InputForm("Rinumera ID", ref dat);
-
-					if(inpf.ShowDialog() == DialogResult.OK)
-						{
-						int n;
-						if(int.TryParse(dat[1].Contenuto, out n))
-							{
-							if(x is Nodo)
-								{
-								doc.Dati.RinumeraIDnodo(x.ID, (uint)n);
-								}
-							else if(x is Ramo)
-								{
-								doc.Dati.RinumeraIDramo(x.ID, (uint)n);
-								}
-							vista.SetOutdatedDL();
-							vista.RegenDL(true);
-							}
-						}
-					}
-				}
+			SpostaSelezionati();
 			}
 
-		/// <summary>
-		/// Compatta gli ID di nodi e rami
-		/// </summary>
-		private void CompattaID()
+		private void inserisciCoordinateToolStripMenuItem_Click(object sender, EventArgs e)
 			{
-			bool ok = true;
-			if(doc != null)
-				{
-				ok = doc.Dati.CompattaID();
-				if(!ok)
-					MessageBox.Show("Errore durante la rinumerazione");
-				}
-			vista.SetOutdatedDL();
+			CoordinateNodo();
+			}
+
+		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			vista.SwapAxisX();
 			vista.RegenDL(true);
 			}
 
-		/// <summary>
-		/// Seleziona o deseleziona tutti gli elementi
-		/// </summary>
-		/// <param name="select">seleziona o deseleziona</param>
-		/// <param name="st">Stato attuale usato come filtro: nodi o rami; se Edit: tutti</param>
-		/// <param name="doc">documento</param>
-		private void SelectAll(bool select, Def.Stat st, CircuitoDoc doc)
-			{if(doc != null)
-				{
-				doc.Dati.ViewFilter = st;												// Filtro = stato attuale: Nodi o Rami					
-				if(st == Def.Stat.Edit)		doc.Dati.ViewFilter = Def.Stat.Tutti;		// Stato Edit: filtro Tutti
-				foreach(Elemento el in doc.Dati.Elementi())
-					{
-					el.Selected = select;
-					}
-				}
-			}
-
-		/// <summary>
-		/// Paint
-		/// </summary>
-		private void drwPanel_Paint(object sender, PaintEventArgs e)
+		private void inverteAsseYToolStripMenuItem_Click(object sender, EventArgs e)
 			{
-			if(doc != null)
-				{
-				#if(DEBUG)
-				LOG.Write("drwPanel_Paint()", 2);
-				#endif
-				vista.RegenDL(true);
-				}
-			}
-
-		/// <summary>
-		/// Resize
-		/// </summary>
-		private void drwPanel_Resize(object sender, EventArgs e)
-			{
-			#if(DEBUG)
-			LOG.Write("drwPanel_Resize()");
-			#endif
-			vista.Resize();
+			vista.SwapAxisY();
 			vista.RegenDL(true);
 			}
 
-		/// <summary>
-		/// Mouse move
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e">e.X, e.Y sono le coordinate del mouse</param>
-		private void drwPanel_MouseMove(object sender, MouseEventArgs e)
-			{
-			bool dragging = false;
-
-			switch(stato.Stato)
-				{
-				case Def.Stat.Pan:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseMove():case Def.Stat.Pan", 2);
-					#endif
-					Point delta = new Point(e.Location.X - dragIni.X, e.Location.Y - dragIni.Y);
-					Point2D pan = delta/vista.ScalaXY;
-					vista.SetCursor(false);					// Disabilita evidenziazione degli elementi
-					vista.Pan(pan);
-					vista.RegenDL(true);
-					dragIni = e.Location;
-					}
-					break;
-				case Def.Stat.Edit:
-					{
-					vista.SetCursor(true, e.Location.X, e.Location.Y);	// Abilita evidenziazione degli elementi vicini al cursore
-					vista.Redraw(false);
-					}
-					break;
-				case Def.Stat.Rami:
-					{
-					vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi vicini al cursore
-					vista.Redraw(false);
-					}
-					break;
-				case Def.Stat.Nodi:
-					{
-					vista.SetCursor(false);		// Disabilita evidenziazione
-					}
-					break;
-				case Def.Stat.Drag:
-					{
-					dragging = true;			// Per cambiare la formula della scala (scala vettore)
-					vista.SetCursor(false);		// Disabilita evidenziazione
-					}
-					break;
-				}
-
-			Point2D p;							// Aggiorna le ccordinate del cursore. Se dragging: mostra il vettore di spostamento
-			if(!dragging)						// Movimento normale: scala il punto del cursore
-				{								
-				p = vista.Scala(new Point(e.X, e.Y));
-				}
-			else								// Trascinamento: scala il vettore
-				{
-				p = vista.ScalaVettore(new Point(e.X - dragIni.X , e.Y - dragIni.Y));
-				}
-			xPos.Text = $"{ (dragging ? "D" : "") }{String.Format("X:{0:0.###}", p.X)}";
-			yPos.Text = $"{ (dragging ? "D" : "") }{String.Format("Y:{0:0.###}", p.Y)}";
-			}
-
-		/// <summary>
-		/// Mouse click
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e">Contiene i dati dell'evento</param>
-		private void drwPanel_MouseClick(object sender, MouseEventArgs e)
-			{
-			switch(stato.Stato)
-				{
-				case Def.Stat.Vista:
-					{
-					}
-					break;
-				case Def.Stat.Nodi:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseClick():case Def.Stat.Nodi");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						if(doc != null)
-							doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-					}
-					break;
-				case Def.Stat.Rami:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseClick():case Def.Stat.Rami");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi vicini al cursore
-						vista.Redraw(false);
-						if(doc != null)
-							doc.SelectLastElement(vista);
-						}
-					}
-					break;
-				case Def.Stat.Edit:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseClick():case Def.Stat.Edit");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Tutti);	// Abilita evidenziazione degli elementi vicini al cursore
-						vista.Redraw(false);
-						if(doc != null)
-							doc.SelectLastElement(vista);
-						}
-					}
-					break;
-				case Def.Stat.Pan:
-					{
-					}
-					break;
-				}
-			}
-
-		/// <summary>
-		/// Mouse down (inizio trascinamento)
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void drwPanel_MouseDown(object sender, MouseEventArgs e)
-			{
-			switch(stato.Stato)
-				{
-				case Def.Stat.Vista:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseDown():case Def.Stat.View");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						dragIni = e.Location;
-						stato.Stato = Def.Stat.Pan;
-						if(doc != null)
-							doc.Dati.ViewFilter = Def.Stat.Nodi;
-						UpdateToolStrips();
-						}
-					}
-					break;
-				case Def.Stat.Nodi:
-					{
-					
-					}
-					break;
-				case Def.Stat.Rami:
-					{
-					
-					}
-					break;
-				case Def.Stat.Edit:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseDown():case Def.Stat.Edit");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						dragIni = e.Location;
-						#error	Lo stato non deve cambiare, ma se ne devono usare due: 1°: Stat, modalità; 2°: opeazione in corso.
-						//stato.Stato = Def.Stat.Drag;
-						//if(doc != null)
-						//	doc.Dati.ViewFilter = Def.Stat.Nodi;
-						UpdateToolStrips();
-						}
-					}
-					break;
-				}
-			}
-
-		/// <summary>
-		/// Mouse up (fine trascinamento)
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void drwPanel_MouseUp(object sender, MouseEventArgs e)
-			{
-			switch(stato.Stato)
-				{
-				case Def.Stat.Vista:
-					{
-					
-					}
-					break;
-				case Def.Stat.Nodi:
-					{
-					
-					}
-					break;
-				case Def.Stat.Rami:
-					{
-					
-					}
-					break;
-				case Def.Stat.Edit:
-					{
-					}
-					break;
-				case Def.Stat.Pan:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseUp():case Def.Stat.Pan");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						stato.Stato = Def.Stat.Vista;
-						dragIni.X = dragIni.Y = 0;
-						if(doc != null)
-							doc.Dati.ViewFilter = Def.Stat.Nodi | Def.Stat.Rami;
-						UpdateToolStrips();
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-					}
-					break;
-				case Def.Stat.Drag:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseUp():case Def.Stat.Pan");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						stato.Stato = Def.Stat.Edit;
-						dragIni.X = dragIni.Y = 0;
-						//if(doc != null)
-						//	doc.Dati.ViewFilter = Def.Stat.Nodi | Def.Stat.Rami;
-						UpdateToolStrips();
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-					}
-					break;
-				}
-			}
-
-		/// <summary>
-		/// Moude wheel
-		/// Esegue Zoom +/- in modalità Vista
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void drwPanel_Wheel(object sender, MouseEventArgs e)
-			{
-			if(doc != null)
-				{
-				switch(stato.Stato)
-					{
-					case Def.Stat.Vista:
-						{
-						#if(DEBUG)
-						LOG.Write("drwPanel_Wheel():case Def.Stat.Vista");
-						#endif
-
-					
-						if((e.Delta > 0)||(e.Delta < 0))
-							{
-							vista.Zoom(Math.Pow(Def.ZOOM_STEP,e.Delta/SystemInformation.MouseWheelScrollDelta));
-							vista.RegenDL(true);
-							}
-						}
-						break;
-					}
-				}
-			}
-
-
-		#region TEST
-
-		private void rinumeraNodoToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			InputForm.InputData[] dat = new InputForm.InputData[] {
-																new InputForm.InputData("Id vecchio", Def.InputType.Int, "0"),
-																new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
-															};
-			InputForm inpf = new InputForm("Rinumera nodo",ref dat);
-			if(inpf.ShowDialog() == DialogResult.OK)
-				{
-				if(doc != null)
-					{
-					int v,n;
-					if(
-						int.TryParse(dat[0].Contenuto, out v)
-						&&
-						int.TryParse(dat[1].Contenuto, out n) )
-						{
-						doc.Dati.RinumeraIDnodo((uint)v, (uint)n);
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-
-					}
-				}
-			}
-
-		private void rinumeraRamoToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			InputForm.InputData[] dat = new InputForm.InputData[] {
-																new InputForm.InputData("Id vecchio", Def.InputType.Int, "0"),
-																new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
-															};
-			InputForm inpf = new InputForm("Rinumera ramo",ref dat);
-			if(inpf.ShowDialog() == DialogResult.OK)
-				{
-				if(doc != null)
-					{
-					int v,n;
-					if(
-						int.TryParse(dat[0].Contenuto, out v)
-						&&
-						int.TryParse(dat[1].Contenuto, out n) )
-						{
-						doc.Dati.RinumeraIDramo((uint)v, (uint)n);
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-
-					}
-				}
-			}
-
-		private void testDialogToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			InputForm.InputData[] dat = new InputForm.InputData[] {
-																new InputForm.InputData("Testo", Def.InputType.String, "Uno"),
-																new InputForm.InputData("Intero", Def.InputType.Int, "20"),
-																new InputForm.InputData("Reale", Def.InputType.Double, "234.789"),
-															};
-			InputForm inpf = new InputForm("Titolo",ref dat);
-			if(inpf.ShowDialog() == DialogResult.OK)
-				{
-				StringBuilder strb = new StringBuilder();
-				foreach(InputForm.InputData ind in dat)
-					strb.Append($"{ind.Messaggio}[{ind.Tipo.ToString()}]: {ind.Contenuto}\n");
-				MessageBox.Show(strb.ToString());
-				}
-			}
-
 		#endregion
-
 
 	
 		}

@@ -58,6 +58,8 @@ namespace Circ
 			this.aggiungiRamoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.rinumeraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.compattaIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.eliminaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.spostaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.vistaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ridisegnaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +95,9 @@ namespace Circ
 			this.lbRami = new System.Windows.Forms.Label();
 			this.lbRamoFree = new System.Windows.Forms.Label();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+			this.inverteAsseXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inverteAsseYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inserisciCoordinateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripEditor.SuspendLayout();
 			this.toolStripFile.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -151,7 +156,7 @@ namespace Circ
             this.editMode});
 			this.toolStripEditor.Location = new System.Drawing.Point(66, 0);
 			this.toolStripEditor.Name = "toolStripEditor";
-			this.toolStripEditor.Size = new System.Drawing.Size(174, 25);
+			this.toolStripEditor.Size = new System.Drawing.Size(143, 25);
 			this.toolStripEditor.TabIndex = 1;
 			this.toolStripEditor.Tag = "";
 			this.toolStripEditor.Text = "Editor";
@@ -313,7 +318,10 @@ namespace Circ
             this.aggiungiNodoToolStripMenuItem,
             this.aggiungiRamoToolStripMenuItem,
             this.rinumeraToolStripMenuItem,
-            this.compattaIDToolStripMenuItem});
+            this.compattaIDToolStripMenuItem,
+            this.eliminaToolStripMenuItem,
+            this.spostaToolStripMenuItem,
+            this.inserisciCoordinateToolStripMenuItem});
 			this.editToolStripMenuItem.Name = "editToolStripMenuItem";
 			this.editToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
 			this.editToolStripMenuItem.Text = "Modifica";
@@ -350,10 +358,26 @@ namespace Circ
 			this.compattaIDToolStripMenuItem.Text = "Compatta ID";
 			this.compattaIDToolStripMenuItem.Click += new System.EventHandler(this.compattaIDToolStripMenuItem_Click);
 			// 
+			// eliminaToolStripMenuItem
+			// 
+			this.eliminaToolStripMenuItem.Name = "eliminaToolStripMenuItem";
+			this.eliminaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.eliminaToolStripMenuItem.Text = "Elimina";
+			this.eliminaToolStripMenuItem.Click += new System.EventHandler(this.eliminaToolStripMenuItem_Click);
+			// 
+			// spostaToolStripMenuItem
+			// 
+			this.spostaToolStripMenuItem.Name = "spostaToolStripMenuItem";
+			this.spostaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.spostaToolStripMenuItem.Text = "Sposta";
+			this.spostaToolStripMenuItem.Click += new System.EventHandler(this.spostaToolStripMenuItem_Click);
+			// 
 			// vistaToolStripMenuItem
 			// 
 			this.vistaToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ridisegnaToolStripMenuItem});
+            this.ridisegnaToolStripMenuItem,
+            this.inverteAsseXToolStripMenuItem,
+            this.inverteAsseYToolStripMenuItem});
 			this.vistaToolStripMenuItem.Name = "vistaToolStripMenuItem";
 			this.vistaToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.vistaToolStripMenuItem.Text = "Vista";
@@ -361,7 +385,7 @@ namespace Circ
 			// ridisegnaToolStripMenuItem
 			// 
 			this.ridisegnaToolStripMenuItem.Name = "ridisegnaToolStripMenuItem";
-			this.ridisegnaToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+			this.ridisegnaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.ridisegnaToolStripMenuItem.Text = "Ridisegna";
 			this.ridisegnaToolStripMenuItem.Click += new System.EventHandler(this.Ridisegna_M_Click);
 			// 
@@ -433,7 +457,7 @@ namespace Circ
             this.ZoomInToolStripButton,
             this.ZoomOutToolStripButton,
             this.ZoomFitToolStripButton});
-			this.toolStripVista.Location = new System.Drawing.Point(240, 0);
+			this.toolStripVista.Location = new System.Drawing.Point(209, 0);
 			this.toolStripVista.Name = "toolStripVista";
 			this.toolStripVista.Size = new System.Drawing.Size(136, 25);
 			this.toolStripVista.TabIndex = 3;
@@ -491,7 +515,7 @@ namespace Circ
             this.toolStripLabel4,
             this.SelectAlltoolStripButton,
             this.SelectNonetoolStripButton});
-			this.toolStripSelect.Location = new System.Drawing.Point(376, 0);
+			this.toolStripSelect.Location = new System.Drawing.Point(345, 0);
 			this.toolStripSelect.Name = "toolStripSelect";
 			this.toolStripSelect.Size = new System.Drawing.Size(94, 25);
 			this.toolStripSelect.TabIndex = 4;
@@ -530,7 +554,7 @@ namespace Circ
             this.RinumeraToolStripButton,
             this.CompattaIDToolStripButton,
             this.EliminaToolStripButton});
-			this.toolStripModifica.Location = new System.Drawing.Point(470, 0);
+			this.toolStripModifica.Location = new System.Drawing.Point(439, 0);
 			this.toolStripModifica.Name = "toolStripModifica";
 			this.toolStripModifica.Size = new System.Drawing.Size(135, 25);
 			this.toolStripModifica.TabIndex = 5;
@@ -678,6 +702,27 @@ namespace Circ
 			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
 			this.toolStripButton1.Text = "toolStripButton1";
 			// 
+			// inverteAsseXToolStripMenuItem
+			// 
+			this.inverteAsseXToolStripMenuItem.Name = "inverteAsseXToolStripMenuItem";
+			this.inverteAsseXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.inverteAsseXToolStripMenuItem.Text = "Inverte asse X";
+			this.inverteAsseXToolStripMenuItem.Click += new System.EventHandler(this.inverteAsseXToolStripMenuItem_Click);
+			// 
+			// inverteAsseYToolStripMenuItem
+			// 
+			this.inverteAsseYToolStripMenuItem.Name = "inverteAsseYToolStripMenuItem";
+			this.inverteAsseYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.inverteAsseYToolStripMenuItem.Text = "Inverte asse Y";
+			this.inverteAsseYToolStripMenuItem.Click += new System.EventHandler(this.inverteAsseYToolStripMenuItem_Click);
+			// 
+			// inserisciCoordinateToolStripMenuItem
+			// 
+			this.inserisciCoordinateToolStripMenuItem.Name = "inserisciCoordinateToolStripMenuItem";
+			this.inserisciCoordinateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.inserisciCoordinateToolStripMenuItem.Text = "Inserisci coordinate";
+			this.inserisciCoordinateToolStripMenuItem.Click += new System.EventHandler(this.inserisciCoordinateToolStripMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -777,6 +822,11 @@ namespace Circ
 		private System.Windows.Forms.ToolStripButton RinumeraToolStripButton;
 		private System.Windows.Forms.ToolStripButton CompattaIDToolStripButton;
 		private System.Windows.Forms.ToolStripButton EliminaToolStripButton;
+		private System.Windows.Forms.ToolStripMenuItem eliminaToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem spostaToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem inverteAsseXToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem inverteAsseYToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem inserisciCoordinateToolStripMenuItem;
 		}
 	}
 

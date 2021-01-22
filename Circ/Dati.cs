@@ -27,8 +27,7 @@ namespace Circ
 		Def.Stat viewFilter;				// Filtro visualizzazione
 		bool maxIDerror;					// Errore se raggiunto max ID. Necessaria rinumerazione
 
-		#warning Conferma eliminazione
-		#warning Aggiunta stato Disattivo (in futuro)
+		#warning Aggiunta stato Disattivo (in futuro) agli elementi
 
 		/// <summary>
 		/// Costruttore
@@ -101,7 +100,7 @@ namespace Circ
 				e.ID = freeIDnodo;
 				freeIDnodo++;
 				e.Name = $"N{e.ID}";
-				if(nodi.Count < Def.MAX_NUM_NODI)	// Controlla capienza
+				if(nodi.Count < Def.NUM_NODI_MAX)	// Controlla capienza
 					{
 					nodi.Add((Nodo)e);
 					ok = true;
@@ -114,7 +113,7 @@ namespace Circ
 				e.Name = $"R{e.ID}";
 				if(AggiornaRifNodiInRamo((Ramo)e))
 					{
-					if(rami.Count < Def.MAX_NUM_RAMI)	// Controlla capienza
+					if(rami.Count < Def.NUM_RAMI_MAX)	// Controlla capienza
 						{
 						uint n1 = ((Ramo)e).N1;
 						uint n2 = ((Ramo)e).N2;
@@ -135,7 +134,7 @@ namespace Circ
 		/// </summary>
 		/// <param name="r"></param>
 		/// <returns></returns>
-		bool AggiornaRifNodiInRamo(Ramo r)
+		private bool AggiornaRifNodiInRamo(Ramo r)
 			{
 			bool ok = false;
 			Nodo nd1,nd2;
@@ -197,7 +196,7 @@ namespace Circ
 		/// <returns></returns>
 		private bool CheckMaxID()
 			{
-			if((freeIDnodo > Def.MAX_ID_NODI)||(freeIDramo > Def.MAX_ID_RAMI))
+			if((freeIDnodo > Def.ID_NODI_MAX)||(freeIDramo > Def.ID_RAMI_MAX))
 				{
 				maxIDerror = true;
 				}
@@ -207,12 +206,13 @@ namespace Circ
 				}
 			return maxIDerror;
 			}
+
 		/// <summary>
 		/// Enumeratore di tutti gli elementi
 		/// filtrati con ViewFiter
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<Elemento> Elementi()
+		public IEnumerable<Elemento> Elementi()	
 			{
 			if((viewFilter & Def.Stat.Nodi) != 0)
 				{
@@ -235,7 +235,7 @@ namespace Circ
 		/// Ordina gli elementi nella lista
 		/// in base alla classe di confronto (sugli ID)
 		/// </summary>
-		void Sort()
+		private void Sort()
 			{
 			nodi.Sort(new ElementoComparer());
 			rami.Sort(new ElementoComparer());
@@ -278,7 +278,6 @@ namespace Circ
 			return el;
 			}
 
-		#warning CONTROLLARE
 		/// <summary>
 		/// Trova gli Elementi con l'ID richiesto
 		/// </summary>
@@ -360,6 +359,11 @@ namespace Circ
 			return l;
 			}
 
+		/// <summary>
+		/// Conta il numero di nodi e rami selezionati
+		/// </summary>
+		/// <param name="selezionati"></param>
+		/// <returns></returns>
 		public Tuple<uint,uint> ContaNodiRamiSelezionati(bool selezionati = true)
 			{
 			uint cn, cr;
@@ -380,7 +384,7 @@ namespace Circ
 				}
 			return new Tuple<uint, uint>(cn, cr);
 			}
-		#warning CONTROLLARE
+
 		/// <summary>
 		/// Tutti gli elementi che usano il nodo con ID idnodo
 		/// </summary>
@@ -425,11 +429,11 @@ namespace Circ
 			Point2D center = pmax/2 + pmin/2;			// ...e centro. Con valori grandi, prima divide, poi somma
 			if(size.X < Def.EPSILON || size.X > Def.MAX_VALUE)					// Corregge se necessario (uno o nessun punto)
 				{
-				size.X = 2 * Def.SZ_ZOOM_DEFAULT;
+				size.X = 2 * Def.ZOOM_DEFAULT_SIZE;
 				}
 			if(size.Y < Def.EPSILON || size.Y > Def.MAX_VALUE)					// Corregge se necessario e...
 				{
-				size.Y = 2 * Def.SZ_ZOOM_DEFAULT;
+				size.Y = 2 * Def.ZOOM_DEFAULT_SIZE;
 				}
 			pmin = center - size/2;						// Ricalcola le estensioni
 			pmax = center + size/2;
@@ -447,6 +451,14 @@ namespace Circ
 			{
 			return RinumeraIDramo(oldID, newID, true);
 			}
+
+		/// <summary>
+		/// Rinumera l'ID di un ramo (private)
+		/// </summary>
+		/// <param name="oldID"></param>
+		/// <param name="newID"></param>
+		/// <param name="check_max">Controlla se supera l'ID_MAX</param>
+		/// <returns></returns>
 		private bool RinumeraIDramo(uint oldID, uint newID, bool check_max)
 			{
 			bool ok = false;
@@ -455,7 +467,7 @@ namespace Circ
 			_new = GetElementi(newID, Def.Stat.Rami);		// Rami con l'id nuovo
 			if((_old.Count == 1) && (_new.Count == 0))
 				{
-				if( (newID < Def.MAX_ID_NODI) || !check_max)
+				if( (newID < Def.ID_NODI_MAX) || !check_max)
 					{
 					_old[0].ID = newID;							// Aggiorna l'ID del ramo
 					ok = true;
@@ -474,6 +486,14 @@ namespace Circ
 			{
 			return RinumeraIDnodo(oldID, newID, true);
 			}
+
+		/// <summary>
+		/// Rinumera l'ID di un nodo (private)
+		/// </summary>
+		/// <param name="oldID"></param>
+		/// <param name="newID"></param>
+		/// <param name="check_max"></param>
+		/// <returns></returns>
 		public bool RinumeraIDnodo(uint oldID, uint newID, bool check_max)
 			{
 			bool ok = false;
@@ -482,7 +502,7 @@ namespace Circ
 			_new = GetElementi(newID, Def.Stat.Nodi);		// Nodi con l'id nuovo
 			if((_old.Count == 1) && (_new.Count == 0))
 				{
-				if((newID < Def.MAX_ID_NODI) || !check_max)
+				if((newID < Def.ID_NODI_MAX) || !check_max)
 					{
 					_old[0].ID = newID;							// Aggiorna l'ID del nodo
 					foreach(Ramo r in rami)						// Percorre tutti i rami
@@ -504,13 +524,13 @@ namespace Circ
 			{
 			uint counterId;
 			bool ok = true;
-			counterId = Def.MAX_ID_NODI;			// Rinumera nodi e rami, in ordine, dopo l'ID_MAM
+			counterId = Def.ID_NODI_MAX;			// Rinumera nodi e rami, in ordine, dopo l'ID_MAM
 			foreach(Nodo n in nodi)
 				{
 				ok &= RinumeraIDnodo(n.ID, counterId,false);	// Controllo ID_MAX disabilitato
 				counterId++;
 				}
-			counterId = Def.MAX_ID_RAMI;
+			counterId = Def.ID_RAMI_MAX;
 			foreach(Ramo r in rami)
 				{
 				ok &= RinumeraIDramo(r.ID, counterId,false);
@@ -531,6 +551,11 @@ namespace Circ
 			return ok;
 			}
 
+		/// <summary>
+		/// Elimina il ramo ID
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		public bool EliminaRamo(uint id)
 			{
 			bool ok = true;
@@ -542,6 +567,11 @@ namespace Circ
 			return ok;
 			}
 
+		/// <summary>
+		/// Elimina il nodo ID, se non è utilizzato
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		public bool EliminaNodo(uint id)
 			{
 			bool ok = true;
@@ -560,16 +590,50 @@ namespace Circ
 			return ok;
 			}
 
+		/// <summary>
+		/// Elimina gli elementi selezionati
+		/// </summary>
 		public void EliminaSelezionati()
 			{
-			List<Elemento> esel = GetSelezionati(true);
-			foreach(Elemento x in esel)
+			List<Elemento> esel;
+			esel = GetSelezionati(true);
+			foreach(Elemento x in esel)			// Prima elimina i rami
 				{
 				if(x is Ramo)
 					EliminaRamo(x.ID);
-				else if(x is Nodo)
+				}
+			esel = GetSelezionati(true);		// Poi aggiorna la lista dei selezionati e...		
+			foreach(Elemento x in esel)			// ...elimina i nodi
+				{
+				if(x is Nodo)
 					EliminaNodo(x.ID);
 				}
+			}
+
+		/// <summary>
+		/// Muove gli elementi selezionati
+		/// </summary>
+		/// <param name="vect"></param>
+		/// <returns></returns>
+		public int MuoviSelezionati(Point2D vect)
+			{
+			int count = 0;
+			foreach(Ramo r in rami)
+				{
+				if(r.Selected)
+					{
+					r.Nd1.Selected = r.Nd2.Selected = true;
+					}
+				}
+			foreach(Nodo n in nodi)
+				{
+				if(n.Selected)
+					{
+					n.P = n.P + vect;
+					count++;
+					}
+				}
+			return count;
 			}
 
 		}	// Fine classe DatiCirc

@@ -9,12 +9,13 @@ using System.Drawing;						// Point e altro
 
 namespace Circ
 	{
-	public class Elemento : IID /*, IDraw*/
+	public class Elemento : IID, IDraw
 		{
 		public static uint UNASSIGNED = 0;
 		uint id;					// ID dell'oggetto
 		string name;				// Descrizione
 		bool sel;					// Selezionato
+		Def.ClipFlag clipped;		// Fuori dalla vista attuale (non in display list)
 
 		/// <summary>
 		/// Costruttore
@@ -24,6 +25,7 @@ namespace Circ
 			name = string.Empty;
 			id = UNASSIGNED;
 			sel = false;
+			clipped = Def.ClipFlag.Inside;
 			}
 
 		#region PROPRIETÀ PER SERIALIZZAZIONE
@@ -47,17 +49,34 @@ namespace Circ
 			set {sel = value;}
 			}
 
+		[JsonIgnore]
+		public Def.ClipFlag Clipped
+			{
+			get {return clipped;}
+			set {clipped = value;}
+			}
+
+		[JsonIgnore]
+		public virtual Point Center
+			{
+			get {throw new Exception("Proprietà public virtual Point Center non sovrascritta nella classe derivata");}
+			}
+
 		#endregion
 
-		public virtual void Draw(Vista v)
+		public virtual void Regen(Vista v)
 			{
-			throw new Exception("public virtual void Draw(...) non sovrascritta nella classe derivata");
+			throw new Exception("public virtual void Regen() non sovrascritta nella classe derivata");
 			}
-		public virtual Point Center(Vista v)
+		public virtual void Draw(Graphics g, Pen pn, Brush br, Font fn)
 			{
-			throw new Exception("public virtual Point Center(...) non sovrascritta nella classe derivata");
+			throw new Exception("public virtual void Draw() non sovrascritta nella classe derivata");
 			}
-		
+		public virtual Def.ClipFlag Clip(Vista v)
+			{
+			throw new Exception("public virtual Def.ClipFlag Clip() non sovrascritta nella classe derivata");
+			}
+
 		}	// Fine classe Dato
 
 	/// <summary>
