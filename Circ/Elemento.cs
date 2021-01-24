@@ -64,7 +64,7 @@ namespace Circ
 
 		#endregion
 
-		public virtual void Regen(Vista v)
+		public virtual void Regen(Vista v, bool addToDisplayList = true)
 			{
 			throw new Exception("public virtual void Regen() non sovrascritta nella classe derivata");
 			}

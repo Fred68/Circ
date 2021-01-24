@@ -46,16 +46,17 @@ namespace Circ
 
 		#endregion
 
-		public override void Regen(Vista v)
+		public override void Regen(Vista v, bool addToDisplayList = true)
 			{
 			Point2D p1 = nd[0].P;
 			Point2D p2 = nd[1].P;
 			if((p1 != null) && (p2 != null))
 				{
-				Point pv1 = v.Scala(p1);
-				Point pv2 = v.Scala(p2);
+				nd[0].Regen(v, false);				// Rigenera i nodi di estremità calcolando solo la scala...
+				nd[1].Regen(v, false);				// ... ma senza aggiungerli alla display list
 				pc = v.Scala(Point2D.Midpoint(nd[0].P,nd[1].P));
-				v.AddDL(this,Def.Shape.Ramo, Def.Colori.Red, pc.X, pc.Y);
+				if(addToDisplayList)
+					v.AddDL(this,Def.Shape.Ramo, Def.Colori.Red, pc.X, pc.Y);
 				}
 			}
 
@@ -76,7 +77,6 @@ namespace Circ
 				{
 				Clipped = Def.ClipFlag.Inside;					// Clip parziale. Non si esegue il clipping sui double, ...
 				}												// ...ma si lascia fare a Windows.Graphics, su coordiante intere, più veloce
-
 			return Clipped;
 			}
 

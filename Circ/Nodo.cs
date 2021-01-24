@@ -40,10 +40,11 @@ namespace Circ
 
 		#endregion
 
-		public override void Regen(Vista v)
+		public override void Regen(Vista v, bool addToDisplayList = true)
 			{
 			ps = v.Scala(p);
-			v.AddDL(this,Def.Shape.Nodo, Def.Colori.Black, ps.X, ps.Y);
+			if(addToDisplayList)
+				v.AddDL(this,Def.Shape.Nodo, Def.Colori.Black, ps.X, ps.Y);
 			}
 		
 		public override Def.ClipFlag Clip(Vista v)
