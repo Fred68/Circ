@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using System.Drawing;
 
+using Fred68.Tools.Log;
+
 namespace Circ
 	{
 

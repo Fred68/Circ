@@ -16,6 +16,7 @@ namespace Circ
 		string name;				// Descrizione
 		bool sel;					// Selezionato
 		Def.ClipFlag clipped;		// Fuori dalla vista attuale (non in display list)
+		bool connesso;
 
 		/// <summary>
 		/// Costruttore
@@ -26,9 +27,10 @@ namespace Circ
 			id = UNASSIGNED;
 			sel = false;
 			clipped = Def.ClipFlag.Inside;
+			connesso = false;
 			}
 
-		#region PROPRIETÀ PER SERIALIZZAZIONE
+		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
 		public uint ID
 			{
@@ -60,6 +62,13 @@ namespace Circ
 		public virtual Point Center
 			{
 			get {throw new Exception("Proprietà public virtual Point Center non sovrascritta nella classe derivata");}
+			}
+
+		[JsonIgnore]
+		public bool Connesso
+			{
+			get {return connesso;}
+			set {connesso = value;}
 			}
 
 		#endregion

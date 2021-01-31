@@ -60,8 +60,13 @@ namespace Circ
 			this.compattaIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.eliminaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.spostaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inserisciCoordinateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.vistaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ridisegnaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inverteAsseXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inverteAsseYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.strumentiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.controllaNodiIsolatiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -95,9 +100,7 @@ namespace Circ
 			this.lbRami = new System.Windows.Forms.Label();
 			this.lbRamoFree = new System.Windows.Forms.Label();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-			this.inverteAsseXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.inverteAsseYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.inserisciCoordinateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.creaMatriceDiIncidenzaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripEditor.SuspendLayout();
 			this.toolStripFile.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -249,6 +252,7 @@ namespace Circ
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
             this.vistaToolStripMenuItem,
+            this.strumentiToolStripMenuItem,
             this.aboutToolStripMenuItem,
             this.debugToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
@@ -330,7 +334,7 @@ namespace Circ
 			// 
 			this.aggiungiNodoToolStripMenuItem.Enabled = false;
 			this.aggiungiNodoToolStripMenuItem.Name = "aggiungiNodoToolStripMenuItem";
-			this.aggiungiNodoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.aggiungiNodoToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.aggiungiNodoToolStripMenuItem.Text = "Aggiungi nodo";
 			this.aggiungiNodoToolStripMenuItem.Visible = false;
 			this.aggiungiNodoToolStripMenuItem.Click += new System.EventHandler(this.AggiungiNodoToolStripMenuItem_Click);
@@ -339,7 +343,7 @@ namespace Circ
 			// 
 			this.aggiungiRamoToolStripMenuItem.Enabled = false;
 			this.aggiungiRamoToolStripMenuItem.Name = "aggiungiRamoToolStripMenuItem";
-			this.aggiungiRamoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.aggiungiRamoToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.aggiungiRamoToolStripMenuItem.Text = "Aggiungi ramo";
 			this.aggiungiRamoToolStripMenuItem.Visible = false;
 			this.aggiungiRamoToolStripMenuItem.Click += new System.EventHandler(this.AggiungiRamoToolStripMenuItem_Click);
@@ -347,30 +351,37 @@ namespace Circ
 			// rinumeraToolStripMenuItem
 			// 
 			this.rinumeraToolStripMenuItem.Name = "rinumeraToolStripMenuItem";
-			this.rinumeraToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.rinumeraToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.rinumeraToolStripMenuItem.Text = "Rinumera";
 			this.rinumeraToolStripMenuItem.Click += new System.EventHandler(this.rinumeraToolStripMenuItem_Click);
 			// 
 			// compattaIDToolStripMenuItem
 			// 
 			this.compattaIDToolStripMenuItem.Name = "compattaIDToolStripMenuItem";
-			this.compattaIDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.compattaIDToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.compattaIDToolStripMenuItem.Text = "Compatta ID";
 			this.compattaIDToolStripMenuItem.Click += new System.EventHandler(this.compattaIDToolStripMenuItem_Click);
 			// 
 			// eliminaToolStripMenuItem
 			// 
 			this.eliminaToolStripMenuItem.Name = "eliminaToolStripMenuItem";
-			this.eliminaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.eliminaToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.eliminaToolStripMenuItem.Text = "Elimina";
 			this.eliminaToolStripMenuItem.Click += new System.EventHandler(this.eliminaToolStripMenuItem_Click);
 			// 
 			// spostaToolStripMenuItem
 			// 
 			this.spostaToolStripMenuItem.Name = "spostaToolStripMenuItem";
-			this.spostaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.spostaToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.spostaToolStripMenuItem.Text = "Sposta";
 			this.spostaToolStripMenuItem.Click += new System.EventHandler(this.spostaToolStripMenuItem_Click);
+			// 
+			// inserisciCoordinateToolStripMenuItem
+			// 
+			this.inserisciCoordinateToolStripMenuItem.Name = "inserisciCoordinateToolStripMenuItem";
+			this.inserisciCoordinateToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+			this.inserisciCoordinateToolStripMenuItem.Text = "Inserisci coordinate";
+			this.inserisciCoordinateToolStripMenuItem.Click += new System.EventHandler(this.inserisciCoordinateToolStripMenuItem_Click);
 			// 
 			// vistaToolStripMenuItem
 			// 
@@ -385,9 +396,39 @@ namespace Circ
 			// ridisegnaToolStripMenuItem
 			// 
 			this.ridisegnaToolStripMenuItem.Name = "ridisegnaToolStripMenuItem";
-			this.ridisegnaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.ridisegnaToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
 			this.ridisegnaToolStripMenuItem.Text = "Ridisegna";
 			this.ridisegnaToolStripMenuItem.Click += new System.EventHandler(this.Ridisegna_M_Click);
+			// 
+			// inverteAsseXToolStripMenuItem
+			// 
+			this.inverteAsseXToolStripMenuItem.Name = "inverteAsseXToolStripMenuItem";
+			this.inverteAsseXToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+			this.inverteAsseXToolStripMenuItem.Text = "Inverte asse X";
+			this.inverteAsseXToolStripMenuItem.Click += new System.EventHandler(this.inverteAsseXToolStripMenuItem_Click);
+			// 
+			// inverteAsseYToolStripMenuItem
+			// 
+			this.inverteAsseYToolStripMenuItem.Name = "inverteAsseYToolStripMenuItem";
+			this.inverteAsseYToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+			this.inverteAsseYToolStripMenuItem.Text = "Inverte asse Y";
+			this.inverteAsseYToolStripMenuItem.Click += new System.EventHandler(this.inverteAsseYToolStripMenuItem_Click);
+			// 
+			// strumentiToolStripMenuItem
+			// 
+			this.strumentiToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.controllaNodiIsolatiToolStripMenuItem,
+            this.creaMatriceDiIncidenzaToolStripMenuItem});
+			this.strumentiToolStripMenuItem.Name = "strumentiToolStripMenuItem";
+			this.strumentiToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
+			this.strumentiToolStripMenuItem.Text = "Strumenti";
+			// 
+			// controllaNodiIsolatiToolStripMenuItem
+			// 
+			this.controllaNodiIsolatiToolStripMenuItem.Name = "controllaNodiIsolatiToolStripMenuItem";
+			this.controllaNodiIsolatiToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+			this.controllaNodiIsolatiToolStripMenuItem.Text = "Controlla nodi isolati";
+			this.controllaNodiIsolatiToolStripMenuItem.Click += new System.EventHandler(this.controllaNodiIsolatiToolStripMenuItem_Click_1);
 			// 
 			// aboutToolStripMenuItem
 			// 
@@ -702,26 +743,12 @@ namespace Circ
 			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
 			this.toolStripButton1.Text = "toolStripButton1";
 			// 
-			// inverteAsseXToolStripMenuItem
+			// creaMatriceDiIncidenzaToolStripMenuItem
 			// 
-			this.inverteAsseXToolStripMenuItem.Name = "inverteAsseXToolStripMenuItem";
-			this.inverteAsseXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.inverteAsseXToolStripMenuItem.Text = "Inverte asse X";
-			this.inverteAsseXToolStripMenuItem.Click += new System.EventHandler(this.inverteAsseXToolStripMenuItem_Click);
-			// 
-			// inverteAsseYToolStripMenuItem
-			// 
-			this.inverteAsseYToolStripMenuItem.Name = "inverteAsseYToolStripMenuItem";
-			this.inverteAsseYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.inverteAsseYToolStripMenuItem.Text = "Inverte asse Y";
-			this.inverteAsseYToolStripMenuItem.Click += new System.EventHandler(this.inverteAsseYToolStripMenuItem_Click);
-			// 
-			// inserisciCoordinateToolStripMenuItem
-			// 
-			this.inserisciCoordinateToolStripMenuItem.Name = "inserisciCoordinateToolStripMenuItem";
-			this.inserisciCoordinateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.inserisciCoordinateToolStripMenuItem.Text = "Inserisci coordinate";
-			this.inserisciCoordinateToolStripMenuItem.Click += new System.EventHandler(this.inserisciCoordinateToolStripMenuItem_Click);
+			this.creaMatriceDiIncidenzaToolStripMenuItem.Name = "creaMatriceDiIncidenzaToolStripMenuItem";
+			this.creaMatriceDiIncidenzaToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+			this.creaMatriceDiIncidenzaToolStripMenuItem.Text = "Crea matrice di incidenza";
+			this.creaMatriceDiIncidenzaToolStripMenuItem.Click += new System.EventHandler(this.creaMatriceDiIncidenzaToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -827,6 +854,9 @@ namespace Circ
 		private System.Windows.Forms.ToolStripMenuItem inverteAsseXToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem inverteAsseYToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem inserisciCoordinateToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem strumentiToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem controllaNodiIsolatiToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem creaMatriceDiIncidenzaToolStripMenuItem;
 		}
 	}
 

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 
+using Fred68.Tools.Log;
+
 namespace Circ
 	{
 	public class Vista

@@ -7,7 +7,7 @@ using System.IO;
 
 using System.Drawing;				// Point struct
 using Newtonsoft.Json;				// Serializzazione in Json
-
+using Fred68.Tools.Messaggi;
 
 namespace Circ
 	{
@@ -24,7 +24,7 @@ namespace Circ
 
 		#warning IMPORTANTE: SPOSTARE TUTTE LE MODIFICHE AI DATI SOTTO DOCUMENTO (per impostare il flag privato _isModied)
 
-		#region PROPRIETÀ PER SERIALIZZAZIONE
+		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
 		public Dati Dati
 			{
@@ -67,7 +67,9 @@ namespace Circ
 			bool ok = true;
 			selezionati.Clear();
 			this.filename = fileName;
+			#if(DEBUG)
 			System.Windows.Forms.MessageBox.Show(filename);
+			#endif
 			try
 				{
 				dati.Nome = Path.GetFileName(this.filename);
@@ -75,7 +77,7 @@ namespace Circ
 			catch(Exception e)
 					{
 					ok = false;
-					System.Windows.Forms.MessageBox.Show(e.ToString());
+					Messaggi.AddMessage(Messaggi.ERR.ERRORE_FILE,e.ToString(),Messaggi.Tipo.Errori);
 					}
 
 			if (ok)
@@ -91,7 +93,7 @@ namespace Circ
 				catch(Exception e)
 					{
 					ok = false;
-					System.Windows.Forms.MessageBox.Show(e.ToString());
+					Messaggi.AddMessage(Messaggi.ERR.ERRORE_SAVE,e.ToString(),Messaggi.Tipo.Errori);
 					}
 				}
 
@@ -104,7 +106,6 @@ namespace Circ
 
 		public bool Open(Stream stream, string fileName)
 			{
-
 			bool ok = true;
 			selezionati.Clear();
 			this.filename = fileName;
@@ -119,13 +120,13 @@ namespace Circ
 			catch(Exception e)
 				{
 				ok = false;
-				System.Windows.Forms.MessageBox.Show(e.ToString());
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_OPEN,e.ToString(),Messaggi.Tipo.Errori);
 				}
 			int failed;
 			if( (failed = dati.AggiornaRiferimenti()) > 0)
 				{
 				ok = false;
-				System.Windows.Forms.MessageBox.Show($"Falliti {failed} rami");
+				Messaggi.AddMessage(Messaggi.ERR.AGGIORNA_RIFERIMENTI,$"Falliti {failed} rami",Messaggi.Tipo.Errori);
 				}
 			if(ok)
 				{

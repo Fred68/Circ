@@ -27,7 +27,7 @@ namespace Circ
 			nd[0] = nd[1] = null;
 			}
 
-		#region PROPRIETÀ PER SERIALIZZAZIONE
+		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
 		public uint N1 {get{return n[0];} set{n[0]=value;}}
 		public uint N2 {get{return n[1];} set{n[1]=value;}}

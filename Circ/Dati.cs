@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;						// Serializzazione in Json
 
+using Fred68.Tools.Matematica;
+using Fred68.Tools.Messaggi;
+
 namespace Circ
 	{
 
@@ -45,7 +48,7 @@ namespace Circ
 			}
 
 
-		#region PROPRIETÀ PER SERIALIZZAZIONE
+		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
 		public string Nome
 			{
@@ -335,9 +338,9 @@ namespace Circ
 			}
 		
 		/// <summary>
-		/// Trova tutti gli elementi selezionati
+		/// Trova tutti gli elementi selezionati o non selezionati
 		/// </summary>
-		/// <param name="selezionati"></param>
+		/// <param name="selezionati">true per i selezionati</param>
 		/// <returns></returns>
 		public List<Elemento> GetSelezionati(bool selezionati = true)
 			{
@@ -473,6 +476,8 @@ namespace Circ
 					ok = true;
 					}
 				}
+			if(!ok)
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_RINUMERAZIONE_RAMO,"",Messaggi.Tipo.Errori);
 			return ok;
 			}
 
@@ -513,6 +518,8 @@ namespace Circ
 					ok = true;
 					}
 				}
+			if(!ok)
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_RINUMERAZIONE_NODO,"",Messaggi.Tipo.Errori);
 			return ok;
 			}
 
@@ -522,9 +529,10 @@ namespace Circ
 		/// <returns>false se errore in una rinumerazione (rischio id errati)</returns>
 		public bool CompattaID()
 			{
+			Sort();								// Riordina gli elementi in base all'ID assegnato (non all'ordine di creazione)
 			uint counterId;
 			bool ok = true;
-			counterId = Def.ID_NODI_MAX;			// Rinumera nodi e rami, in ordine, dopo l'ID_MAM
+			counterId = Def.ID_NODI_MAX;		// Rinumera nodi e rami, in ordine, dopo l'ID_MAX
 			foreach(Nodo n in nodi)
 				{
 				ok &= RinumeraIDnodo(n.ID, counterId,false);	// Controllo ID_MAX disabilitato
@@ -536,7 +544,7 @@ namespace Circ
 				ok &= RinumeraIDramo(r.ID, counterId,false);
 				counterId++;
 				}
-			counterId=1;							// Rinumera nodi e rami, in ordine, da 1 in poi
+			counterId=1;						// Rinumera nodi e rami, in ordine, da 1 in poi
 			foreach(Nodo n in nodi)				
 				{
 				ok &= RinumeraIDnodo(n.ID, counterId, false);
@@ -547,6 +555,55 @@ namespace Circ
 				{
 				ok &= RinumeraIDramo(r.ID, counterId, false);
 				counterId++;
+				}
+			return ok;
+			}
+
+		/// <summary>
+		/// Verifica se il grafo è connesso, selezionando gli elementi
+		/// </summary>
+		/// <returns></returns>
+		public bool VerificaNodiIsolati(bool selectConnessi = false)
+			{
+			bool ok = false;
+			Stack<Elemento> s = new Stack<Elemento>();		// Crea uno stack per la ricerca
+			foreach(Elemento e in Elementi())				// Deseleziona tutti gli elementi
+				{
+				e.Connesso = false;
+				}
+			if( (nodi.Count>1) && (rami.Count>0) )			// Se ci sono almeno 2 nodi ed un ramo...
+				{
+				Elemento x = nodi[0];						// Estrae il primo nodo e lo mette nello stack
+				s.Push(x);
+				while(s.Any())								// Finché lo stack contiene quaqlcosa...
+					{
+					x = s.Pop();							// Estrae un elemento e...
+					if(!x.Connesso)							// ...se non è ancora stato selezionato
+						{
+						if(x is Ramo)						// Se è un ramo, aggiunge i nodi allo stack
+							{
+							s.Push(((Ramo)x).Nd1);
+							s.Push(((Ramo)x).Nd2);
+							}
+						else if(x is Nodo)					// Se è un nodo, cerca tutti i rami collegati...
+							{
+							List<Elemento> ramiCollegati = GetElementiUsing(x.ID);
+							foreach(Ramo r in ramiCollegati)
+								{
+								s.Push(r);					// ...e li aggiunge allo stack
+								}
+							}
+						x.Connesso = true;					// Infine segna l'elemento estratto come già selezionato
+						}
+					}
+				ok = true;
+				foreach(Elemento e in Elementi())			// Se trova un elemento non selezionato...
+					{
+					if(!e.Connesso)
+						ok = false;							// ...restituisce false;
+					if(selectConnessi)						
+						e.Selected = e.Connesso;			// Seleziona 
+					}
 				}
 			return ok;
 			}
@@ -635,6 +692,89 @@ namespace Circ
 				}
 			return count;
 			}
+
+		/// <summary>
+		/// Crea la matice di incidenza
+		/// eliminando, se richiesto, il nodo selezionato
+		/// per non avere le righe linearmente dipendenti
+		/// </summary>
+		/// <param name="eliminaNodoSelezionato">true per eliminare il nodo</param>
+		/// <returns></returns>
+		public Matrix CreaMatriceDiIncidenza(bool eliminaNodoSelezionato)
+			{
+			Matrix A = null;
+			
+			uint nodoDaEliminare = Elemento.UNASSIGNED;
+			if(CompattaID())						// Compatta gli ID
+				{
+				if(VerificaNodiIsolati(false))		// Verifica se il circuito è connesso (senza cambiare lo stato di selezione)
+					{
+					List<Elemento> sel = GetSelezionati(true);		// Cerca gli elementi selezionati
+					if(eliminaNodoSelezionato && sel.Count>0)		// Se è richiesta la matrice ridotta (e c'é qualcosa di selezionato)
+						{
+						if(sel.Count == 1)			// Verifica se selezione multipla
+							{
+							if(sel[0] is Nodo)		// Verifica se è selezionato un nodo
+								{
+								nodoDaEliminare = sel[0].ID;	// Imposta l'ID
+								}
+							else
+								{
+								Messaggi.AddMessage(Messaggi.ERR.SELEZIONE_ERRATA,Messaggi.MSG.SELEZIONARE_UN_NODO,Messaggi.Tipo.Errori);
+								}
+							}
+						else
+							{
+							Messaggi.AddMessage(Messaggi.ERR.SELEZIONE_ERRATA,Messaggi.MSG.SELEZIONARE_UN_NODO,Messaggi.Tipo.Errori);
+							}
+						}
+
+					int n, l;						// nodi e rami/lati totali
+					n = nodi.Count;
+					l = rami.Count;
+					A = new Matrix(n, l);			// Crea la matrice completa
+
+					int i, j;
+					for(j=1; j <= l; j++)
+						{
+						Ramo ramoj = (Ramo)GetElemento((uint)j, Def.Stat.Rami);
+						if(ramoj != null)
+							{
+							uint uscenteDaN = ramoj.N1;
+							uint entranteInN = ramoj.N2;
+							for(i=1; i<=n; i++)
+								{
+								if(i == uscenteDaN)
+									A[i-1,j-1] = +1;
+								else if(i == entranteInN)
+									A[i-1,j-1] = -1;
+								else
+									A[i-1,j-1] = 0;
+								}
+							}
+						else
+							{
+							Messaggi.AddMessage(String.Format("Ramo con ID={0} non trovato."),"Errore",Messaggi.Tipo.Errori);
+							A = null;
+							}
+						}
+					if(nodoDaEliminare != Nodo.UNASSIGNED)
+						A.RemRow((int)nodoDaEliminare-1);
+					}
+				else
+					{
+					Messaggi.AddMessage(Messaggi.ERR.CIRCUITO_NON_CONNESSO,"",Messaggi.Tipo.Errori);
+					} 
+				}
+			else
+				{
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_RINUMERAZIONE,"",Messaggi.Tipo.Errori);
+				}
+			
+			return A;
+			}
+
+
 
 		}	// Fine classe DatiCirc
 	}

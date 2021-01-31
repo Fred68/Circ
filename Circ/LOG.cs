@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 
-namespace Circ
+namespace Fred68.Tools.Log
 	{
-	
 	/// <summary>
 	/// Classe statica per LOG su file
 	/// Attiva solo in DEBUG

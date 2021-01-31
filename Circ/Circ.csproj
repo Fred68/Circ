@@ -71,12 +71,14 @@
     <Compile Include="CircuitoDoc.cs" />
     <Compile Include="Dati.cs" />
     <Compile Include="Def.cs" />
+    <Compile Include="Fmin.cs" />
     <Compile Include="InputForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InputForm.Designer.cs">
       <DependentUpon>InputForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LinearSys.cs" />
     <Compile Include="LOG.cs" />
     <Compile Include="DisplayList.cs" />
     <Compile Include="Elemento.cs" />
@@ -88,6 +90,9 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Matrix.cs" />
+    <Compile Include="MatrixBase.cs" />
+    <Compile Include="Messaggi.cs" />
     <Compile Include="Nodo.cs" />
     <Compile Include="Point2D.cs" />
     <Compile Include="Program.cs" />
@@ -107,6 +112,8 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Circuiti01.pdf" />
+    <None Include="Circuiti02.pdf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

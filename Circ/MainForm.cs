@@ -12,6 +12,9 @@ using System.Reflection;					// Per Assembly()
 using System.IO;							// Per FileInfo
 using System.Diagnostics;					// Per Process.Start
 
+using Fred68.Tools.Log;						// Per Log e debug
+using Fred68.Tools.Messaggi;				// Messaggi di errore
+using Fred68.Tools.Matematica;				// Matrici e varie
 
 namespace Circ
 	{
@@ -157,7 +160,7 @@ namespace Circ
 		/// <param name="e"></param>
 		private void MainFormClosing(object sender, FormClosingEventArgs e)
 			{
-			if(MessageBox.Show("Uscire dal programma ?","Chiusura programma",MessageBoxButtons.YesNo) != DialogResult.Yes)
+			if(MessageBox.Show(Messaggi.MSG.EXIT,"Chiusura programma",MessageBoxButtons.YesNo) != DialogResult.Yes)
 				{
 				e.Cancel = true;
 				}
@@ -215,6 +218,7 @@ namespace Circ
 			#if(DEBUG)
 			LOG.Write("SalvaDoc()");
 			#endif
+			Messaggi.Clear();
 			bool ok = false;
 			Stream stream;
 			sfd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
@@ -231,8 +235,9 @@ namespace Circ
 				}
 			if(!ok)
 				{
-				MessageBox.Show($"Salvataggio del file: {doc.Dati.Nome} non eseguito !");
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_SAVE,$"Salvataggio del file: {doc.Dati.Nome} non eseguito !",Messaggi.Tipo.Errori);
 				}
+			if(Messaggi.hasError)	MessageBox.Show(Messaggi.MessaggiCompleti());
 			UpdateMenus();
 			vista.SetOutdatedDL();
 			vista.RegenDL(true);
@@ -249,6 +254,7 @@ namespace Circ
 			#if(DEBUG)
 			LOG.Write("ApriDoc()");
 			#endif
+			Messaggi.Clear();
 			bool ok = false;
 			Stream stream;
 			ofd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
@@ -274,7 +280,7 @@ namespace Circ
 				}
 			if(!ok)
 				{
-				MessageBox.Show($"Errore nell'apertura del file: {ofd.FileName}");
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_OPEN,$"Errore nell'apertura del file: {ofd.FileName}",Messaggi.Tipo.Errori);
 				ChiudiDoc();
 				}
 			if(asText)											// Se in formato testo, chiude subito il documento
@@ -282,6 +288,7 @@ namespace Circ
 				ChiudiDoc();
 				ok = false;										// Inibisce le operazioni successive
 				}
+			if(Messaggi.hasError)	MessageBox.Show(Messaggi.MessaggiCompleti());
 			UpdateMenus();
 			if(ok)
 				{
@@ -307,7 +314,7 @@ namespace Circ
 				{
 				if(doc.IsModified)
 					{
-					if(MessageBox.Show($"Salvare il documento {doc.Dati.Nome} ?","Salvataggio documento",MessageBoxButtons.YesNo) == DialogResult.Yes)
+					if(MessageBox.Show(String.Format(Messaggi.MSG.SALVARE_FILE, doc.Dati.Nome),"Salvataggio documento",MessageBoxButtons.YesNo) == DialogResult.Yes)
 						{
 						SalvaDoc();
 						}
@@ -409,6 +416,7 @@ namespace Circ
 			this.toolStripSelect.Enabled = enbl;
 			this.toolStripModifica.Enabled = enbl;
 			this.editToolStripMenuItem.Enabled = enbl;
+			this.strumentiToolStripMenuItem.Enabled = enbl;
 			}
 
 		/// <summary>
@@ -488,7 +496,7 @@ namespace Circ
 			if(doc != null)
 					{
 					Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
-					if(MessageBox.Show($"Eliminare:\n{t.Item1} nodi\n{t.Item2} rami\nselezionati ?","Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
+					if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI, t.Item1, t.Item2),"Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
 						{
 						doc.Dati.EliminaSelezionati();
 						vista.SetOutdatedDL();
@@ -537,11 +545,11 @@ namespace Circ
 					{
 					if(lsel.Count == 0)
 						{
-						MessageBox.Show("Selezionare un elemento");
+						MessageBox.Show(Messaggi.MSG.SELEZIONARE_UN_ELEMENTO);
 						}
 					else
 						{
-						MessageBox.Show("Selezionare un solo elemento");
+						MessageBox.Show(Messaggi.MSG.SELEZIONARE_UN_SOLO_ELEMENTO);
 						}
 					}
 				}
@@ -583,12 +591,12 @@ namespace Circ
 						}
 					else
 						{
-						MessageBox.Show("Selezionare un nodo");
+						MessageBox.Show(Messaggi.MSG.SELEZIONARE_UN_NODO);
 						}
 					}
 				else
 					{
-					MessageBox.Show("Selezionare un solo nodo");
+					MessageBox.Show(Messaggi.MSG.SELEZIONARE_UN_SOLO_NODO);
 					}
 				}
 			}
@@ -599,6 +607,7 @@ namespace Circ
 		/// </summary>
 		private void CompattaID()
 			{
+			Messaggi.Clear();
 			bool ok = true;
 			if(doc != null)
 				{
@@ -1049,6 +1058,11 @@ namespace Circ
 				}
 			}
 
+		private void controllaNodiIsolatiToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			
+			}
+
 		#endregion
 
 		
@@ -1115,13 +1129,14 @@ namespace Circ
 							ramok = true;
 							}
 						}
-					doc.UnselectAll();
+					doc.UnselectAll();			// Dopo aver aggiunto il ramo, deseleziona tutto
 					vista.RegenDL(true);
 					}
+				doc.UnselectAll();				// Deseleziona tutto, in ogni caso, per evitare problemi ala selezione successiva.
 				if(!ramok)
 					{
 					#warning Spostare tutti i messaggi da popup/dialog a toolbar
-					MessageBox.Show($"Selezionare due nodi");		
+					MessageBox.Show(Messaggi.MSG.SELEZIONARE_DUE_NODI);		
 					}
 				}
 
@@ -1241,6 +1256,30 @@ namespace Circ
 		private void inserisciCoordinateToolStripMenuItem_Click(object sender, EventArgs e)
 			{
 			CoordinateNodo();
+			}
+
+		private void controllaNodiIsolatiToolStripMenuItem_Click_1(object sender, EventArgs e)
+			{
+			if(doc != null)
+				{
+				string x = (doc.Dati.VerificaNodiIsolati(true)==true) ? "" : "non ";
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				MessageBox.Show($"Il circuito {x}è connesso");
+				}
+			}
+
+		private void creaMatriceDiIncidenzaToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			if(doc != null)
+				{
+				Messaggi.Clear();
+				Matrix A = doc.Dati.CreaMatriceDiIncidenza(true);
+				if(Messaggi.hasError)
+					MessageBox.Show(Messaggi.MessaggiCompleti());
+				else
+					MessageBox.Show(A.ToString());
+				}
 			}
 
 		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)

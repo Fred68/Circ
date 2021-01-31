@@ -14,6 +14,7 @@ namespace Circ
 		{
 		Point2D p;			// Coordinate in World
 		Point ps;			// Cordinata di schermo, scalata
+
 		#region COSTRUTTORI
 		public Nodo() : base()
 			{
@@ -25,7 +26,7 @@ namespace Circ
 			}
 		#endregion
 
-		#region PROPRIETÀ PER SERIALIZZAZIONE
+		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
 		public Point2D P {get { return p; } set { p = value; } }
 
