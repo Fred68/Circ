@@ -100,8 +100,6 @@ namespace Fred68.Tools.Messaggi
 		
 		public enum Tipo {Messaggi=0, Errori, NUM};
 
-		#warning AGGIUNGERE ANCHE MESSAGEBOX.SHOW() MODIFICATO PER I MESSAGGI, PER SEMPLIFICARE LE CHIAMATE.
-		#warning AGGIUNGERE ADDMESSAGE() CON OPZIONE MESSAGEBOX.SHOW() IMMEDIATO
 
 		/// <summary>
 		/// Costruttore statico

@@ -702,8 +702,7 @@ namespace Circ
 		/// <returns></returns>
 		public Matrix CreaMatriceDiIncidenza(bool eliminaNodoSelezionato)
 			{
-			Matrix A = null;
-			
+			Matrix A = null;		
 			uint nodoDaEliminare = Elemento.UNASSIGNED;
 			if(CompattaID())						// Compatta gli ID
 				{
@@ -774,6 +773,8 @@ namespace Circ
 			return A;
 			}
 
+		#warning IMPORTANTE: UNIRE I NODI SEMPLICEMENTE CONNESSI IN UN UNICO NUMERO. Usare numero nodo, indicea parte (o ID ridotto)
+		
 
 
 		}	// Fine classe DatiCirc

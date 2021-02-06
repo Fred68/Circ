@@ -983,6 +983,17 @@ namespace Circ
 				}
 			}
 
+		private void DivideRamiSelezionati()
+			{
+			if(doc != null)
+				{
+				doc.DivideRamiSelezionati();
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				vista.Redraw(true);
+				}
+
+			}
 
 
 		#region TEST
@@ -1280,6 +1291,16 @@ namespace Circ
 				else
 					MessageBox.Show(A.ToString());
 				}
+			}
+
+		private void DivideToolStripButton_Click(object sender, EventArgs e)
+			{
+			DivideRamiSelezionati();
+			}
+
+		private void dividiRamoToolStripMenuItem_Click(object sender, EventArgs e)
+			{
+			DivideRamiSelezionati();
 			}
 
 		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)

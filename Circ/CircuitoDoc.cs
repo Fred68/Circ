@@ -198,6 +198,37 @@ namespace Circ
 			selezionati.Clear();
 			}
 
+		public void DivideRamiSelezionati()
+			{
+			List<Elemento> sel = dati.GetSelezionati(true);		// Cerca gli elementi selezionati
+			foreach(Elemento e in sel)
+				{
+				if(e is Ramo)
+					{
+					DividiRamo((Ramo)e);
+					_isModified = true;
+					}
+				}
+			}
+
+		private void DividiRamo(Ramo r)
+			{
+			Nodo n = (Nodo)AddNodo(Point2D.Midpoint(r.Nd1.P, r.Nd2.P));		// Nuovo nodo nel punto medio
+			uint id1, id2, id3;
+			id1 = r.N1;							// I nuovi id degli estremi
+			id2 = n.ID;
+			id3 = r.N2;
+
+			Dati.EliminaRamo(r.ID);				// Elimina il ramo r
+			Ramo r1 = (Ramo)AddRamo(id1,id2);	// Crea i nuovi rami
+			Ramo r2 = (Ramo)AddRamo(id2,id3);
+
+			r1.CopyData(r);						// Copia le proprietà
+			r2.CopyData(r);
+			r1.Name += ".1";					// Diversifica i nomi		
+			r2.Name += ".2";
+			
+			}
 
 		}	// Fine classe CircuitoDoc
 

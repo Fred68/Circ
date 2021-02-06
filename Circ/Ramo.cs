@@ -4,18 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.Drawing;						// Per draw
+using System.Drawing;                       // Per draw
+using System.Drawing.Drawing2D;
 using Newtonsoft.Json;						// Serializzazione in Json
 
+using Fred68.Tools.Matematica;				// Matrice di rotazione
 
 namespace Circ
 	{
-	public class Ramo : Elemento, IDraw
+	public class Ramo : Elemento, IDraw, ICopyData
 		{
 		uint[] n;					// ID dei nodi di partenza ed arrivo
 		Nodo[] nd;					// Nodi di partenza ed arrivo
 
 		Point pc;					// Centro, cordinata di schermo, scalata
+		double rotation;			// angolo di rotazione
+
 		/// <summary>
 		/// Costruttore
 		/// </summary>
@@ -25,6 +29,7 @@ namespace Circ
 			nd = new Nodo[2];
 			n[0] = n[1] = UNASSIGNED;
 			nd[0] = nd[1] = null;
+			rotation = 0;
 			}
 
 		#region PROPRIETÀ (e SERIALIZZAZIONE)
@@ -55,6 +60,13 @@ namespace Circ
 				nd[0].Regen(v, false);				// Rigenera i nodi di estremità calcolando solo la scala...
 				nd[1].Regen(v, false);				// ... ma senza aggiungerli alla display list
 				pc = v.Scala(Point2D.Midpoint(nd[0].P,nd[1].P));
+
+				Point2D delta = p2-p1;
+				rotation = Math.Atan2(delta.Y*Math.Sign(v.Verso.Y), delta.X*Math.Sign(v.Verso.X)) * 180/Math.PI;
+				m.Reset();							// Torna alla matrice identità (non richiedo riallocazione)
+				m.Translate(pc.X,pc.Y);
+				m.Rotate((float)rotation);
+
 				if(addToDisplayList)
 					v.AddDL(this,Def.Shape.Ramo, Def.Colori.Red, pc.X, pc.Y);
 				}
@@ -67,23 +79,42 @@ namespace Circ
 
 			if( (clip1 | clip2) == Def.ClipFlag.Inside)			// Entrambi gli estremi all'interno (bitwise OR è zero): no clip
 				{
-				Clipped = Def.ClipFlag.Inside;
+				clipped = Def.ClipFlag.Inside;
 				}
 			else if((clip1 & clip2) != Def.ClipFlag.Inside)		//	Bitwise AND non è zero: condividono una area esterna: clip
 				{
-				Clipped = Def.ClipFlag.Outside;
+				clipped = Def.ClipFlag.Outside;
 				}
 			else
 				{
-				Clipped = Def.ClipFlag.Inside;					// Clip parziale. Non si esegue il clipping sui double, ...
+				clipped = Def.ClipFlag.Inside;					// Clip parziale. Non si esegue il clipping sui double, ...
 				}												// ...ma si lascia fare a Windows.Graphics, su coordiante intere, più veloce
-			return Clipped;
+			return clipped;
 			}
 
 		public override void Draw(Graphics g, Pen pn, Brush br, Font fn)
 			{
-			g.DrawLine(pn, nd[0].Ps, nd[1].Ps);
-			g.DrawString(ID.ToString(), fn, br,pc.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2,pc.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2);
+			g.DrawLine(pn, nd[0].Ps, nd[1].Ps);         // Disegna prima la linea, poi sovrappone una figura con il simbolo
+
+			if(Point2D.Mod(new Point(nd[1].Ps.X-nd[0].Ps.X,nd[1].Ps.Y-nd[0].Ps.Y)) > Def.SHAPE_HALFSIZE*Def.SHAPE_HALFSIZE*4 )
+					{
+					//GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Shape.Rectangle).Clone();
+					GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Shape.Arrow).Clone();
+					pth.Transform(m);
+					g.DrawPath(pn,pth);
+					//g.FillPath(br,pth);
+					}
+
+			g.DrawString(id.ToString(), fn, br,pc.X+Def.NODE_HALFSIZE*2,pc.Y+Def.NODE_HALFSIZE*2);
+
 			}
+
+		public override void CopyData(Elemento e)
+			{
+			base.CopyData(e);			// Copia i dati base
+			if(e is Ramo)
+				{}						// Al momento non ha altri dati da copiare (resta connesso ai suoi nodi)
+			}
+		
 		}	// Fine classe Ramo
 	}

@@ -27,8 +27,14 @@ namespace Circ
 			this.x = x;
 			this.y = y;
 			}
+		public Point2D(Point2D p)
+			{
+			this.x = p.x;
+			this.y = p.Y;
+			}
 		#endregion
 
+		#region Operatori
 		public static Point2D Zero = new Point2D(0,0);					// Costante
 		public override string ToString()
 			{
@@ -98,21 +104,26 @@ namespace Circ
 			{
 			return (p.x * p.x) + (p.y * p.y);
 			}
+		public static double Lenght(Point2D p)
+			{
+			return Math.Sqrt((p.x * p.x) + (p.y * p.y));
+			}						// Lunghezza
 		public static Point2D Midpoint(Point2D sx, Point2D dx)			// Punto medio
 			{
 			return new Point2D((sx.x+dx.x)*0.5, (sx.y+dx.y)*0.5);
 			}
+		#endregion
 
+		#region Operatori di conversione
 		public static implicit operator Point2D(Point p)				// Conversione da Point a Point2D
 			{
 			return new Point2D(p.X, p.Y);
 			}				
-
 		public static explicit operator Point(Point2D p)				// Conversione da Point2D a Point
 			{
 			return new Point((int)p.x,(int)p.y);
 			}				
-		
+		#endregion
 		}
 
 	}

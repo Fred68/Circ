@@ -72,6 +72,7 @@
     <Compile Include="Dati.cs" />
     <Compile Include="Def.cs" />
     <Compile Include="Fmin.cs" />
+    <Compile Include="ICopyData.cs" />
     <Compile Include="InputForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Compatta.bmp" />
+    <Content Include="Resources\Divide.bmp" />
     <Content Include="Resources\Elimina.bmp" />
     <Content Include="Resources\Rinumera.bmp" />
     <Content Include="Resources\SelAll.bmp" />

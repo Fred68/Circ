@@ -113,6 +113,7 @@ namespace Fred68.Tools.Matematica
 						for(c=0; c<col; c++)
 							dat[r, c] = m.dat[r, c];		// Nota (*) : usa l'operatore = ma dovrebbe usare Clone()
 															// Opportuno mettere un controllo su T, se ICloneable
+															// Ma Clone() fa una copia superficiale come object
 					}
 				}
 			else

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 
 namespace Circ
@@ -22,7 +23,49 @@ namespace Circ
 			Black, Red, Green, Blue			// Gli altri colori
 			};
 
-		#warning Aggiungere vari tipi di nodo o di ramo (es.: resistenza, diodo, tubo, ecc...)
+#warning Usare classi aggiuntive per i dati degli elementi, oppure derivare da Nodo e Ramo ?
+
+		public class Shape2D
+			{
+			public enum Shape
+				{
+				None,
+				Circle,
+				Square,
+				Arrow,
+				Rectangle,
+				VGen,
+				IGen,
+				Oneway
+				}
+
+			static GraphicsPath[] shapes;
+
+			static Shape2D()
+				{
+				int n = Enum.GetNames(typeof(Shape)).Length;
+				shapes = new GraphicsPath[n];
+				for(int i = 0; i < n; i++)
+					{
+					shapes[i] = new GraphicsPath();
+					}
+
+				shapes[(int)Shape.Circle].AddEllipse(-Def.NODE_HALFSIZE, -Def.NODE_HALFSIZE, Def.NODE_HALFSIZE * 2, Def.NODE_HALFSIZE * 2);
+
+				shapes[(int)Shape.Rectangle].AddRectangle(new Rectangle(-Def.SHAPE_HALFSIZE, -Def.SHAPE_HALFSIZE / 3, 2 * Def.SHAPE_HALFSIZE, 2 * Def.SHAPE_HALFSIZE / 3));
+
+				shapes[(int)Shape.Arrow].AddLine(-Def.SHAPE_HALFSIZE,0, Def.SHAPE_HALFSIZE,0);
+				shapes[(int)Shape.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0,	Def.SHAPE_HALFSIZE/3, Def.SHAPE_HALFSIZE/3);
+				shapes[(int)Shape.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0, Def.SHAPE_HALFSIZE/3, -Def.SHAPE_HALFSIZE/3);
+				}
+
+			public static GraphicsPath GetShape(Shape sh)
+				{
+				return shapes[(int)sh];
+				}
+			}
+
+
 
 		/// <summary>
 		/// Nomi degli oggetti grafici, delle forme nella display list e dei flag per gli evidenziati
@@ -90,6 +133,7 @@ namespace Circ
 		public static int FONT_D_SIZE = 9;
 
 		public static int NODE_HALFSIZE = 3;					// Dimensioni del nodo disegnato
+		public static int SHAPE_HALFSIZE = 30;					// Dimensioni della sagoma disegnata
 
 		public static Color ColourSelected = Color.Cyan;		// Colori di default
 		public static Color ColourHighlighed = Color.Yellow;
@@ -98,6 +142,10 @@ namespace Circ
 		public static Color ColourRamo = Color.Red;
 
 		public static int TIMER_REFRESH = 300;				// Intervallo di refresh di alcune scritte (tra cui il nome file da salvare)
+
+
+		
 		}
+	
 	}
 	 
