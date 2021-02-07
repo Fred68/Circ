@@ -35,6 +35,8 @@ namespace Circ
 
 		IEnumerable<Elemento> elEnum;			// Enumeratore degli elementi nella lista degli oggetti grafici
 
+		Griglia grid;
+
 		#region PROPRIETÀ PUBBLICHE
 		
 		/// <summary>
@@ -98,6 +100,23 @@ namespace Circ
 			get {return dl.PEN.Length;}
 			}
 
+		/// <summary>
+		/// Limiti dell'area visualizzata in coordinate World
+		/// </summary>
+		public Point2D SzWorldTopLeft
+			{get {return szWorldTopLeft;}}
+		public Point2D SzWorldBottomRight
+			{get {return szWorldBottomRight;}}
+
+		/// <summary>
+		/// Restituiscono lo stato ed il passo della griglia
+		/// </summary>
+		public bool IsGridOn
+			{get {return grid.Active;}}
+		public double GripStep
+			{get {return grid.Step;}}
+
+
 		#endregion
 	
 		/// <summary>
@@ -119,6 +138,8 @@ namespace Circ
 			raggioSq = 0;
 			raggioSelezioneSq = Def.RAGGIO_SELEZIONE*Def.RAGGIO_SELEZIONE;
 			filter = Def.Shape.Tutti;
+
+			grid = new Griglia();
 
 			Resize();
 			}
@@ -176,13 +197,15 @@ namespace Circ
 		#endregion
 
 		/// <summary>
-		/// Ricalcola le coordinate World della finestra della vista
+		/// Ricalcola le coordinate World della finestra della vista e la griglia
 		/// (per il clipping)
 		/// </summary>
-		private void RecalcSzWlorld()
+		public void RecalcSzWlorld()
 			{
+			#warning Errore, se la vista viene spostata, non corrisponde più !
 			szWorldTopLeft = Scala(new Point(0,0));
 			szWorldBottomRight = Scala(new Point(szClient.Width,szClient.Height));
+			grid.Recalc(this);
 			}
 
 		/// <summary>
@@ -329,11 +352,13 @@ namespace Circ
 			g = p.CreateGraphics();
 			if(clear)	g.Clear(Def.ColourBackground);
 			g.DrawRectangle(PEN[(int)Def.Colori.Black],1,1,p.Width-2,p.Height-2);		// Cornice
+			grid.Draw(g,this,PEN[(int)Def.Colori.Blue]);
 			DrawWorldAxes(g);															// Assi
 			dl.Play(g, ref cursor, raggioSq, filter);									// Disegna la D.L.
 			g.Dispose();
 			}
 		
+
 		/// <summary>
 		/// Disegna gli assi X Y world sullo schermo
 		/// </summary>
@@ -428,7 +453,6 @@ namespace Circ
 		public Def.ClipFlag IsInsideWorld(Point2D p)
 			{
 			Def.ClipFlag pos = Def.ClipFlag.Inside;
-
 			if((p.X - szWorldTopLeft.X)*verso.X < 0)
 				pos |= Def.ClipFlag.Left;
 			else if((p.X - szWorldBottomRight.X)*verso.X > 0)
@@ -462,5 +486,21 @@ namespace Circ
 				}
 			}
 
+		/// <summary>
+		/// Cambia lo stato della griglia
+		/// </summary>
+		public void ToggleGriglia()
+			{
+			grid.Active = !(grid.Active);
+			}
+
+		/// <summary>
+		/// Cambia il passo della griglia
+		/// </summary>
+		/// <param name="mul"></param>
+		public void GrigliaStepMultiply(double mul)
+			{
+			grid.Step = grid.Step * mul;
+			}
 		}
 	}

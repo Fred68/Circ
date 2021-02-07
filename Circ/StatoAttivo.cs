@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Drawing;				// Point
+
 using Fred68.Tools.Log;
 
 namespace Circ
@@ -14,6 +16,10 @@ namespace Circ
 		
 		Def.Stat stat;
 		bool dragging;
+
+		public Point dragIniRel;		// Punto inizio drag relativo (azzerato in Pan ad ogni mouse move=
+		public Point dragIniFix;		// Punto inizio drag fisso
+		public Elemento dragFromElement;		// Elemento da cui inizia il drag
 
 		public Def.Stat Stato
 			{
@@ -39,6 +45,7 @@ namespace Circ
 			set
 				{
 				dragging = value;
+				if(dragging ==false)	dragFromElement = null;
 				}
 			}
 
@@ -46,6 +53,7 @@ namespace Circ
 			{
 			stat = Def.Stat.Vista;
 			dragging = false;
+			dragFromElement = null;
 			}
 
 		}

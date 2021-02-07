@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Drawing;				// Point struct
-using System.Globalization;			// Point struct
+using System.Globalization;
 
 namespace Circ
 	{
@@ -104,7 +104,7 @@ namespace Circ
 			{
 			return (p.x * p.x) + (p.y * p.y);
 			}
-		public static double Lenght(Point2D p)
+		public static double Length(Point2D p)
 			{
 			return Math.Sqrt((p.x * p.x) + (p.y * p.y));
 			}						// Lunghezza
@@ -124,6 +124,29 @@ namespace Circ
 			return new Point((int)p.x,(int)p.y);
 			}				
 		#endregion
+
+		public static double Dist(Point2D p1, Point2D p2)				// Calcolo distanze
+			{
+			return Length(p2-p1);
+			}
+		public static double Dist2(Point2D p1, Point2D p2)
+			{
+			return Mod(p2-p1);
+			}
+		public static float Dist2(Point p1, Point p2)					// Calcolo distanze tra punti Point (System.Drawing;)
+			{
+			int dx, dy;
+			dx = p2.X - p1.Y;
+			dy = p2.Y - p1.Y;
+			return (dx * dx + dy * dy);
+			}
+		public static float Dist(Point p1, Point p2)
+			{
+			int dx, dy;
+			dx = p2.X - p1.Y;
+			dy = p2.Y - p1.Y;
+			return (float)Math.Sqrt(dx * dx + dy * dy);
+			}
 		}
 
 	}

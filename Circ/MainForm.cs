@@ -29,11 +29,11 @@ namespace Circ
 		Dictionary<string,TsBarRef> ts;						// Dati delle toolbar (per costruire il menù)
 		readonly EventHandler menuClickHandler;				// Handler unico dei click per i comandi del menù
 		
-		Point dragIniRel;							// Punto inizio drag relativo (azzerato in Pan ad ogni mouse move=
-		Point dragIniFix;							// Punto inizio drag fisso
+		//Point dragIniRel;							// Punto inizio drag relativo (azzerato in Pan ad ogni mouse move=
+		//Point dragIniFix;							// Punto inizio drag fisso
 
 		Point pini,pfin,pold;						// Punti per disegno dinamico linea si schermo
-		bool firstLine;
+		bool firstLine;								// Flag per il disegno in inverso
 
 
 		#region COSTRUTTORE E INIZIALIZZAZIONE
@@ -430,6 +430,7 @@ namespace Circ
 				kv.Value.tstrip.Visible = kv.Value.visible;
 				}
 			labelStat.Text = stato.Stato.ToString();
+			lbGrid.Text = vista.IsGridOn ? string.Format("Gr: {0}", vista.GripStep.ToString("0:#.##")) : "Gr: off";
 			}
 
 		/// <summary>
@@ -464,6 +465,9 @@ namespace Circ
 				}
 			}
 
+		/// <summary>
+		/// Sposta gli elementi selezionati (con una Dialog)
+		/// </summary>
 		private void SpostaSelezionati()
 			{
 			if(doc != null)
@@ -555,6 +559,9 @@ namespace Circ
 				}
 			}
 
+		/// <summary>
+		/// Inserisce le coordinate di un nodo
+		/// </summary>
 		private void CoordinateNodo()
 			{
 			if(doc != null)
@@ -600,7 +607,6 @@ namespace Circ
 					}
 				}
 			}
-
 
 		/// <summary>
 		/// Compatta gli ID di nodi e rami
@@ -686,14 +692,14 @@ namespace Circ
 
 						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
 
-						Point delta = new Point(e.Location.X - dragIniRel.X, e.Location.Y - dragIniRel.Y);
+						Point delta = new Point(e.Location.X - stato.dragIniRel.X, e.Location.Y - stato.dragIniRel.Y);
 						
 						Point2D pan = vista.ScalaVettore(delta);
 
 						vista.SetCursor(false);					// Disabilita evidenziazione degli elementi
 						vista.Pan(pan);
 						vista.RegenDL(true);
-						dragIniRel = e.Location;
+						stato.dragIniRel = e.Location;
 						vista.SetCursor(false);					// Disabilita evidenziazione
 						}
 					}
@@ -703,6 +709,7 @@ namespace Circ
 					if(stato.Dragging)
 						{
 						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
+						vista.RegenDL(true);
 						}
 					else
 						{
@@ -713,13 +720,22 @@ namespace Circ
 					break;
 				case Def.Stat.Rami:
 					{
-					vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi vicini al cursore
-					vista.Redraw(false);
+					vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi (anche in dragging)
+					if(stato.Dragging)
+						{
+						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
+						vista.RegenDL(true);
+						}
+					else
+						{
+						vista.Redraw(false);
+						}
 					}
 					break;
 				case Def.Stat.Nodi:
 					{
-					vista.SetCursor(false);		// Disabilita evidenziazione
+					vista.SetCursor(false);			// Disabilita evidenziazione 
+					vista.Redraw(false);
 					}
 					break;
 				}
@@ -727,7 +743,7 @@ namespace Circ
 			Point2D p;							// Aggiorna le ccordinate del cursore. Se dragging: mostra il vettore di spostamento
 			if(stato.Dragging)					// Trascinamento: scala il vettore
 				{
-				p = vista.ScalaVettore(new Point(e.X - dragIniFix.X , e.Y - dragIniFix.Y));
+				p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X , e.Y - stato.dragIniFix.Y));
 				}
 			else								// Movimento normale: scala il punto del cursore
 				{
@@ -735,28 +751,6 @@ namespace Circ
 				}
 			xPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("X:{0:0.###}", p.X)}";
 			yPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("Y:{0:0.###}", p.Y)}";
-			}
-
-		/// <summary>
-		/// Disegna in inverso una linea fino al mouse
-		/// Non usare: crea caos se si esce dalla finestra
-		/// </summary>
-		/// <param name="loc"></param>
-		private void DrawScreenReverseLine(Point loc)
-			{
-			pfin = new Point(loc.X + drwPanel.Location.X, loc.Y + drwPanel.Location.Y);
-			if(firstLine)
-				{
-				pini = new Point(dragIniFix.X + drwPanel.Location.X, dragIniFix.Y + drwPanel.Location.Y);
-				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.Blue);
-				}
-			else
-				{
-				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pold), Color.White);
-				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.White);
-				}
-			pold = pfin;
-			firstLine = false;
 			}
 
 		/// <summary>
@@ -772,6 +766,7 @@ namespace Circ
 					{
 					}
 					break;
+
 				case Def.Stat.Nodi:
 					{
 					#if(DEBUG)
@@ -786,6 +781,7 @@ namespace Circ
 						}
 					}
 					break;
+
 				case Def.Stat.Rami:
 					{
 					#if(DEBUG)
@@ -833,7 +829,7 @@ namespace Circ
 					#endif
 					if(e.Button == MouseButtons.Left)
 						{
-						dragIniRel = dragIniFix = e.Location;
+						stato.dragIniRel = stato.dragIniFix = e.Location;
 						stato.Dragging = true;
 						firstLine = true;
 						if(doc != null)
@@ -849,7 +845,26 @@ namespace Circ
 					break;
 				case Def.Stat.Rami:
 					{
-					
+					#if(DEBUG)
+					LOG.Write("drwPanel_MouseDown():case Def.Stat.Rami");
+					#endif
+					if(e.Button == MouseButtons.Left)
+						{
+						Elemento el = vista.GetLastHighLighted();
+						if(el != null)
+							{
+							stato.dragIniRel = stato.dragIniFix = el.Center;
+							stato.dragFromElement = el;
+							}
+						else
+							{
+							stato.dragIniRel = stato.dragIniFix = e.Location;
+							stato.dragFromElement = null;
+							}
+						stato.Dragging = true;
+						firstLine = true;
+						UpdateToolStrips();
+						}
 					}
 					break;
 				case Def.Stat.Edit:
@@ -859,7 +874,7 @@ namespace Circ
 					#endif
 					if(e.Button == MouseButtons.Left)
 						{
-						dragIniRel = dragIniFix = e.Location;
+						stato.dragIniRel = stato.dragIniFix = e.Location;
 						stato.Dragging = true;
 						firstLine = true;
 						UpdateToolStrips();
@@ -876,10 +891,13 @@ namespace Circ
 		/// <param name="e"></param>
 		private void drwPanel_MouseUp(object sender, MouseEventArgs e)
 			{
-			if((stato.Dragging) && (stato.Stato == Def.Stat.Edit))		
-				{												 
-				if((Math.Abs(e.Location.X - dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - dragIniFix.Y) < Def.DRG_MIN))
-					stato.Dragging = false;
+			if(stato.Dragging)
+				{
+				if((Math.Abs(e.Location.X - stato.dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - stato.dragIniFix.Y) < Def.DRG_MIN))
+					{
+					stato.Dragging = false;		// Annulla il dragging se lo spostamento è piccolo per distinguere un click da un drag.
+					vista.RegenDL(false);
+					}
 				}
 
 			switch(stato.Stato)
@@ -895,12 +913,13 @@ namespace Circ
 							{
 							stato.Stato = Def.Stat.Vista;
 							Point2D p;
-							p = vista.ScalaVettore(new Point(e.X - dragIniFix.X , e.Y - dragIniFix.Y));
+							p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X , e.Y - stato.dragIniFix.Y));
 
-							dragIniRel.X = dragIniRel.Y = dragIniFix.X = dragIniFix.Y = 0;
+							stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
 							if(doc != null)
 								doc.Dati.ViewFilter = Def.Stat.Nodi | Def.Stat.Rami;
 							UpdateToolStrips();
+							vista.RecalcSzWlorld();
 							vista.SetOutdatedDL();
 							vista.RegenDL(true);
 							}
@@ -914,39 +933,85 @@ namespace Circ
 					break;
 				case Def.Stat.Rami:
 					{
-					
+					if(stato.Dragging)
+						{
+						#if(DEBUG)
+						LOG.Write("drwPanel_MouseUp():case Def.Stat.Rami");
+						#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							Elemento hi = vista.GetLastHighLighted();
+							stato.Stato = Def.Stat.Rami;
+							if(doc != null)
+								{
+								uint id1, id2;
+								if(stato.dragFromElement != null)			// Primo nodo
+									{
+									id1 = stato.dragFromElement.ID;
+									}
+								else
+									{
+									Nodo n = (Nodo)doc.AddNodo(vista.Scala(stato.dragIniFix));
+									if(n != null)
+										{
+										id1 = n.ID;
+										}
+									else
+										{
+										id1 = Elemento.UNASSIGNED;
+										}
+									}
+
+								if(hi != null)								// Secondo nodo
+									{
+									id2 = hi.ID;
+									}
+								else
+									{
+									Nodo n = (Nodo)doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
+									if(n != null)
+										{
+										id2 = n.ID;
+										}
+									else
+										{
+										id2 = Elemento.UNASSIGNED;
+										}
+									}
+
+								doc.AddRamo(id1, id2);
+								
+								}
+							stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
+							UpdateToolStrips();
+							}
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
+						}
 					}
 					break;
 				case Def.Stat.Edit:
 					{
 					if(stato.Dragging)
 						{
-						if((Math.Abs(e.Location.X - dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - dragIniFix.Y) < Def.DRG_MIN))
+						#if(DEBUG)
+						LOG.Write("drwPanel_MouseUp():case Def.Stat.Move");
+						#endif
+						if(e.Button == MouseButtons.Left)
 							{
-							stato.Stato = Def.Stat.Edit;		// Annulla il dragging se lo spostamento è piccolo per distinguere un click da un drag.
-							vista.RegenDL(false);
-							}
-						else
-							{
-							#if(DEBUG)
-							LOG.Write("drwPanel_MouseUp():case Def.Stat.Move");
-							#endif
-							if(e.Button == MouseButtons.Left)
+							stato.Stato = Def.Stat.Edit;
+							Point2D p;
+							p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X , e.Y - stato.dragIniFix.Y));
+							stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
+							if(doc != null)
 								{
-								stato.Stato = Def.Stat.Edit;
-								Point2D p;
-								p = vista.ScalaVettore(new Point(e.X - dragIniFix.X , e.Y - dragIniFix.Y));
-								dragIniRel.X = dragIniRel.Y = dragIniFix.X = dragIniFix.Y = 0;
-								if(doc != null)
-									{
-									doc.Dati.MuoviSelezionati(p);
-									}
-								UpdateToolStrips();
-							
+								doc.Dati.MuoviSelezionati(p);
 								}
-							vista.SetOutdatedDL();
-							vista.RegenDL(true);
+							UpdateToolStrips();
+							
 							}
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
 						}
 					}
 					break;
@@ -965,6 +1030,7 @@ namespace Circ
 				{
 				switch(stato.Stato)
 					{
+					#warning	Permettere lo zoom in ogni stato, purche' non dragging
 					case Def.Stat.Vista:
 						{
 						#if(DEBUG)
@@ -983,6 +1049,10 @@ namespace Circ
 				}
 			}
 
+
+		/// <summary>
+		/// Divide i rami selezionati
+		/// </summary>
 		private void DivideRamiSelezionati()
 			{
 			if(doc != null)
@@ -994,6 +1064,29 @@ namespace Circ
 				}
 
 			}
+
+		/// <summary>
+		/// Disegna in inverso una linea fino al mouse
+		/// Non usare: crea caos se si esce dalla finestra
+		/// </summary>
+		/// <param name="loc"></param>
+		private void DrawScreenReverseLine(Point loc)
+			{
+			pfin = new Point(loc.X + drwPanel.Location.X, loc.Y + drwPanel.Location.Y);
+			if(firstLine)
+				{
+				pini = new Point(stato.dragIniFix.X + drwPanel.Location.X, stato.dragIniFix.Y + drwPanel.Location.Y);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.Blue);
+				}
+			else
+				{
+				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pold), Color.White);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.White);
+				}
+			pold = pfin;
+			firstLine = false;
+			}
+
 
 
 		#region TEST
@@ -1074,9 +1167,22 @@ namespace Circ
 			
 			}
 
+
+		private void gridToolStripMenuItem_Click(object sender,EventArgs e)
+			{
+			if(doc!=null)
+				{
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				vista.Redraw(true);
+				}
+
+			}
 		#endregion
 
 		
+
+
 		#region HANDLER DI MENU E PULSANTI
 
 		private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1301,6 +1407,31 @@ namespace Circ
 		private void dividiRamoToolStripMenuItem_Click(object sender, EventArgs e)
 			{
 			DivideRamiSelezionati();
+			}
+
+		private void grigliaToggle_Click(object sender,EventArgs e)
+			{
+			vista.ToggleGriglia();
+			grigliaToolStripMenuItem.Checked = vista.IsGridOn;
+			UpdateToolStrips();
+			vista.SetOutdatedDL();
+			vista.RegenDL(true);
+			}
+
+		private void GrigliaPiùFitta_Click(object sender,EventArgs e)
+			{
+			vista.GrigliaStepMultiply(1/Def.ZOOM_STEP);
+			UpdateToolStrips();
+			vista.SetOutdatedDL();
+			vista.RegenDL(true);
+			}
+
+		private void GrigliaMenoFitta_Click(object sender,EventArgs e)
+			{
+			vista.GrigliaStepMultiply(Def.ZOOM_STEP);
+			UpdateToolStrips();
+			vista.SetOutdatedDL();
+			vista.RegenDL(true);
 			}
 
 		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)

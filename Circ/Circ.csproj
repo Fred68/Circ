@@ -72,6 +72,7 @@
     <Compile Include="Dati.cs" />
     <Compile Include="Def.cs" />
     <Compile Include="Fmin.cs" />
+    <Compile Include="Griglia.cs" />
     <Compile Include="ICopyData.cs" />
     <Compile Include="InputForm.cs">
       <SubType>Form</SubType>
@@ -147,6 +148,9 @@
     <Content Include="Resources\Compatta.bmp" />
     <Content Include="Resources\Divide.bmp" />
     <Content Include="Resources\Elimina.bmp" />
+    <Content Include="Resources\Grid.bmp" />
+    <Content Include="Resources\GridMeno.bmp" />
+    <Content Include="Resources\GridPiu.bmp" />
     <Content Include="Resources\Rinumera.bmp" />
     <Content Include="Resources\SelAll.bmp" />
     <Content Include="Resources\SelNothing.bmp" />

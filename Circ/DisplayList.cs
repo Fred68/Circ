@@ -225,7 +225,7 @@ namespace Circ
 		#warning Aggiungere funzione per stampare proprietà aggiuntive: ID, Nome ecc... con Filtro flag aggiuntivo
 
 		/// <summary>
-		/// Restituisce uno gli ultimi elementi evidenziati (il primo della lista)
+		/// Restituisce uno degli ultimi elementi evidenziati (il primo della lista)
 		/// </summary>
 		/// <returns>Elemento oppure null</returns>
 		public Elemento GetLastHighLighted()

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using System.Drawing;                       // Per draw
 using System.Drawing.Drawing2D;
-using System.Drawing.Drawing2D;				// Per DrawPath
 using Newtonsoft.Json;						// Serializzazione in Json
 
 
@@ -58,7 +57,7 @@ namespace Circ
 
 		public override void Draw(Graphics g, Pen pn, Brush br, Font fn)
 			{
-			GraphicsPath pth = (GraphicsPath) Def.Shape2D.GetShape(Def.Shape2D.Shape.Circle).Clone();
+			GraphicsPath pth = (GraphicsPath) Def.Shape2D.GetShape(Def.Shape2D.Name.Circle).Clone();
 			Matrix m = new Matrix();
 			m.Translate(ps.X,ps.Y);
 			pth.Transform(m);

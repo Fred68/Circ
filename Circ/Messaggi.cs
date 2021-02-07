@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#warning IMPORTANTE: PER GLI ERRORI, USARE Messaggi.Clear() nella chiamata più a monte (in MainForm.cs, possibilmente)
 
 namespace Fred68.Tools.Messaggi
 	{

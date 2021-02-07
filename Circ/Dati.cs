@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Drawing;						// Point
 using Newtonsoft.Json;						// Serializzazione in Json
 
 using Fred68.Tools.Matematica;
@@ -361,7 +362,29 @@ namespace Circ
 				}
 			return l;
 			}
-
+		
+		/// <summary>
+		/// Cerc l'elemento selezionato più vicino
+		/// </summary>
+		/// <param name="pt">Point del punto</param>
+		/// <param name="sh">Def.Shape tipo di elemento</param>
+		/// <returns></returns>
+		public Elemento GetSelezionatoPiùVicino(Point pt, Def.Shape sh)
+			{
+			List<Elemento> ls = GetSelezionati(true);
+			Elemento emin = null;
+			float dmin = float.MaxValue;
+			foreach(Elemento e in ls)
+				{
+				float d = Point2D.Dist2(pt,e.Center);
+				if(d < dmin)
+					{
+					dmin = d;
+					emin = e;
+					}
+				}
+			return emin;
+			}
 		/// <summary>
 		/// Conta il numero di nodi e rami selezionati
 		/// </summary>

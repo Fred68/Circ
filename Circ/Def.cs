@@ -27,7 +27,7 @@ namespace Circ
 
 		public class Shape2D
 			{
-			public enum Shape
+			public enum Name
 				{
 				None,
 				Circle,
@@ -43,23 +43,23 @@ namespace Circ
 
 			static Shape2D()
 				{
-				int n = Enum.GetNames(typeof(Shape)).Length;
+				int n = Enum.GetNames(typeof(Name)).Length;
 				shapes = new GraphicsPath[n];
 				for(int i = 0; i < n; i++)
 					{
 					shapes[i] = new GraphicsPath();
 					}
 
-				shapes[(int)Shape.Circle].AddEllipse(-Def.NODE_HALFSIZE, -Def.NODE_HALFSIZE, Def.NODE_HALFSIZE * 2, Def.NODE_HALFSIZE * 2);
+				shapes[(int)Name.Circle].AddEllipse(-Def.NODE_HALFSIZE, -Def.NODE_HALFSIZE, Def.NODE_HALFSIZE * 2, Def.NODE_HALFSIZE * 2);
 
-				shapes[(int)Shape.Rectangle].AddRectangle(new Rectangle(-Def.SHAPE_HALFSIZE, -Def.SHAPE_HALFSIZE / 3, 2 * Def.SHAPE_HALFSIZE, 2 * Def.SHAPE_HALFSIZE / 3));
+				shapes[(int)Name.Rectangle].AddRectangle(new Rectangle(-Def.SHAPE_HALFSIZE, -Def.SHAPE_HALFSIZE / 3, 2 * Def.SHAPE_HALFSIZE, 2 * Def.SHAPE_HALFSIZE / 3));
 
-				shapes[(int)Shape.Arrow].AddLine(-Def.SHAPE_HALFSIZE,0, Def.SHAPE_HALFSIZE,0);
-				shapes[(int)Shape.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0,	Def.SHAPE_HALFSIZE/3, Def.SHAPE_HALFSIZE/3);
-				shapes[(int)Shape.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0, Def.SHAPE_HALFSIZE/3, -Def.SHAPE_HALFSIZE/3);
+				shapes[(int)Name.Arrow].AddLine(-Def.SHAPE_HALFSIZE,0, Def.SHAPE_HALFSIZE,0);
+				shapes[(int)Name.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0,	Def.SHAPE_HALFSIZE/3, Def.SHAPE_HALFSIZE/3);
+				shapes[(int)Name.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0, Def.SHAPE_HALFSIZE/3, -Def.SHAPE_HALFSIZE/3);
 				}
 
-			public static GraphicsPath GetShape(Shape sh)
+			public static GraphicsPath GetShape(Name sh)
 				{
 				return shapes[(int)sh];
 				}
@@ -108,7 +108,7 @@ namespace Circ
 		public enum InputType {String, Int, Double}
 
 		public static readonly int RAGGIO_SELEZIONE = 10;		// Raggio di selezioni per evidenziazione
-		public static readonly int DRG_MIN = 5;					// Minima distanza di trascinamento
+		public static readonly int DRG_MIN = 15;				// Minima distanza di trascinamento
 
 		public static int FREE_MIN = 5;							// Spazio libero minimo e massimo dell'array della Display List [10]
 		public static int FREE_MAX = 10;						// [100]
@@ -134,10 +134,11 @@ namespace Circ
 
 		public static int NODE_HALFSIZE = 3;					// Dimensioni del nodo disegnato
 		public static int SHAPE_HALFSIZE = 30;					// Dimensioni della sagoma disegnata
+		public static int MAX_GRID_POINTS = 70;					// Numero massimo di divisioni della griglia
 
 		public static Color ColourSelected = Color.Cyan;		// Colori di default
 		public static Color ColourHighlighed = Color.Yellow;
-		public static Color ColourBackground = Color.Black;
+		public static Color ColourBackground = Color.FromArgb(20,20,20);
 		public static Color ColourNodo = Color.LightGray;
 		public static Color ColourRamo = Color.Red;
 

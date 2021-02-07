@@ -99,7 +99,7 @@ namespace Circ
 			if(Point2D.Mod(new Point(nd[1].Ps.X-nd[0].Ps.X,nd[1].Ps.Y-nd[0].Ps.Y)) > Def.SHAPE_HALFSIZE*Def.SHAPE_HALFSIZE*4 )
 					{
 					//GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Shape.Rectangle).Clone();
-					GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Shape.Arrow).Clone();
+					GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Name.Arrow).Clone();
 					pth.Transform(m);
 					g.DrawPath(pn,pth);
 					//g.FillPath(br,pth);
