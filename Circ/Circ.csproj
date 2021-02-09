@@ -151,6 +151,7 @@
     <Content Include="Resources\Grid.bmp" />
     <Content Include="Resources\GridMeno.bmp" />
     <Content Include="Resources\GridPiu.bmp" />
+    <Content Include="Resources\Inverte.bmp" />
     <Content Include="Resources\Rinumera.bmp" />
     <Content Include="Resources\SelAll.bmp" />
     <Content Include="Resources\SelNothing.bmp" />

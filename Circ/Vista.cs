@@ -109,13 +109,18 @@ namespace Circ
 			{get {return szWorldBottomRight;}}
 
 		/// <summary>
-		/// Restituiscono lo stato ed il passo della griglia
+		/// Restituisce lo stato della griglia
 		/// </summary>
 		public bool IsGridOn
 			{get {return grid.Active;}}
-		public double GripStep
-			{get {return grid.Step;}}
-
+		/// <summary>
+		/// Imposta il passo della griglia
+		/// </summary>
+		public double GridStep
+			{
+			get {return grid.Step;}
+			set {grid.Step=value;}
+			}
 
 		#endregion
 	
@@ -202,7 +207,6 @@ namespace Circ
 		/// </summary>
 		public void RecalcSzWlorld()
 			{
-			#warning Errore, se la vista viene spostata, non corrisponde più !
 			szWorldTopLeft = Scala(new Point(0,0));
 			szWorldBottomRight = Scala(new Point(szClient.Width,szClient.Height));
 			grid.Recalc(this);

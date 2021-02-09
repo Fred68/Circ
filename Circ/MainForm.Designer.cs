@@ -37,13 +37,8 @@ namespace Circ
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripEditor = new System.Windows.Forms.ToolStrip();
 			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-			this.viewMode = new System.Windows.Forms.ToolStripButton();
-			this.insNodoMode = new System.Windows.Forms.ToolStripButton();
-			this.insRamoMode = new System.Windows.Forms.ToolStripButton();
-			this.editMode = new System.Windows.Forms.ToolStripButton();
 			this.toolStripFile = new System.Windows.Forms.ToolStrip();
 			this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
-			this.saveButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +57,8 @@ namespace Circ
 			this.spostaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.inserisciCoordinateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.dividiRamoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inverteRamoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.allineaAllaGrigliaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.vistaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ridisegnaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.inverteAsseXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,6 +66,7 @@ namespace Circ
 			this.grigliaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.piùFittaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menoFittaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.inserisciPassoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.strumentiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.controllaNodiIsolatiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.creaMatriceDiIncidenzaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,23 +80,10 @@ namespace Circ
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.toolStripVista = new System.Windows.Forms.ToolStrip();
 			this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-			this.ridisegnaToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.ZoomInToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.ZoomOutToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.ZoomFitToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSelect = new System.Windows.Forms.ToolStrip();
 			this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
-			this.SelectAlltoolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.SelectNonetoolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStripModifica = new System.Windows.Forms.ToolStrip();
 			this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
-			this.RinumeraToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.CompattaIDToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.DivideToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.EliminaToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.ofd = new System.Windows.Forms.OpenFileDialog();
 			this.sfd = new System.Windows.Forms.SaveFileDialog();
 			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
@@ -109,8 +94,27 @@ namespace Circ
 			this.lbNodoFree = new System.Windows.Forms.Label();
 			this.lbRami = new System.Windows.Forms.Label();
 			this.lbRamoFree = new System.Windows.Forms.Label();
-			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.lbGrid = new System.Windows.Forms.Label();
+			this.saveButton = new System.Windows.Forms.ToolStripButton();
+			this.viewMode = new System.Windows.Forms.ToolStripButton();
+			this.insNodoMode = new System.Windows.Forms.ToolStripButton();
+			this.insRamoMode = new System.Windows.Forms.ToolStripButton();
+			this.editMode = new System.Windows.Forms.ToolStripButton();
+			this.ridisegnaToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.ZoomInToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.ZoomOutToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.ZoomFitToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+			this.SelectAlltoolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.SelectNonetoolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.RinumeraToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.CompattaIDToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.DivideToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
+			this.EliminaToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripEditor.SuspendLayout();
 			this.toolStripFile.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -180,46 +184,6 @@ namespace Circ
 			this.toolStripLabel1.Size = new System.Drawing.Size(39, 22);
 			this.toolStripLabel1.Text = "Modo";
 			// 
-			// viewMode
-			// 
-			this.viewMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.viewMode.Image = global::Circ.Properties.Resources.View;
-			this.viewMode.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.viewMode.Name = "viewMode";
-			this.viewMode.Size = new System.Drawing.Size(23, 22);
-			this.viewMode.Text = "Vista";
-			this.viewMode.Click += new System.EventHandler(this.ViewMode_TB_Click);
-			// 
-			// insNodoMode
-			// 
-			this.insNodoMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.insNodoMode.Image = global::Circ.Properties.Resources.AddNode;
-			this.insNodoMode.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.insNodoMode.Name = "insNodoMode";
-			this.insNodoMode.Size = new System.Drawing.Size(23, 22);
-			this.insNodoMode.Text = "Nodi";
-			this.insNodoMode.Click += new System.EventHandler(this.NodoMode_TB_Click);
-			// 
-			// insRamoMode
-			// 
-			this.insRamoMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.insRamoMode.Image = global::Circ.Properties.Resources.AddLink;
-			this.insRamoMode.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.insRamoMode.Name = "insRamoMode";
-			this.insRamoMode.Size = new System.Drawing.Size(23, 22);
-			this.insRamoMode.Text = "Rami";
-			this.insRamoMode.Click += new System.EventHandler(this.RamoMode_TB_Click);
-			// 
-			// editMode
-			// 
-			this.editMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.editMode.Image = global::Circ.Properties.Resources.Edit;
-			this.editMode.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.editMode.Name = "editMode";
-			this.editMode.Size = new System.Drawing.Size(23, 22);
-			this.editMode.Text = "Edit";
-			this.editMode.Click += new System.EventHandler(this.EditMode_TB_Click);
-			// 
 			// toolStripFile
 			// 
 			this.toolStripFile.Dock = System.Windows.Forms.DockStyle.None;
@@ -239,16 +203,6 @@ namespace Circ
 			this.toolStripLabel3.Name = "toolStripLabel3";
 			this.toolStripLabel3.Size = new System.Drawing.Size(25, 22);
 			this.toolStripLabel3.Text = "File";
-			// 
-			// saveButton
-			// 
-			this.saveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.saveButton.Image = global::Circ.Properties.Resources.Save;
-			this.saveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.saveButton.Name = "saveButton";
-			this.saveButton.Size = new System.Drawing.Size(23, 22);
-			this.saveButton.Text = "Save";
-			this.saveButton.Click += new System.EventHandler(this.SaveStripButton_Click);
 			// 
 			// toolStripSeparator2
 			// 
@@ -336,7 +290,9 @@ namespace Circ
             this.eliminaToolStripMenuItem,
             this.spostaToolStripMenuItem,
             this.inserisciCoordinateToolStripMenuItem,
-            this.dividiRamoToolStripMenuItem});
+            this.dividiRamoToolStripMenuItem,
+            this.inverteRamoToolStripMenuItem,
+            this.allineaAllaGrigliaToolStripMenuItem});
 			this.editToolStripMenuItem.Name = "editToolStripMenuItem";
 			this.editToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
 			this.editToolStripMenuItem.Text = "Modifica";
@@ -401,6 +357,20 @@ namespace Circ
 			this.dividiRamoToolStripMenuItem.Text = "Dividi ramo";
 			this.dividiRamoToolStripMenuItem.Click += new System.EventHandler(this.dividiRamoToolStripMenuItem_Click);
 			// 
+			// inverteRamoToolStripMenuItem
+			// 
+			this.inverteRamoToolStripMenuItem.Name = "inverteRamoToolStripMenuItem";
+			this.inverteRamoToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+			this.inverteRamoToolStripMenuItem.Text = "Inverte ramo";
+			this.inverteRamoToolStripMenuItem.Click += new System.EventHandler(this.inverteRamo_Click);
+			// 
+			// allineaAllaGrigliaToolStripMenuItem
+			// 
+			this.allineaAllaGrigliaToolStripMenuItem.Name = "allineaAllaGrigliaToolStripMenuItem";
+			this.allineaAllaGrigliaToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+			this.allineaAllaGrigliaToolStripMenuItem.Text = "Allinea alla griglia";
+			this.allineaAllaGrigliaToolStripMenuItem.Click += new System.EventHandler(this.allineaAllaGriglia_Click);
+			// 
 			// vistaToolStripMenuItem
 			// 
 			this.vistaToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -437,7 +407,8 @@ namespace Circ
 			// 
 			this.grigliaToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.piùFittaToolStripMenuItem,
-            this.menoFittaToolStripMenuItem});
+            this.menoFittaToolStripMenuItem,
+            this.inserisciPassoToolStripMenuItem});
 			this.grigliaToolStripMenuItem.Name = "grigliaToolStripMenuItem";
 			this.grigliaToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
 			this.grigliaToolStripMenuItem.Text = "Griglia";
@@ -446,16 +417,23 @@ namespace Circ
 			// piùFittaToolStripMenuItem
 			// 
 			this.piùFittaToolStripMenuItem.Name = "piùFittaToolStripMenuItem";
-			this.piùFittaToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+			this.piùFittaToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
 			this.piùFittaToolStripMenuItem.Text = "Più fitta";
 			this.piùFittaToolStripMenuItem.Click += new System.EventHandler(this.GrigliaPiùFitta_Click);
 			// 
 			// menoFittaToolStripMenuItem
 			// 
 			this.menoFittaToolStripMenuItem.Name = "menoFittaToolStripMenuItem";
-			this.menoFittaToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+			this.menoFittaToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
 			this.menoFittaToolStripMenuItem.Text = "Meno fitta";
 			this.menoFittaToolStripMenuItem.Click += new System.EventHandler(this.GrigliaMenoFitta_Click);
+			// 
+			// inserisciPassoToolStripMenuItem
+			// 
+			this.inserisciPassoToolStripMenuItem.Name = "inserisciPassoToolStripMenuItem";
+			this.inserisciPassoToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.inserisciPassoToolStripMenuItem.Text = "Inserisci passo";
+			this.inserisciPassoToolStripMenuItem.Click += new System.EventHandler(this.inserisciPasso_Click);
 			// 
 			// strumentiToolStripMenuItem
 			// 
@@ -571,76 +549,6 @@ namespace Circ
 			this.toolStripLabel2.Size = new System.Drawing.Size(32, 22);
 			this.toolStripLabel2.Text = "Vista";
 			// 
-			// ridisegnaToolStripButton
-			// 
-			this.ridisegnaToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ridisegnaToolStripButton.Image = global::Circ.Properties.Resources.Redraw;
-			this.ridisegnaToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ridisegnaToolStripButton.Name = "ridisegnaToolStripButton";
-			this.ridisegnaToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.ridisegnaToolStripButton.Text = "Ridisegna";
-			this.ridisegnaToolStripButton.Click += new System.EventHandler(this.Ridisegna_TB_Click);
-			// 
-			// ZoomInToolStripButton
-			// 
-			this.ZoomInToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ZoomInToolStripButton.Image = global::Circ.Properties.Resources.ZoomIn;
-			this.ZoomInToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ZoomInToolStripButton.Name = "ZoomInToolStripButton";
-			this.ZoomInToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.ZoomInToolStripButton.Text = "Zoom +";
-			this.ZoomInToolStripButton.Click += new System.EventHandler(this.ZoomInToolStripButton_Click);
-			// 
-			// ZoomOutToolStripButton
-			// 
-			this.ZoomOutToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ZoomOutToolStripButton.Image = global::Circ.Properties.Resources.ZoomOut;
-			this.ZoomOutToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ZoomOutToolStripButton.Name = "ZoomOutToolStripButton";
-			this.ZoomOutToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.ZoomOutToolStripButton.Text = "Zoom -";
-			this.ZoomOutToolStripButton.Click += new System.EventHandler(this.ZoomOutToolStripButton_Click);
-			// 
-			// ZoomFitToolStripButton
-			// 
-			this.ZoomFitToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ZoomFitToolStripButton.Image = global::Circ.Properties.Resources.ZoomFit;
-			this.ZoomFitToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ZoomFitToolStripButton.Name = "ZoomFitToolStripButton";
-			this.ZoomFitToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.ZoomFitToolStripButton.Text = "Adatta zoom";
-			this.ZoomFitToolStripButton.Click += new System.EventHandler(this.ZoomFitToolStripButton_Click);
-			// 
-			// toolStripButton2
-			// 
-			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton2.Image = global::Circ.Properties.Resources.Grid;
-			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton2.Name = "toolStripButton2";
-			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton2.Text = "toolStripButton2";
-			this.toolStripButton2.Click += new System.EventHandler(this.grigliaToggle_Click);
-			// 
-			// toolStripButton3
-			// 
-			this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton3.Image = global::Circ.Properties.Resources.GridPiu;
-			this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton3.Name = "toolStripButton3";
-			this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton3.Text = "toolStripButton3";
-			this.toolStripButton3.Click += new System.EventHandler(this.GrigliaPiùFitta_Click);
-			// 
-			// toolStripButton4
-			// 
-			this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton4.Image = global::Circ.Properties.Resources.GridMeno;
-			this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton4.Name = "toolStripButton4";
-			this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton4.Text = "toolStripButton4";
-			this.toolStripButton4.Click += new System.EventHandler(this.GrigliaMenoFitta_Click);
-			// 
 			// toolStripSelect
 			// 
 			this.toolStripSelect.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -659,26 +567,6 @@ namespace Circ
 			this.toolStripLabel4.Size = new System.Drawing.Size(36, 22);
 			this.toolStripLabel4.Text = "Selez.";
 			// 
-			// SelectAlltoolStripButton
-			// 
-			this.SelectAlltoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.SelectAlltoolStripButton.Image = global::Circ.Properties.Resources.SelAll;
-			this.SelectAlltoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.SelectAlltoolStripButton.Name = "SelectAlltoolStripButton";
-			this.SelectAlltoolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.SelectAlltoolStripButton.Text = "Seleziona tutto";
-			this.SelectAlltoolStripButton.Click += new System.EventHandler(this.SelectAlltoolStripButton_Click);
-			// 
-			// SelectNonetoolStripButton
-			// 
-			this.SelectNonetoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.SelectNonetoolStripButton.Image = global::Circ.Properties.Resources.SelNothing;
-			this.SelectNonetoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.SelectNonetoolStripButton.Name = "SelectNonetoolStripButton";
-			this.SelectNonetoolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.SelectNonetoolStripButton.Text = "Deseleziona tutto";
-			this.SelectNonetoolStripButton.Click += new System.EventHandler(this.SelectNonetoolStripButton_Click);
-			// 
 			// toolStripModifica
 			// 
 			this.toolStripModifica.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -686,10 +574,11 @@ namespace Circ
             this.RinumeraToolStripButton,
             this.CompattaIDToolStripButton,
             this.DivideToolStripButton,
+            this.toolStripButton5,
             this.EliminaToolStripButton});
 			this.toolStripModifica.Location = new System.Drawing.Point(508, 0);
 			this.toolStripModifica.Name = "toolStripModifica";
-			this.toolStripModifica.Size = new System.Drawing.Size(158, 25);
+			this.toolStripModifica.Size = new System.Drawing.Size(212, 25);
 			this.toolStripModifica.TabIndex = 5;
 			this.toolStripModifica.Text = "Modifica";
 			// 
@@ -698,46 +587,6 @@ namespace Circ
 			this.toolStripLabel5.Name = "toolStripLabel5";
 			this.toolStripLabel5.Size = new System.Drawing.Size(54, 22);
 			this.toolStripLabel5.Text = "Modifica";
-			// 
-			// RinumeraToolStripButton
-			// 
-			this.RinumeraToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.RinumeraToolStripButton.Image = global::Circ.Properties.Resources.Rinumera;
-			this.RinumeraToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.RinumeraToolStripButton.Name = "RinumeraToolStripButton";
-			this.RinumeraToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.RinumeraToolStripButton.Text = "Rinumera ID";
-			this.RinumeraToolStripButton.Click += new System.EventHandler(this.RinumeraToolStripButton_Click);
-			// 
-			// CompattaIDToolStripButton
-			// 
-			this.CompattaIDToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.CompattaIDToolStripButton.Image = global::Circ.Properties.Resources.Compatta;
-			this.CompattaIDToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.CompattaIDToolStripButton.Name = "CompattaIDToolStripButton";
-			this.CompattaIDToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.CompattaIDToolStripButton.Text = "Compatta ID";
-			this.CompattaIDToolStripButton.Click += new System.EventHandler(this.CompattaIDToolStripButton_Click);
-			// 
-			// DivideToolStripButton
-			// 
-			this.DivideToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.DivideToolStripButton.Image = global::Circ.Properties.Resources.Divide;
-			this.DivideToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.DivideToolStripButton.Name = "DivideToolStripButton";
-			this.DivideToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.DivideToolStripButton.Text = "Dividi ramo";
-			this.DivideToolStripButton.Click += new System.EventHandler(this.DivideToolStripButton_Click);
-			// 
-			// EliminaToolStripButton
-			// 
-			this.EliminaToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.EliminaToolStripButton.Image = global::Circ.Properties.Resources.Elimina;
-			this.EliminaToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.EliminaToolStripButton.Name = "EliminaToolStripButton";
-			this.EliminaToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.EliminaToolStripButton.Text = "Elimina";
-			this.EliminaToolStripButton.Click += new System.EventHandler(this.EliminaToolStripButton_Click);
 			// 
 			// ofd
 			// 
@@ -837,15 +686,6 @@ namespace Circ
 			this.lbRamoFree.Text = "---";
 			this.lbRamoFree.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// toolStripButton1
-			// 
-			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton1.Name = "toolStripButton1";
-			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton1.Text = "toolStripButton1";
-			// 
 			// lbGrid
 			// 
 			this.lbGrid.AutoSize = true;
@@ -856,6 +696,205 @@ namespace Circ
 			this.lbGrid.TabIndex = 106;
 			this.lbGrid.Text = "Gr:----";
 			this.lbGrid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// saveButton
+			// 
+			this.saveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.saveButton.Image = global::Circ.Properties.Resources.Save;
+			this.saveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.saveButton.Name = "saveButton";
+			this.saveButton.Size = new System.Drawing.Size(23, 22);
+			this.saveButton.Text = "Save";
+			this.saveButton.Click += new System.EventHandler(this.SaveStripButton_Click);
+			// 
+			// viewMode
+			// 
+			this.viewMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.viewMode.Image = global::Circ.Properties.Resources.View;
+			this.viewMode.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.viewMode.Name = "viewMode";
+			this.viewMode.Size = new System.Drawing.Size(23, 22);
+			this.viewMode.Text = "Vista";
+			this.viewMode.Click += new System.EventHandler(this.ViewMode_TB_Click);
+			// 
+			// insNodoMode
+			// 
+			this.insNodoMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.insNodoMode.Image = global::Circ.Properties.Resources.AddNode;
+			this.insNodoMode.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.insNodoMode.Name = "insNodoMode";
+			this.insNodoMode.Size = new System.Drawing.Size(23, 22);
+			this.insNodoMode.Text = "Nodi";
+			this.insNodoMode.Click += new System.EventHandler(this.NodoMode_TB_Click);
+			// 
+			// insRamoMode
+			// 
+			this.insRamoMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.insRamoMode.Image = global::Circ.Properties.Resources.AddLink;
+			this.insRamoMode.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.insRamoMode.Name = "insRamoMode";
+			this.insRamoMode.Size = new System.Drawing.Size(23, 22);
+			this.insRamoMode.Text = "Rami";
+			this.insRamoMode.Click += new System.EventHandler(this.RamoMode_TB_Click);
+			// 
+			// editMode
+			// 
+			this.editMode.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.editMode.Image = global::Circ.Properties.Resources.Edit;
+			this.editMode.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.editMode.Name = "editMode";
+			this.editMode.Size = new System.Drawing.Size(23, 22);
+			this.editMode.Text = "Edit";
+			this.editMode.Click += new System.EventHandler(this.EditMode_TB_Click);
+			// 
+			// ridisegnaToolStripButton
+			// 
+			this.ridisegnaToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ridisegnaToolStripButton.Image = global::Circ.Properties.Resources.Redraw;
+			this.ridisegnaToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ridisegnaToolStripButton.Name = "ridisegnaToolStripButton";
+			this.ridisegnaToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.ridisegnaToolStripButton.Text = "Ridisegna";
+			this.ridisegnaToolStripButton.Click += new System.EventHandler(this.Ridisegna_TB_Click);
+			// 
+			// ZoomInToolStripButton
+			// 
+			this.ZoomInToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ZoomInToolStripButton.Image = global::Circ.Properties.Resources.ZoomIn;
+			this.ZoomInToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ZoomInToolStripButton.Name = "ZoomInToolStripButton";
+			this.ZoomInToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.ZoomInToolStripButton.Text = "Zoom +";
+			this.ZoomInToolStripButton.Click += new System.EventHandler(this.ZoomInToolStripButton_Click);
+			// 
+			// ZoomOutToolStripButton
+			// 
+			this.ZoomOutToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ZoomOutToolStripButton.Image = global::Circ.Properties.Resources.ZoomOut;
+			this.ZoomOutToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ZoomOutToolStripButton.Name = "ZoomOutToolStripButton";
+			this.ZoomOutToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.ZoomOutToolStripButton.Text = "Zoom -";
+			this.ZoomOutToolStripButton.Click += new System.EventHandler(this.ZoomOutToolStripButton_Click);
+			// 
+			// ZoomFitToolStripButton
+			// 
+			this.ZoomFitToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ZoomFitToolStripButton.Image = global::Circ.Properties.Resources.ZoomFit;
+			this.ZoomFitToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ZoomFitToolStripButton.Name = "ZoomFitToolStripButton";
+			this.ZoomFitToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.ZoomFitToolStripButton.Text = "Adatta zoom";
+			this.ZoomFitToolStripButton.Click += new System.EventHandler(this.ZoomFitToolStripButton_Click);
+			// 
+			// toolStripButton2
+			// 
+			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton2.Image = global::Circ.Properties.Resources.Grid;
+			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton2.Name = "toolStripButton2";
+			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton2.Text = "toolStripButton2";
+			this.toolStripButton2.Click += new System.EventHandler(this.grigliaToggle_Click);
+			// 
+			// toolStripButton3
+			// 
+			this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton3.Image = global::Circ.Properties.Resources.GridPiu;
+			this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton3.Name = "toolStripButton3";
+			this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton3.Text = "toolStripButton3";
+			this.toolStripButton3.Click += new System.EventHandler(this.GrigliaPiùFitta_Click);
+			// 
+			// toolStripButton4
+			// 
+			this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton4.Image = global::Circ.Properties.Resources.GridMeno;
+			this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton4.Name = "toolStripButton4";
+			this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton4.Text = "toolStripButton4";
+			this.toolStripButton4.Click += new System.EventHandler(this.GrigliaMenoFitta_Click);
+			// 
+			// SelectAlltoolStripButton
+			// 
+			this.SelectAlltoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.SelectAlltoolStripButton.Image = global::Circ.Properties.Resources.SelAll;
+			this.SelectAlltoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.SelectAlltoolStripButton.Name = "SelectAlltoolStripButton";
+			this.SelectAlltoolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.SelectAlltoolStripButton.Text = "Seleziona tutto";
+			this.SelectAlltoolStripButton.Click += new System.EventHandler(this.SelectAlltoolStripButton_Click);
+			// 
+			// SelectNonetoolStripButton
+			// 
+			this.SelectNonetoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.SelectNonetoolStripButton.Image = global::Circ.Properties.Resources.SelNothing;
+			this.SelectNonetoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.SelectNonetoolStripButton.Name = "SelectNonetoolStripButton";
+			this.SelectNonetoolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.SelectNonetoolStripButton.Text = "Deseleziona tutto";
+			this.SelectNonetoolStripButton.Click += new System.EventHandler(this.SelectNonetoolStripButton_Click);
+			// 
+			// RinumeraToolStripButton
+			// 
+			this.RinumeraToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.RinumeraToolStripButton.Image = global::Circ.Properties.Resources.Rinumera;
+			this.RinumeraToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.RinumeraToolStripButton.Name = "RinumeraToolStripButton";
+			this.RinumeraToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.RinumeraToolStripButton.Text = "Rinumera ID";
+			this.RinumeraToolStripButton.Click += new System.EventHandler(this.RinumeraToolStripButton_Click);
+			// 
+			// CompattaIDToolStripButton
+			// 
+			this.CompattaIDToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.CompattaIDToolStripButton.Image = global::Circ.Properties.Resources.Compatta;
+			this.CompattaIDToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.CompattaIDToolStripButton.Name = "CompattaIDToolStripButton";
+			this.CompattaIDToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.CompattaIDToolStripButton.Text = "Compatta ID";
+			this.CompattaIDToolStripButton.Click += new System.EventHandler(this.CompattaIDToolStripButton_Click);
+			// 
+			// DivideToolStripButton
+			// 
+			this.DivideToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.DivideToolStripButton.Image = global::Circ.Properties.Resources.Divide;
+			this.DivideToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.DivideToolStripButton.Name = "DivideToolStripButton";
+			this.DivideToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.DivideToolStripButton.Text = "Dividi ramo";
+			this.DivideToolStripButton.Click += new System.EventHandler(this.DivideToolStripButton_Click);
+			// 
+			// toolStripButton5
+			// 
+			this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton5.Image = global::Circ.Properties.Resources.Inverte;
+			this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton5.Name = "toolStripButton5";
+			this.toolStripButton5.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton5.Text = "toolStripButton5";
+			this.toolStripButton5.Click += new System.EventHandler(this.inverteRamoToolStrip_Click);
+			// 
+			// EliminaToolStripButton
+			// 
+			this.EliminaToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.EliminaToolStripButton.Image = global::Circ.Properties.Resources.Elimina;
+			this.EliminaToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.EliminaToolStripButton.Name = "EliminaToolStripButton";
+			this.EliminaToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.EliminaToolStripButton.Text = "Elimina";
+			this.EliminaToolStripButton.Click += new System.EventHandler(this.EliminaToolStripButton_Click);
+			// 
+			// toolStripButton1
+			// 
+			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton1.Name = "toolStripButton1";
+			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton1.Text = "toolStripButton1";
 			// 
 			// MainForm
 			// 
@@ -974,6 +1013,10 @@ namespace Circ
 		private System.Windows.Forms.ToolStripButton toolStripButton3;
 		private System.Windows.Forms.ToolStripButton toolStripButton4;
 		private System.Windows.Forms.Label lbGrid;
+		private System.Windows.Forms.ToolStripMenuItem inserisciPassoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem allineaAllaGrigliaToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem inverteRamoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripButton toolStripButton5;
 		}
 	}
 

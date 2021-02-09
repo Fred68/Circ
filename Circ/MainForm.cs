@@ -218,6 +218,9 @@ namespace Circ
 			#if(DEBUG)
 			LOG.Write("SalvaDoc()");
 			#endif
+
+			doc.Dati.PassoGriglia = vista.GridStep;		// Copia il passo della griglia prima del salvataggio
+
 			Messaggi.Clear();
 			bool ok = false;
 			Stream stream;
@@ -292,6 +295,8 @@ namespace Circ
 			UpdateMenus();
 			if(ok)
 				{
+				vista.GridStep = doc.Dati.PassoGriglia;			// Ricopia il passo della griglia dal documento alla vista
+				UpdateToolStrips();								// Aggiorna la statusBar con i dti della griglia
 				vista.SetElements(doc.Dati.Elementi());
 				vista.SetOutdatedDL();
 				}
@@ -424,13 +429,14 @@ namespace Circ
 		/// </summary>
 		private void UpdateToolStrips()
 			{
+			#warning	Spostare stato e grid in un'altra funzione (e aggiornare le molte chiamate)
 			foreach(KeyValuePair<string, TsBarRef> kv in ts)
 				{
 				kv.Value.mitem.Checked = kv.Value.visible;
 				kv.Value.tstrip.Visible = kv.Value.visible;
 				}
 			labelStat.Text = stato.Stato.ToString();
-			lbGrid.Text = vista.IsGridOn ? string.Format("Gr: {0}", vista.GripStep.ToString("0:#.##")) : "Gr: off";
+			lbGrid.Text = vista.IsGridOn ? string.Format("Gr: {0}", vista.GridStep.ToString("#.##")) : "Gr: off";
 			}
 
 		/// <summary>
@@ -500,11 +506,14 @@ namespace Circ
 			if(doc != null)
 					{
 					Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
-					if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI, t.Item1, t.Item2),"Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
+					if((t.Item1>0)||(t.Item2>0))
 						{
-						doc.Dati.EliminaSelezionati();
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
+						if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI, t.Item1, t.Item2),"Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
+							{
+							doc.Dati.EliminaSelezionati();
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
+							}
 						}
 					}
 			}
@@ -672,6 +681,8 @@ namespace Circ
 			vista.Resize();
 			vista.RegenDL(true);
 			}
+
+		#region MOVIMENTI DEL MOUSE
 
 		/// <summary>
 		/// Mouse move
@@ -891,11 +902,11 @@ namespace Circ
 		/// <param name="e"></param>
 		private void drwPanel_MouseUp(object sender, MouseEventArgs e)
 			{
-			if(stato.Dragging)
-				{
+			if(stato.Dragging && stato.Stato!=Def.Stat.Edit)	// Se sta eseguendo un dragging (ma non in Edit...
+				{												// ...per consentire aggiustamenti piccoli)...
 				if((Math.Abs(e.Location.X - stato.dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - stato.dragIniFix.Y) < Def.DRG_MIN))
 					{
-					stato.Dragging = false;		// Annulla il dragging se lo spostamento è piccolo per distinguere un click da un drag.
+					stato.Dragging = false;		// ...annulla il dragging se lo spostamento è piccolo per distinguere un click da un drag.
 					vista.RegenDL(false);
 					}
 				}
@@ -1028,27 +1039,38 @@ namespace Circ
 			{
 			if(doc != null)
 				{
-				switch(stato.Stato)
+				#if(DEBUG)
+				LOG.Write("drwPanel_Wheel():case Def.Stat.Vista");
+				#endif
+				if(!stato.Dragging)
 					{
-					#warning	Permettere lo zoom in ogni stato, purche' non dragging
-					case Def.Stat.Vista:
+					if((e.Delta > 0) || (e.Delta < 0))
 						{
-						#if(DEBUG)
-						LOG.Write("drwPanel_Wheel():case Def.Stat.Vista");
-						#endif
-
-					
-						if((e.Delta > 0)||(e.Delta < 0))
-							{
-							vista.Zoom(Math.Pow(Def.ZOOM_STEP,e.Delta/SystemInformation.MouseWheelScrollDelta));
-							vista.RegenDL(true);
-							}
+						vista.Zoom(Math.Pow(Def.ZOOM_STEP,e.Delta / SystemInformation.MouseWheelScrollDelta));
+						vista.RegenDL(true);
 						}
-						break;
 					}
+				//switch(stato.Stato)
+				//	{
+				//	#warning	Permettere lo zoom in ogni stato, purche' non dragging
+				//	//case Def.Stat.Vista:
+				//	default:
+				//		{
+				//		#if(DEBUG)
+				//		LOG.Write("drwPanel_Wheel():case Def.Stat.Vista");
+				//		#endif
+				//		if((e.Delta > 0)||(e.Delta < 0))
+				//			{
+				//			vista.Zoom(Math.Pow(Def.ZOOM_STEP,e.Delta/SystemInformation.MouseWheelScrollDelta));
+				//			vista.RegenDL(true);
+				//			}
+				//		}
+				//		break;
+				//	}
 				}
 			}
 
+		#endregion
 
 		/// <summary>
 		/// Divide i rami selezionati
@@ -1087,7 +1109,27 @@ namespace Circ
 			firstLine = false;
 			}
 
-
+		private void AllineaAllaGriglia()
+			{
+			if(doc != null)
+				{
+				doc.AllineaAllaGriglia(vista);
+				vista.RegenDL(true);
+				vista.Redraw(true);
+				Invalidate();
+				}
+			}
+		
+		private void InverteRamoSelezionato()
+			{
+			if(doc != null)
+				{
+				doc.InverteRamiSelezionati();
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				vista.Redraw(true);
+				}
+			}
 
 		#region TEST
 
@@ -1432,6 +1474,44 @@ namespace Circ
 			UpdateToolStrips();
 			vista.SetOutdatedDL();
 			vista.RegenDL(true);
+			}
+
+		private void inserisciPasso_Click(object sender,EventArgs e)
+			{
+			InputForm.InputData[] dat = new InputForm.InputData[] {
+										new InputForm.InputData("Passo", Def.InputType.Double, vista.GridStep.ToString()),
+										};
+					InputForm inpf = new InputForm("Passo griglia", ref dat);
+
+					if(inpf.ShowDialog() == DialogResult.OK)
+						{
+						double p;
+						if(double.TryParse(dat[0].Contenuto, out p))
+							{
+							if(p > Def.EPSILON)
+								{
+								vista.GridStep = p;
+								}
+							UpdateToolStrips();
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
+							}
+						}
+			}
+
+		private void allineaAllaGriglia_Click(object sender,EventArgs e)
+			{
+			AllineaAllaGriglia();
+			}
+
+		private void inverteRamo_Click(object sender,EventArgs e)
+			{
+			InverteRamoSelezionato();
+			}
+
+		private void inverteRamoToolStrip_Click(object sender,EventArgs e)
+			{
+			InverteRamoSelezionato();
 			}
 
 		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)

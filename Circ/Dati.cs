@@ -30,6 +30,7 @@ namespace Circ
 		uint freeIDnodo, freeIDramo;		// Contatori per un ID libero
 		Def.Stat viewFilter;				// Filtro visualizzazione
 		bool maxIDerror;					// Errore se raggiunto max ID. Necessaria rinumerazione
+		double passoGriglia;				// Temporaneo per salvataggio / caricamento, dato usato nella vista
 
 		#warning Aggiunta stato Disattivo (in futuro) agli elementi
 
@@ -45,7 +46,6 @@ namespace Circ
 			freeIDnodo = freeIDramo = 1;	// Inizializza contatori
 			maxIDerror = false;				//Azzera flag
 			viewFilter = Def.Stat.Nodi | Def.Stat.Rami;		// Filtro per IEnumerable<Elemento>
-			
 			}
 
 
@@ -66,6 +66,11 @@ namespace Circ
 			get {return rami;}
 			set {rami = value;}
 			}
+		public double PassoGriglia
+			{
+			get {return passoGriglia;}
+			set {passoGriglia = value;}
+			}
 
 		[JsonIgnore]
 		public uint FreeIDNodo
@@ -78,8 +83,6 @@ namespace Circ
 			{
 			get {return freeIDramo;}
 			}
-
-
 
 		[JsonIgnore]
 		public Def.Stat ViewFilter

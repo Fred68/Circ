@@ -22,12 +22,9 @@ namespace Circ
 
 		public readonly List<Elemento> selezionati;     // Lista elementi selezionati
 
-
-
-#warning	Aggiungere sposta su griglia dei nodi (non dinamica, troppo complesso)
-
 #warning	Collassa ramo (restituisce nodi)
 #warning	Collassa due o più nodi
+#warning	Divide nodo (se connesso a due rami o più rami)
 
 #warning	Testo con sfondo
 #warning	Sagome 2D con colore di sfondo
@@ -45,12 +42,15 @@ namespace Circ
 
 		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
+		/// <summary>
+		/// Dati del circuito
+		/// </summary>
 		public Dati Dati
 			{
 			get {return dati;}
 			set {dati = value;}
 			}
-		
+
 		[JsonIgnore]
 		public bool IsModified
 			{
@@ -273,7 +273,23 @@ namespace Circ
 				{
 				if(e is Ramo)
 					{
-					DividiRamo((Ramo)e);
+					DivideRamo((Ramo)e);
+					_isModified = true;
+					}
+				}
+			}
+
+		/// <summary>
+		/// Scambia il verso dei rami selezionati
+		/// </summary>
+		public void InverteRamiSelezionati()
+			{
+			List<Elemento> sel = dati.GetSelezionati(true);		// Cerca gli elementi selezionati
+			foreach(Elemento e in sel)
+				{
+				if(e is Ramo)
+					{
+					InverteRamo((Ramo)e);
 					_isModified = true;
 					}
 				}
@@ -283,7 +299,7 @@ namespace Circ
 		/// Divide in due un ramo
 		/// </summary>
 		/// <param name="r"></param>
-		private void DividiRamo(Ramo r)
+		private void DivideRamo(Ramo r)
 			{
 			Nodo n = (Nodo)AddNodo(Point2D.Midpoint(r.Nd1.P, r.Nd2.P));		// Nuovo nodo nel punto medio
 			uint id1, id2, id3;
@@ -299,9 +315,40 @@ namespace Circ
 			r2.CopyData(r);
 			r1.Name += ".1";					// Diversifica i nomi		
 			r2.Name += ".2";
-			
 			}
 
+		/// <summary>
+		/// Scambia i nodi del ramo
+		/// </summary>
+		/// <param name="r"></param>
+		private void InverteRamo(Ramo r)
+			{
+			Nodo nTmp;
+			uint idTmp;
+			idTmp = r.N1;
+			nTmp = r.Nd1;
+			r.N1 = r.N2;
+			r.Nd1 = r.Nd2;
+			r.N2 = idTmp;
+			r.Nd2 = nTmp;
+			}
+
+
+		public void AllineaAllaGriglia(Vista v)
+			{
+			foreach(Elemento el in Dati.Elementi())
+				{
+				if(el is Nodo)
+					{
+					Point2D rp = ((Nodo)el).P/v.GridStep;		// Rapporti 
+					rp.X = Math.Round(rp.X,0)*v.GridStep;
+					rp.Y = Math.Round(rp.Y,0)*v.GridStep;
+					((Nodo)el).P.X = rp.X;
+					((Nodo)el).P.Y = rp.Y;
+					}
+				}
+			_isModified = true;
+			}
 		}	// Fine classe CircuitoDoc
 
 
