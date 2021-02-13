@@ -83,9 +83,29 @@ namespace Circ.Properties {
         /// <summary>
         ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Collassa {
+            get {
+                object obj = ResourceManager.GetObject("Collassa", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Compatta {
             get {
                 object obj = ResourceManager.GetObject("Compatta", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Connesso {
+            get {
+                object obj = ResourceManager.GetObject("Connesso", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -136,6 +156,16 @@ namespace Circ.Properties {
         internal static System.Drawing.Bitmap GridMeno {
             get {
                 object obj = ResourceManager.GetObject("GridMeno", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap GridPasso {
+            get {
+                object obj = ResourceManager.GetObject("GridPasso", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -196,6 +226,16 @@ namespace Circ.Properties {
         internal static System.Drawing.Bitmap SelAll {
             get {
                 object obj = ResourceManager.GetObject("SelAll", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SelInverse {
+            get {
+                object obj = ResourceManager.GetObject("SelInverse", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

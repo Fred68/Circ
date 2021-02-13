@@ -22,9 +22,12 @@ namespace Circ
 
 		public readonly List<Elemento> selezionati;     // Lista elementi selezionati
 
-#warning	Collassa ramo (restituisce nodi)
-#warning	Collassa due o più nodi
-#warning	Divide nodo (se connesso a due rami o più rami)
+#warning	Selezioni varie: tutte con pulsante destro
+#warning	Dragging con dx: finestra rettangolare
+#warning	Contaext menù con tasto destro
+
+#warning	Lampeggiare gli element selezionati (sfruttare il timer)
+#warning	Messaggi: correggere il testo, in base alla selezione. Es. "Eliminare 1 nodo selezionato" e non "Eliminare 1 nodi 0 rami selezionati"
 
 #warning	Testo con sfondo
 #warning	Sagome 2D con colore di sfondo
@@ -266,7 +269,7 @@ namespace Circ
 		/// <summary>
 		/// Divide in due i rami selezionati
 		/// </summary>
-		public void DivideRamiSelezionati()
+		public void DivideSelezionati()
 			{
 			List<Elemento> sel = dati.GetSelezionati(true);		// Cerca gli elementi selezionati
 			foreach(Elemento e in sel)
@@ -274,6 +277,11 @@ namespace Circ
 				if(e is Ramo)
 					{
 					DivideRamo((Ramo)e);
+					_isModified = true;
+					}
+				else if(e is Nodo)
+					{
+					DivideNodo((Nodo)e);
 					_isModified = true;
 					}
 				}
@@ -307,7 +315,7 @@ namespace Circ
 			id2 = n.ID;
 			id3 = r.N2;
 
-			Dati.EliminaRamo(r.ID);				// Elimina il ramo r
+			dati.EliminaRamo(r.ID);				// Elimina il ramo r
 			Ramo r1 = (Ramo)AddRamo(id1,id2);	// Crea i nuovi rami
 			Ramo r2 = (Ramo)AddRamo(id2,id3);
 
@@ -317,6 +325,41 @@ namespace Circ
 			r2.Name += ".2";
 			}
 
+		/// <summary>
+		/// Divide il nodo selezionato, aggiungendo un nodo per ogni ramo connesso
+		/// </summary>
+		/// <param name="n"></param>
+		private void DivideNodo(Nodo n)
+			{
+			List<Elemento> lr = dati.GetElementiUsing(n.ID);
+			int count = 0;
+			foreach(Elemento r in lr)
+				{
+				if(r is Ramo)
+					{
+					Point2D spost;
+					Nodo nn = (Nodo)AddNodo(n.P);
+					nn.CopyData(n);
+					nn.Name += $".{count++}";
+					if(((Ramo)r).N1 == n.ID)
+						{
+						((Ramo)r).N1 = nn.ID;
+						((Ramo)r).Nd1 = nn;
+						spost = (((Ramo)r).Nd2.P - ((Ramo)r).Nd1.P)/10;
+						}
+					else
+						{
+						((Ramo)r).N2 = nn.ID;
+						((Ramo)r).Nd2 = nn;
+						spost = (((Ramo)r).Nd1.P - ((Ramo)r).Nd2.P)/10;
+						}
+					nn.P += spost;
+					}
+				}
+			#if DEBUG
+			System.Windows.Forms.MessageBox.Show($"count = {count}");
+			#endif	
+			}
 		/// <summary>
 		/// Scambia i nodi del ramo
 		/// </summary>
@@ -333,7 +376,10 @@ namespace Circ
 			r.Nd2 = nTmp;
 			}
 
-
+		/// <summary>
+		/// Allinea tutti i nodi alla griglia della vista
+		/// </summary>
+		/// <param name="v">Vista con la griglia</param>
 		public void AllineaAllaGriglia(Vista v)
 			{
 			foreach(Elemento el in Dati.Elementi())
@@ -349,6 +395,50 @@ namespace Circ
 				}
 			_isModified = true;
 			}
+
+		/// <summary>
+		/// Collassa i nodi selezionati sul primo della lista
+		/// </summary>
+		/// <param name="removeNodes">Elimina i nodi collassati</param>
+		/// <returns></returns>
+		public int CollassaSelezionati(bool removeNodes = false)
+			{
+			int count = 0;
+			List<Elemento> sel;
+			sel = dati.GetSelezionati(true,Def.Stat.Nodi);			// Cerca i nodi selezionati
+			if(sel.Count > 1)										// Se sono selezionati almeno due nodi
+				{
+				for(int i=1; i<sel.Count; i++)						// Percorre la lista dal 2° elemento
+					{
+					dati.CollassaNodi(sel[0].ID, sel[i].ID);		// Collassa i nodi sul primo nodo
+					if(removeNodes)
+						{
+						dati.EliminaNodo(sel[i].ID);				// Elimina i nodi, se richiesto (e se è possibile)
+						}
+					_isModified = true;
+					}
+				}
+			sel = dati.GetSelezionati(true,Def.Stat.Rami);			// Cerca i rami selezionati
+			foreach(Elemento e in sel)
+				{
+				dati.EliminaRamo(e.ID,true);
+				_isModified = true;
+				}
+			return count;
+			}
+
+		/// <summary>
+		/// Inverte la selezione di tutti gli elementi (filtrati con view Filter)
+		/// </summary>
+		public void InverteSelezione()
+			{
+			//dati.ViewFilter = Def.Stat.Tutti;
+			foreach(Elemento e in dati.Elementi())
+				{
+				e.Selected = !e.Selected;
+				}
+			}
+
 		}	// Fine classe CircuitoDoc
 
 

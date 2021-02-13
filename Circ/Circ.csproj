@@ -145,15 +145,19 @@
     <None Include="Resources\Save.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Collassa.bmp" />
     <Content Include="Resources\Compatta.bmp" />
+    <None Include="Resources\Connesso.bmp" />
     <Content Include="Resources\Divide.bmp" />
     <Content Include="Resources\Elimina.bmp" />
     <Content Include="Resources\Grid.bmp" />
     <Content Include="Resources\GridMeno.bmp" />
+    <None Include="Resources\GridPasso.bmp" />
     <Content Include="Resources\GridPiu.bmp" />
     <Content Include="Resources\Inverte.bmp" />
     <Content Include="Resources\Rinumera.bmp" />
     <Content Include="Resources\SelAll.bmp" />
+    <Content Include="Resources\SelInverse.bmp" />
     <Content Include="Resources\SelNothing.bmp" />
     <Content Include="Resources\ZoomFit.bmp" />
     <Content Include="Resources\ZoomIn.bmp" />

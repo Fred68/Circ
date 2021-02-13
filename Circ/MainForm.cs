@@ -902,11 +902,12 @@ namespace Circ
 		/// <param name="e"></param>
 		private void drwPanel_MouseUp(object sender, MouseEventArgs e)
 			{
-			if(stato.Dragging && stato.Stato!=Def.Stat.Edit)	// Se sta eseguendo un dragging (ma non in Edit...
-				{												// ...per consentire aggiustamenti piccoli)...
+			if(stato.Dragging)					// Se sta eseguendo un dragging...
+				if(  !(stato.Stato==Def.Stat.Vista) )	// ...ma non in Vista
+				{								// Se lo spostamento è piccolo...
 				if((Math.Abs(e.Location.X - stato.dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - stato.dragIniFix.Y) < Def.DRG_MIN))
 					{
-					stato.Dragging = false;		// ...annulla il dragging se lo spostamento è piccolo per distinguere un click da un drag.
+					stato.Dragging = false;		// ...annulla il dragging per distinguere un click da un drag.
 					vista.RegenDL(false);
 					}
 				}
@@ -1075,11 +1076,11 @@ namespace Circ
 		/// <summary>
 		/// Divide i rami selezionati
 		/// </summary>
-		private void DivideRamiSelezionati()
+		private void DivideSelezionati()
 			{
 			if(doc != null)
 				{
-				doc.DivideRamiSelezionati();
+				doc.DivideSelezionati();
 				vista.SetOutdatedDL();
 				vista.RegenDL(true);
 				vista.Redraw(true);
@@ -1109,18 +1110,25 @@ namespace Circ
 			firstLine = false;
 			}
 
+		/// <summary>
+		/// Allinea i nodi alla griglia
+		/// </summary>
 		private void AllineaAllaGriglia()
 			{
 			if(doc != null)
 				{
 				doc.AllineaAllaGriglia(vista);
+				vista.SetOutdatedDL();
 				vista.RegenDL(true);
 				vista.Redraw(true);
 				Invalidate();
 				}
 			}
 		
-		private void InverteRamoSelezionato()
+		/// <summary>
+		/// Inverte i rami selezionati
+		/// </summary>
+		private void InverteRamiSelezionati()
 			{
 			if(doc != null)
 				{
@@ -1131,6 +1139,31 @@ namespace Circ
 				}
 			}
 
+		/// <summary>
+		/// Collassa i nodi selezionati sul primo della lista
+		/// </summary>
+		private void CollassaSelezionati()
+			{
+			if(doc != null)
+				{
+				doc.CollassaSelezionati();
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				vista.Redraw(true);
+				Invalidate();
+				}
+			}
+
+		private void ControllaNodiIsolati()
+			{
+			if(doc != null)
+				{
+				string x = (doc.Dati.VerificaNodiIsolati(true)==true) ? "" : "non ";
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				MessageBox.Show($"Il circuito {x}è connesso");
+				}
+			}
 		#region TEST
 
 		private void rinumeraNodoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1378,20 +1411,11 @@ namespace Circ
 			vista.Redraw();
 			}
 
-		private void rinumeraToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			Rinumera();
-			}
-
 		private void RinumeraToolStripButton_Click(object sender, EventArgs e)
 			{
 			Rinumera();
 			}
 
-		private void compattaIDToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			CompattaID();
-			}
 		private void CompattaIDToolStripButton_Click(object sender, EventArgs e)
 			{
 			CompattaID();
@@ -1419,13 +1443,7 @@ namespace Circ
 
 		private void controllaNodiIsolatiToolStripMenuItem_Click_1(object sender, EventArgs e)
 			{
-			if(doc != null)
-				{
-				string x = (doc.Dati.VerificaNodiIsolati(true)==true) ? "" : "non ";
-				vista.SetOutdatedDL();
-				vista.RegenDL(true);
-				MessageBox.Show($"Il circuito {x}è connesso");
-				}
+			ControllaNodiIsolati();
 			}
 
 		private void creaMatriceDiIncidenzaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1443,12 +1461,12 @@ namespace Circ
 
 		private void DivideToolStripButton_Click(object sender, EventArgs e)
 			{
-			DivideRamiSelezionati();
+			DivideSelezionati();
 			}
 
 		private void dividiRamoToolStripMenuItem_Click(object sender, EventArgs e)
 			{
-			DivideRamiSelezionati();
+			DivideSelezionati();
 			}
 
 		private void grigliaToggle_Click(object sender,EventArgs e)
@@ -1506,12 +1524,44 @@ namespace Circ
 
 		private void inverteRamo_Click(object sender,EventArgs e)
 			{
-			InverteRamoSelezionato();
+			InverteRamiSelezionati();
 			}
 
 		private void inverteRamoToolStrip_Click(object sender,EventArgs e)
 			{
-			InverteRamoSelezionato();
+			InverteRamiSelezionati();
+			}
+
+		private void collassaNodi_Click(object sender,EventArgs e)
+			{
+			CollassaSelezionati();
+			}
+
+		private void inverteSel_Click(object sender,EventArgs e)
+			{
+			if(doc!=null)
+				{
+				doc.InverteSelezione();
+				vista.SetOutdatedDL();
+				vista.RegenDL(true);
+				vista.Redraw(true);
+				}
+			}
+
+		private void toolCollassa_Click(object sender,EventArgs e)
+			{
+			CollassaSelezionati();
+			}
+
+		private void compattaIDToolStrip_Click(object sender,EventArgs e)
+			{
+			CompattaID();
+
+			}
+
+		private void controllaIsolati_toolStrip_Click(object sender,EventArgs e)
+			{
+			ControllaNodiIsolati();
 			}
 
 		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)

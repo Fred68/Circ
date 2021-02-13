@@ -101,10 +101,10 @@ namespace Circ
 
 		/// <summary>
 		/// CopyData
-		/// Copia i dati serializzabili, ma non l'ID
+		/// Copia i dati serializzabili, ma non l'ID, dall'elemento 'e' a this
 		/// Clone() con estensione o altro: laborioso (https://www.c-sharpcorner.com/article/cloning-objects-in-net-framework/)
 		/// </summary>
-		/// <param name="e"></param>
+		/// <param name="e">elemento da cui copiare i dati</param>
 		public virtual void CopyData(Elemento e)
 			{
 			name = e.name;			// Copia il nome

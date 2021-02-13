@@ -216,7 +216,7 @@ namespace Circ
 
 		/// <summary>
 		/// Enumeratore di tutti gli elementi
-		/// filtrati con ViewFiter
+		/// filtrati con ViewFilter
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerable<Elemento> Elementi()	
@@ -259,7 +259,7 @@ namespace Circ
 			Elemento el = null;
 			if(id != Elemento.UNASSIGNED)
 				{
-				if( (typ & Def.Stat.Nodi) != 0 )		//if(typ == Def.Stat.Nodi)
+				if( (typ & Def.Stat.Nodi) != 0 )
 					{
 					foreach(Nodo x in nodi)
 						{
@@ -270,7 +270,7 @@ namespace Circ
 							}
 						}
 					}
-				else if( (typ & Def.Stat.Rami) != 0)	//else if(typ == Def.Stat.Rami)
+				else if( (typ & Def.Stat.Rami) != 0)
 					{
 					foreach(Ramo x in rami)
 						{
@@ -346,21 +346,27 @@ namespace Circ
 		/// </summary>
 		/// <param name="selezionati">true per i selezionati</param>
 		/// <returns></returns>
-		public List<Elemento> GetSelezionati(bool selezionati = true)
+		public List<Elemento> GetSelezionati(bool selezionati = true, Def.Stat typ = Def.Stat.Tutti)
 			{
 			List<Elemento> l = new List<Elemento>();
-			foreach(Ramo el in rami)
+			if((typ & Def.Stat.Rami) != 0)
 				{
-				if(el.Selected == selezionati)
+				foreach(Ramo el in rami)
 					{
-					l.Add(el);
+					if(el.Selected == selezionati)
+						{
+						l.Add(el);
+						}
 					}
 				}
-			foreach(Nodo el in nodi)
+			if((typ & Def.Stat.Nodi) != 0)
 				{
-				if(el.Selected == selezionati)
+				foreach(Nodo el in nodi)
 					{
-					l.Add(el);
+					if(el.Selected == selezionati)
+						{
+						l.Add(el);
+						}
 					}
 				}
 			return l;
@@ -418,13 +424,36 @@ namespace Circ
 		/// Tutti gli elementi che usano il nodo con ID idnodo
 		/// </summary>
 		/// <param name="IDnodo"></param>
-		/// <returns></returns>
+		/// <returns>List<Elemento></returns>
 		public List<Elemento> GetElementiUsing(uint IDnodo)
 			{
 			List<Elemento> l = new List<Elemento>();
 			foreach(Ramo r in rami)
 				{
 				if( (r.N1 == IDnodo) || (r.N2 == IDnodo ))
+					{
+					l.Add(r);
+					}
+				}
+			return l;
+			}
+
+		/// <summary>
+		/// Tutti gli elemento che usano entrambi i nodi
+		/// </summary>
+		/// <param name="IDnodo1"></param>
+		/// <param name="IDnodo2"></param>
+		/// <returns>List<Elemento></returns>
+		public List<Elemento> GetElementiUsingBoth(uint IDnodo1, uint IDnodo2)
+			{
+			List<Elemento> l = new List<Elemento>();
+			foreach(Ramo r in rami)
+				{
+				if	(
+					((r.N1 == IDnodo1) && (r.N2 == IDnodo2))
+					||
+					((r.N1 == IDnodo2) && (r.N2 == IDnodo1))
+					)
 					{
 					l.Add(r);
 					}
@@ -593,15 +622,24 @@ namespace Circ
 			{
 			bool ok = false;
 			Stack<Elemento> s = new Stack<Elemento>();		// Crea uno stack per la ricerca
-			foreach(Elemento e in Elementi())				// Deseleziona tutti gli elementi
+			foreach(Elemento e in Elementi())				// Segna come disconnessi tutti gli elementi
 				{
 				e.Connesso = false;
 				}
 			if( (nodi.Count>1) && (rami.Count>0) )			// Se ci sono almeno 2 nodi ed un ramo...
 				{
-				Elemento x = nodi[0];						// Estrae il primo nodo e lo mette nello stack
-				s.Push(x);
-				while(s.Any())								// Finché lo stack contiene quaqlcosa...
+				Elemento x;									// Elemento di partenza
+				List<Elemento> lsel = GetSelezionati(true);		
+				if(lsel.Count != 0)							// Se ci sono elementi selezionati...
+					{
+					x = lsel[0];							// ...sceglie il primo elemento della selezione.
+					}
+				else
+					{
+					x = nodi[0];							// Se non c'é nulla di selezionato, sceglie il primo nodo.
+					}
+				s.Push(x);									// Mette l'elemento di partenza nello stack
+				while(s.Any())								// Finché lo stack contiene qualcosa...
 					{
 					x = s.Pop();							// Estrae un elemento e...
 					if(!x.Connesso)							// ...se non è ancora stato selezionato
@@ -639,17 +677,23 @@ namespace Circ
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public bool EliminaRamo(uint id)
+		public bool EliminaRamo(uint id, bool collassa = false)
 			{
 			bool ok = true;
 			List<Elemento> l = GetElementi(id, Def.Stat.Rami);
 			foreach(Ramo r in l)
 				{
+				uint n1,n2;
+				n1 = r.N1;
+				n2 = r.N2;
 				rami.Remove(r);
+				if(collassa)
+					CollassaNodi(r.N1, r.N2);
 				}
 			return ok;
 			}
 
+		
 		/// <summary>
 		/// Elimina il nodo ID, se non è utilizzato
 		/// </summary>
@@ -799,8 +843,47 @@ namespace Circ
 			return A;
 			}
 
-		#warning IMPORTANTE: UNIRE I NODI SEMPLICEMENTE CONNESSI IN UN UNICO NUMERO. Usare numero nodo, indicea parte (o ID ridotto)
-		
+		/// <summary>
+		/// Collassa due nodi in un unico nodo
+		/// solo se non c'é un ramo tra i due
+		/// Non elimina nessun nodo
+		/// </summary>
+		/// <param name="IDkeep">Nodo mantenuto</param>
+		/// <param name="IDrem">Nodo eliminato</param>
+		/// <returns></returns>
+		public bool CollassaNodi(uint IDkeep, uint IDrem)
+			{
+			bool ok = false;
+			List<Elemento> lKeep = GetElementi(IDkeep, Def.Stat.Nodi);		// Lista nodi con indice IDkeep (deve esisterne uno solo)
+			if(
+				(lKeep.Count == 1)									// Se c'é il nodo da mantenere e...
+				&&
+				(GetElementiUsingBoth(IDkeep, IDrem).Count==0))		// ...se i due nodi non sono collegati direttamente
+				{
+				Nodo nKeep = (Nodo)lKeep[0];						// Il nodo da mantenere
+				List<Elemento> l = GetElementiUsing(IDrem);			// Lista degli elementi che usano il nodo da eliminare
+				foreach(Elemento el in l)
+					{
+					if(el is Ramo)									// Il ramo el usa IDrem.
+						{
+						if( ((Ramo)el).N1==IDrem )					// Se come primo nodo...
+							{
+							((Ramo)el).N1 = nKeep.ID;
+							((Ramo)el).Nd1 = nKeep;
+							ok = true;
+							}
+						else
+							{										// Se come secondo nodo...
+							((Ramo)el).N2 = nKeep.ID;
+							((Ramo)el).Nd2 = nKeep;
+							ok = true;
+							}
+						}
+					}
+				}
+			return ok;
+			}
+
 
 
 		}	// Fine classe DatiCirc
