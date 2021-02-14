@@ -106,7 +106,7 @@ namespace Circ
 
 			drwPanel.BringToFront();							// Porta il pannello di disegno in primo piano (se no resta dietro dopo il docking)
 			drwPanel.Dock = DockStyle.Fill;						// Estende il pannello
-			drwPanel.BackColor = Def.ColourBackground;
+			drwPanel.BackColor = Colori.BackgroundColor;		// Colore di sfondo
 
 			pini = pfin = pold = new Point(0,0);
 			firstLine = true;
@@ -575,7 +575,6 @@ namespace Circ
 			{
 			if(doc != null)
 				{
-				bool ok = false;
 				List<Elemento> lsel = doc.Dati.GetSelezionati(true);
 				if(lsel.Count == 1)
 					{

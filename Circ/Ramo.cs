@@ -68,7 +68,7 @@ namespace Circ
 				m.Rotate((float)rotation);
 
 				if(addToDisplayList)
-					v.AddDL(this,Def.Shape.Ramo, Def.Colori.Red, pc.X, pc.Y);
+					v.AddDL(this,Def.Shape.Ramo, Colori.Colore.Ramo, pc.X, pc.Y);
 				}
 			}
 

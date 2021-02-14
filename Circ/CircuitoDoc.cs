@@ -26,12 +26,14 @@ namespace Circ
 #warning	Dragging con dx: finestra rettangolare
 #warning	Contaext menù con tasto destro
 
+#warning	Aggiungere comando Duplica elementi
+
 #warning	Lampeggiare gli element selezionati (sfruttare il timer)
 #warning	Messaggi: correggere il testo, in base alla selezione. Es. "Eliminare 1 nodo selezionato" e non "Eliminare 1 nodi 0 rami selezionati"
 
 #warning	Testo con sfondo
 #warning	Sagome 2D con colore di sfondo
-#warning	Spostare gli indici dei colori sotto vista ed usarla per diegnare
+#warning	Spostare colori e penne sotto vista ed usarla per disegnare; le funzioni Draw passano solo gli indici, non le penne.
 #warning	Aggiungere testo per dati aggiuntivi
 #warning	Menù checked con gli oggetti da vedere nella descrizione (dinamico, usare Reflection)
 

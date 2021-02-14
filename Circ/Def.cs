@@ -16,12 +16,7 @@ namespace Circ
 		/// Indici dei colori
 		/// La dimensione deve corrispondere a pen[] e brush[]
 		/// </summary>
-		public enum Colori					// Indici dei colori 
-			{
-			Selected,						// Selezionato
-			Highlighted,					// Evidenziato
-			Black, Red, Green, Blue			// Gli altri colori
-			};
+		
 
 #warning Usare classi aggiuntive per i dati degli elementi, oppure derivare da Nodo e Ramo ?
 
@@ -136,11 +131,7 @@ namespace Circ
 		public static int SHAPE_HALFSIZE = 30;					// Dimensioni della sagoma disegnata
 		public static int MAX_GRID_POINTS = 70;					// Numero massimo di divisioni della griglia
 
-		public static Color ColourSelected = Color.Cyan;		// Colori di default
-		public static Color ColourHighlighed = Color.Yellow;
-		public static Color ColourBackground = Color.FromArgb(20,20,20);
-		public static Color ColourNodo = Color.LightGray;
-		public static Color ColourRamo = Color.Red;
+		
 
 		public static int TIMER_REFRESH = 300;				// Intervallo di refresh di alcune scritte (tra cui il nome file da salvare)
 

@@ -21,10 +21,11 @@ namespace Circ
 			public Def.Shape shape;			// Forma
 			public Point p1;				// Punto 1
 			public Point p2;				// Punto 2
-			public Def.Colori colour;		// Colore
+			public Colori.Colore colour;	// Colore
 			public Point center;			// Centro
 			}
 
+		Vista vista;				// Vista (contenente i dati grafici)
 		Command[] com;				// Comandi della display list
 		int count;					// Numero di elementi
 
@@ -37,28 +38,16 @@ namespace Circ
 
 		public readonly List<int> indxList;	// Lista indici evidenziati nell'ultimo Play()
 
-		Pen[] pen;					// Penne
-		Brush[] brush;				// Pennelli
-		Font[] font;				// Caratteri
-		public Pen[] PEN
-			{
-			get {return pen;}
-			}
-		public Brush[] BRUSH
-			{
-			get {return brush;}
-			}
-		public Font[] FONT
-			{
-			get {return font;}
-			}
 		/// <summary>
 		/// Costruttore
 		/// </summary>
-		public DisplayList()
+		public DisplayList(Vista v)
 			{
+			
+			vista = v;
 			indxList  = new List<int>();			// Crea la lista degli indici
 
+			/*
 			brush = new Brush[]
 				{
 				new SolidBrush(Def.ColourSelected),			// Selected
@@ -67,6 +56,7 @@ namespace Circ
 				new SolidBrush(Def.ColourRamo),				// Rami
 				new SolidBrush(Color.Green),
 				new SolidBrush(Color.Blue),
+				new SolidBrush(Def.ColourBackground)
 				}; 
 			pen = new Pen[]
 				{
@@ -75,7 +65,8 @@ namespace Circ
 				new Pen(Def.ColourNodo, 1),
 				new Pen(Def.ColourRamo, 1),
 				new Pen(Color.Green, 1),
-				new Pen(Color.Blue, 1)
+				new Pen(Color.Blue, 1),
+				new Pen(Def.ColourBackground)
 				};
 			font = new Font[]
 				{
@@ -86,6 +77,7 @@ namespace Circ
 				throw new Exception("Pen array and Color enum do not match");
 			if(brush.Length != Enum.GetNames(typeof(Def.Colori)).Length)
 				throw new Exception("Brush array and Color enum do not match");
+			*/
 
 			com = new Command[Def.FREE_MAX];				// Array
 			#if(DEBUG)
@@ -139,7 +131,7 @@ namespace Circ
 		/// <param name="y1">...e Y</param>
 		/// <param name="x2">Secondo punto: X...</param>
 		/// <param name="y2">...e Y</param>
-		public void Add(Elemento element, Def.Shape shape, Def.Colori colour, int cx, int cy)
+		public void Add(Elemento element, Def.Shape shape, Colori.Colore colour, int cx, int cy)
 			{
 			com[count].elemento = element;
 			com[count].shape = shape;
@@ -203,20 +195,20 @@ namespace Circ
 				{
 				colour = (int)(com[i].colour);
 
-				colour = com[i].elemento.Selected ? (int)Def.Colori.Selected : (int)com[i].colour;  // Colore base o selezionato
-				if (distanceSq > 0)																	// Evidenziato
+				colour = com[i].elemento.Selected ? (int)Colori.Colore.Selected : (int)com[i].colour;  // Colore base o selezionato
+				if (distanceSq > 0)																		// Evidenziato
 					{
 					if((com[i].shape & flags) != 0)			// Filtro per tipo di forma
 						{
 						if(DistanceSquared(com[i].center, p) < distanceSq)
 							{
-							colour = (int)Def.Colori.Highlighted;
+							colour = (int)Colori.Colore.Highlighted;
 							indxList.Add(i);
 							}
 						}
 					}
 
-				com[i].elemento.Draw(g, pen[colour], brush[colour], font[0]);		// Disegna l'elemento su schermo graphics
+				com[i].elemento.Draw(g, vista.Clrs.PEN[colour], vista.Clrs.BRUSH[colour], vista.Clrs.FONT[0]);		// Disegna l'elemento su schermo graphics
 
 				}
 			return indxList.Count;

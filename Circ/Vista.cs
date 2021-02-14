@@ -37,6 +37,11 @@ namespace Circ
 
 		Griglia grid;
 
+		Colori clrs;
+
+		
+		
+
 		#region PROPRIETÀ PUBBLICHE
 		
 		/// <summary>
@@ -86,19 +91,6 @@ namespace Circ
 			{
 			get {return verso;}
 			}
-		public Pen[] PEN
-			{
-			#warning Aggiungere controllo numero e penne standard
-			get {return dl.PEN;}
-			}
-
-		/// <summary>
-		/// Array delle penne
-		/// </summary>
-		public int Pens
-			{
-			get {return dl.PEN.Length;}
-			}
 
 		/// <summary>
 		/// Limiti dell'area visualizzata in coordinate World
@@ -122,6 +114,10 @@ namespace Circ
 			set {grid.Step=value;}
 			}
 
+		public Colori Clrs
+			{
+			get {return clrs;}
+			}
 		#endregion
 	
 		/// <summary>
@@ -132,12 +128,14 @@ namespace Circ
 			{
 			p = obj;
 
+			clrs = new Colori();
+
 			#warning Aggiungere proprietà e controllo scala > epsilon
 			centro = new Point2D(0,0);
 			scalaXY = new Point2D(1,1);
 			verso = new Point(1,-1);
 
-			dl = new DisplayList();
+			dl = new DisplayList(this);
 			
 			cursor = new Point(0,0);
 			raggioSq = 0;
@@ -287,7 +285,7 @@ namespace Circ
 		/// <param name="y2"></param>
 		/// <param name="cx">Centro</param>
 		/// <param name="cy"></param>
-		public void AddDL(Elemento element, Def.Shape shape, Def.Colori colour, int cx, int cy)
+		public void AddDL(Elemento element, Def.Shape shape, Colori.Colore colour, int cx, int cy)
 			{
 			dl.Add(element, shape, colour, cx, cy);
 			}
@@ -354,9 +352,9 @@ namespace Circ
 			LOG.Write(@"Redraw()");
 			#endif
 			g = p.CreateGraphics();
-			if(clear)	g.Clear(Def.ColourBackground);
-			g.DrawRectangle(PEN[(int)Def.Colori.Black],1,1,p.Width-2,p.Height-2);		// Cornice
-			grid.Draw(g,this,PEN[(int)Def.Colori.Blue]);
+			if(clear)	g.Clear(Colori.BackgroundColor);
+			g.DrawRectangle(clrs.PEN[(int)Colori.Colore.Nodo],1,1,p.Width-2,p.Height-2);		// Cornice
+			grid.Draw(g,this,clrs.PEN[(int)Colori.Colore.Griglia]);
 			DrawWorldAxes(g);															// Assi
 			dl.Play(g, ref cursor, raggioSq, filter);									// Disegna la D.L.
 			g.Dispose();
@@ -370,18 +368,18 @@ namespace Circ
 		private void DrawWorldAxes(Graphics g)
 			{
 			Point origin = Scala(Point2D.Zero);															// Origine world
-			g.DrawLine(PEN[(int)Def.Colori.Red],origin.X,origin.Y-5*verso.Y,origin.X,origin.Y+15*verso.Y);
-			g.DrawLine(PEN[(int)Def.Colori.Red],origin.X-3*verso.X,origin.Y+10*verso.Y,origin.X,origin.Y+15*verso.Y);
-			g.DrawLine(PEN[(int)Def.Colori.Red],origin.X+3*verso.X,origin.Y+10*verso.Y,origin.X,origin.Y+15*verso.Y);
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X,origin.Y-5*verso.Y,origin.X,origin.Y+15*verso.Y);
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X-3*verso.X,origin.Y+10*verso.Y,origin.X,origin.Y+15*verso.Y);
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X+3*verso.X,origin.Y+10*verso.Y,origin.X,origin.Y+15*verso.Y);
 
-			g.DrawLine(PEN[(int)Def.Colori.Red],origin.X-5*verso.X,origin.Y,origin.X+15*verso.X,origin.Y);
-			g.DrawLine(PEN[(int)Def.Colori.Red],origin.X+10*verso.X,origin.Y-3*verso.Y,origin.X+15*verso.X,origin.Y);
-			g.DrawLine(PEN[(int)Def.Colori.Red],origin.X+10*verso.X,origin.Y+3*verso.Y,origin.X+15*verso.X,origin.Y);
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X-5*verso.X,origin.Y,origin.X+15*verso.X,origin.Y);
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X+10*verso.X,origin.Y-3*verso.Y,origin.X+15*verso.X,origin.Y);
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X+10*verso.X,origin.Y+3*verso.Y,origin.X+15*verso.X,origin.Y);
 
 			#if(DEBUG)
-			g.DrawLine(PEN[(int)Def.Colori.Blue],cenClient.X,cenClient.Y-5,cenClient.X,cenClient.Y+5);	// Centro client
-			g.DrawLine(PEN[(int)Def.Colori.Blue],cenClient.X-5,cenClient.Y,cenClient.X+5,cenClient.Y);
-			g.DrawEllipse(PEN[(int)Def.Colori.Blue],Scala(centro).X-5,Scala(centro).Y-5,10,10);			// Centro vista
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Griglia],cenClient.X,cenClient.Y-5,cenClient.X,cenClient.Y+5);	// Centro client
+			g.DrawLine(clrs.PEN[(int)Colori.Colore.Griglia],cenClient.X-5,cenClient.Y,cenClient.X+5,cenClient.Y);
+			g.DrawEllipse(clrs.PEN[(int)Colori.Colore.Griglia],Scala(centro).X-5,Scala(centro).Y-5,10,10);			// Centro vista
 			#endif
 			}
 

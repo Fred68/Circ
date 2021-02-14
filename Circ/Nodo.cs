@@ -46,7 +46,7 @@ namespace Circ
 			{
 			ps = v.Scala(p);
 			if(addToDisplayList)
-				v.AddDL(this,Def.Shape.Nodo, Def.Colori.Black, ps.X, ps.Y);
+				v.AddDL(this,Def.Shape.Nodo, Colori.Colore.Nodo, ps.X, ps.Y);
 			}
 		
 		public override Def.ClipFlag Clip(Vista v)
@@ -56,13 +56,20 @@ namespace Circ
 			}
 
 		public override void Draw(Graphics g, Pen pn, Brush br, Font fn)
-			{
+			{	
 			GraphicsPath pth = (GraphicsPath) Def.Shape2D.GetShape(Def.Shape2D.Name.Circle).Clone();
 			Matrix m = new Matrix();
 			m.Translate(ps.X,ps.Y);
 			pth.Transform(m);
 			g.DrawPath(pn, pth);
-			g.DrawString(id.ToString(), fn, br, ps.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2, ps.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2);;
+			string str = id.ToString()+System.Environment.NewLine+"---";
+			SizeF sz = g.MeasureString(str,fn);
+			g.DrawRectangle(pn,ps.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2, ps.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2,sz.Width,sz.Height);
+			//g.FillRectangle(br,ps.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2, ps.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2,sz.Width,sz.Height);
+			g.DrawString(str, fn, br, ps.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2, ps.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2);
+
+
+			
 			}
 
 		public override void CopyData(Elemento e) 
