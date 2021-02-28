@@ -14,8 +14,8 @@ namespace Fred68.Tools.Log
 	/// </summary>
 	public static class LOG
 		{
-		
-		public static bool ENABLED = true;
+
+		public static bool ENABLED = false;
 		public static readonly string LOGFILE = @"Log.txt";
 		public static bool APPEND = false;
 		public static int MAX_LOG_LEVEL = 1;
@@ -23,19 +23,19 @@ namespace Fred68.Tools.Log
 		/// <summary>
 		/// Attiva o disattiva il log
 		/// </summary>
-		public static bool active {get; set;}
+		public static bool active { get; set; }
 
-		#if DEBUG
+#if DEBUG
 		static StreamWriter sw = null;
 		static bool firstline = false;
-		#endif
+#endif
 
 		static LOG()
 			{
-			#if DEBUG
+#if DEBUG
 			sw = new StreamWriter(LOGFILE,APPEND);
 			sw.AutoFlush = true;
-			#endif
+#endif
 			active = false;
 			}
 
@@ -45,36 +45,36 @@ namespace Fred68.Tools.Log
 		/// </summary>
 		/// <param name="msg">Testo del messaggio</param>
 		/// <param name="logLevel">Livello di log del messaggio</param>
-		public static void Write(string msg, int logLevel = 0)
+		public static void Write(string msg,int logLevel = 0)
 			{
-			#if DEBUG
+#if DEBUG
 			if(active)
 				{
 				if(!firstline)
 					{
-					sw.WriteLine(new string('-', 50));
+					sw.WriteLine(new string('-',50));
 					firstline = true;
 					}
 				if(sw != null)
-					if((logLevel <= MAX_LOG_LEVEL) && ENABLED) 
+					if((logLevel <= MAX_LOG_LEVEL) && ENABLED)
 						sw.WriteLine(DateTime.Now.ToString("dd/MM/yy HH:mm:ss") + "\t\t" + msg);
 				}
-			#endif
+#endif
 			return;
 			}
-		
+
 		/// <summary>
 		/// Chiude le operazioni di log
 		/// </summary>
 		public static void Close()
 			{
-			#if DEBUG
+#if DEBUG
 			if(sw != null)
 				{
 				sw.Close();
 				sw = null;
 				}
-			#endif
+#endif
 			}
 		}
 	}

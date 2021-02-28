@@ -9,8 +9,8 @@ namespace Fred68.Tools.Matematica
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	public class MatrixBase<T>
-							: IFormattable					// Per ToString()
-							 where T : new()				// Constraint per tipo T: deve avere metodo new()
+							:IFormattable                   // Per ToString()
+							 where T : new()                // Constraint per tipo T: deve avere metodo new()
 		{
 		/// <summary>
 		/// Error codes
@@ -31,29 +31,29 @@ namespace Fred68.Tools.Matematica
 			Invalid = 6
 			}
 		#region PROTECTED
-		#pragma warning disable 1591						// Disabilita warning in compilazione
-		protected int row;									// Numeri di righe...
-		protected int col;									// ...e colonne
-		protected T[,] dat;									// Matrice dei dati
+#pragma warning disable 1591                       // Disabilita warning in compilazione
+		protected int row;                                  // Numeri di righe...
+		protected int col;                                  // ...e colonne
+		protected T[,] dat;                                 // Matrice dei dati
 		protected bool checkIndex;
-		#pragma warning restore 1591
+#pragma warning restore 1591
 		#endregion
 		#region PROPRIETA
 		/// <summary>
 		/// Numero di righe
 		/// </summary>
-		public int Row {get {return row;}}
+		public int Row { get { return row; } }
 		/// <summary>
 		/// Numero di colonne
 		/// </summary>
-		public int Col { get {return col;}}
+		public int Col { get { return col; } }
 		/// Abilita o disabilita controllo indici all'accesso dei dati
 		/// Dafault: abilitato
 		/// </summary>
 		public bool IndexCheck
 			{
-			get { return checkIndex;}
-			set { checkIndex = value;}
+			get { return checkIndex; }
+			set { checkIndex = value; }
 			}
 		/// <summary>
 		/// Restituisce true se matrice nulla
@@ -61,14 +61,14 @@ namespace Fred68.Tools.Matematica
 		/// <returns></returns>
 		public bool IsNull
 			{
-			get { return ((row==0)||(col==0));}
+			get { return ((row == 0) || (col == 0)); }
 			}
 		#endregion
 		#region COSTRUTTORI
 		/// <summary>
 		/// Costruttore
 		/// </summary>
-		public MatrixBase()									// Costruttore (matrice nulla)
+		public MatrixBase()                                 // Costruttore (matrice nulla)
 			{
 			row = col = 0;
 			dat = null;
@@ -79,16 +79,16 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="rows">Righe</param>
 		/// <param name="cols">Righe</param>
-		public MatrixBase(int rows,int cols)				// Costruttore
+		public MatrixBase(int rows,int cols)                // Costruttore
 			{
-			if( (rows>0)&&(cols>0) )
+			if((rows > 0) && (cols > 0))
 				{
 				row = rows;
 				col = cols;
 				dat = new T[row,col];
 				}
 			else
-				{	
+				{
 				row = col = 0;
 				dat = null;
 				}
@@ -99,21 +99,21 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="m">Matrice di partenza</param>
 		/// <param name="copy">Ricopia i dati se true</param>
-		public MatrixBase(MatrixBase<T> m, bool copy)		// Costruttore (se true, ricopia i dati)
+		public MatrixBase(MatrixBase<T> m,bool copy)        // Costruttore (se true, ricopia i dati)
 			{
-			row = m.row;									// Copia le dimensioni
+			row = m.row;                                    // Copia le dimensioni
 			col = m.col;
-			if( (row>0)&&(col>0) )					
+			if((row > 0) && (col > 0))
 				{
-				dat = new T[row, col];						// Alloca nuovi dati
-				if(copy)									// Se richiesto...
-					{										// ...copia il contenuto
-					int r,c;
-					for(r=0; r<row; r++)
-						for(c=0; c<col; c++)
-							dat[r, c] = m.dat[r, c];		// Nota (*) : usa l'operatore = ma dovrebbe usare Clone()
-															// Opportuno mettere un controllo su T, se ICloneable
-															// Ma Clone() fa una copia superficiale come object
+				dat = new T[row,col];                       // Alloca nuovi dati
+				if(copy)                                    // Se richiesto...
+					{                                       // ...copia il contenuto
+					int r, c;
+					for(r = 0;r < row;r++)
+						for(c = 0;c < col;c++)
+							dat[r,c] = m.dat[r,c];      // Nota (*) : usa l'operatore = ma dovrebbe usare Clone()
+														// Opportuno mettere un controllo su T, se ICloneable
+														// Ma Clone() fa una copia superficiale come object
 					}
 				}
 			else
@@ -127,20 +127,20 @@ namespace Fred68.Tools.Matematica
 		/// <param name="rows">Righe</param>
 		/// <param name="cols">Colonne</param>
 		/// <param name="val">Dato: copia solo il riferimento, non lo clona</param>
-		public MatrixBase(int rows, int cols, T val)
+		public MatrixBase(int rows,int cols,T val)
 			{
-			if( (rows>0)&&(cols>0) )
+			if((rows > 0) && (cols > 0))
 				{
 				row = rows;
 				col = cols;
 				dat = new T[row,col];
 				int r, c;
-				for (r = 0; r < row; r++)
-					for (c = 0; c < col; c++)
-						dat[r, c] = val;					// Se T e` un tipo riferimento, copia solo il riferimento, non lo clona
+				for(r = 0;r < row;r++)
+					for(c = 0;c < col;c++)
+						dat[r,c] = val;                 // Se T e` un tipo riferimento, copia solo il riferimento, non lo clona
 				}
 			else
-				{	
+				{
 				row = col = 0;
 				dat = null;
 				}
@@ -154,9 +154,9 @@ namespace Fred68.Tools.Matematica
 		/// <param name="r">Riga</param>
 		/// <param name="c">Colonna</param>
 		/// <returns>true se indici corretti</returns>
-		public bool CheckIndex(int r, int c)
+		public bool CheckIndex(int r,int c)
 			{
-			return( (r>=0) && (c>=0) && (r<row) && (c<col));
+			return ((r >= 0) && (c >= 0) && (r < row) && (c < col));
 			}
 		/// <summary>
 		/// Legge il valore di una cella
@@ -168,7 +168,7 @@ namespace Fred68.Tools.Matematica
 		/// <param name="c">Colonna</param>
 		/// <param name="d">ref Dato da leggere</param>
 		/// <returns>true se indici corretti</returns>
-		public bool Get(int r, int c, ref T d)
+		public bool Get(int r,int c,ref T d)
 			{
 			if(checkIndex)
 				if(!CheckIndex(r,c))
@@ -188,14 +188,14 @@ namespace Fred68.Tools.Matematica
 		/// <param name="r">Riga</param>
 		/// <param name="c">Colonna</param>
 		/// <returns>Dato letto</returns>
-		public T Get(int r, int c) 
+		public T Get(int r,int c)
 			{
 			if(checkIndex)
-				if(!CheckIndex(r, c))
+				if(!CheckIndex(r,c))
 					{
 					throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 					}
-			return dat[r, c];
+			return dat[r,c];
 			}
 		/// <summary>
 		/// Imposta il valore di una cella
@@ -207,14 +207,14 @@ namespace Fred68.Tools.Matematica
 		/// <param name="c">Colonna</param>
 		/// <param name="d">Valore da impostare</param>
 		/// <returns></returns>
-		public bool Set(int r, int c, T d)
+		public bool Set(int r,int c,T d)
 			{
 			if(checkIndex)
-				if(!CheckIndex(r, c))
+				if(!CheckIndex(r,c))
 					{
 					throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 					}
-			dat[r, c] = d;
+			dat[r,c] = d;
 			return true;
 			}
 		/// <summary>
@@ -223,12 +223,12 @@ namespace Fred68.Tools.Matematica
 		/// <param name="r">Riga</param>
 		/// <param name="c">Colonna</param>
 		/// <returns></returns>
-		public T this[int r, int c]
+		public T this[int r,int c]
 			{
 			get
 				{
 				if(checkIndex)
-					if(!CheckIndex(r, c))
+					if(!CheckIndex(r,c))
 						{
 						throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 						}
@@ -237,7 +237,7 @@ namespace Fred68.Tools.Matematica
 			set
 				{
 				if(checkIndex)
-					if(!CheckIndex(r, c))
+					if(!CheckIndex(r,c))
 						{
 						throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 						}
@@ -263,9 +263,9 @@ namespace Fred68.Tools.Matematica
 			set
 				{
 				if(row == 1)
-					Set(0, rc, value);
+					Set(0,rc,value);
 				else if(col == 1)
-					Set(rc, 0, value);
+					Set(rc,0,value);
 				else
 					throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 				}
@@ -277,7 +277,7 @@ namespace Fred68.Tools.Matematica
 		/// <returns>true se stesse dimensioni</returns>
 		public bool SameSize(MatrixBase<T> m)
 			{
-			if( (this.Col == m.Col) && (this.Row == m.Row))
+			if((this.Col == m.Col) && (this.Row == m.Row))
 				return true;
 			return false;
 			}
@@ -287,7 +287,7 @@ namespace Fred68.Tools.Matematica
 		/// <param name="m1">Prima matrice</param>
 		/// <param name="m2">Seconda matrice</param>
 		/// <returns>true se stesse dimensioni</returns>
-		public static bool SameSize(MatrixBase<T> m1, MatrixBase<T> m2)
+		public static bool SameSize(MatrixBase<T> m1,MatrixBase<T> m2)
 			{
 			return m1.SameSize(m2);
 			}
@@ -298,11 +298,11 @@ namespace Fred68.Tools.Matematica
 		/// <returns></returns>
 		public IEnumerator<T> GetEnumerator()
 			{
-			int r,c;
-			for(r=0; r<row; r++)
-				for(c=0; c<col; c++)
+			int r, c;
+			for(r = 0;r < row;r++)
+				for(c = 0;c < col;c++)
 					yield return dat[r,c];
-			} 
+			}
 		/// <summary>
 		/// Reset enumerator
 		/// </summary>
@@ -320,7 +320,7 @@ namespace Fred68.Tools.Matematica
 			return new MatrixBase<T>(this,true);
 			}
 		#endregion
- 		#region MODIFICA
+		#region MODIFICA
 		/// <summary>
 		/// Ridimensiona la matrice
 		/// Se indici errati: ArgumentOutOfRangeException
@@ -329,32 +329,32 @@ namespace Fred68.Tools.Matematica
 		/// <param name="cols">Colonne</param>
 		/// <param name="keep">True per mantenere i dati</param>
 		/// <returns></returns>
-		public bool Dim(int rows, int cols, bool keep)		// Varia le dimensioni (mantiene il contenuto se true)
+		public bool Dim(int rows,int cols,bool keep)        // Varia le dimensioni (mantiene il contenuto se true)
 			{
-			int ir,ic;										// Contatori
-			T[,] datOld;									// Matrice dei dati vecchi
-			if( (rows<0) || (cols<0))						// Verifica le nuove dimensioni
+			int ir, ic;                                     // Contatori
+			T[,] datOld;                                    // Matrice dei dati vecchi
+			if((rows < 0) || (cols < 0))                        // Verifica le nuove dimensioni
 				throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
-			if( (rows==0) || (cols==0) )					// Se una dimensione è nulla, azzera
+			if((rows == 0) || (cols == 0))                  // Se una dimensione è nulla, azzera
 				{
 				row = col = 0;
 				dat = null;
-				return true;	
+				return true;
 				}
-			datOld = this.dat;								// Salva reference a vecchia matrice
-			dat = new T[rows,cols];							// Alloca nuova matrice e la assegna a dat			
-			if(keep)										// Se deve mantenere i valori...
+			datOld = this.dat;                              // Salva reference a vecchia matrice
+			dat = new T[rows,cols];                         // Alloca nuova matrice e la assegna a dat			
+			if(keep)                                        // Se deve mantenere i valori...
 				{
-				for(ir=0; ir < rows; ir++)					// ...ricopia la vecchia matrice nella nuova
-					for(ic=0; ic < cols; ic++)
+				for(ir = 0;ir < rows;ir++)                  // ...ricopia la vecchia matrice nella nuova
+					for(ic = 0;ic < cols;ic++)
 						{
-						if( (ir < row) && (ic < col) )
-							dat[ir,ic] = datOld[ir,ic];		// Ricopia valori...
-						else							
-							dat[ir,ic]= default(T);			// ...oppure azzera se fuori indice
+						if((ir < row) && (ic < col))
+							dat[ir,ic] = datOld[ir,ic];     // Ricopia valori...
+						else
+							dat[ir,ic] = default(T);            // ...oppure azzera se fuori indice
 						}
 				}
-			row = rows;										// Imposta i nuovi indici
+			row = rows;                                     // Imposta i nuovi indici
 			col = cols;
 			return false;
 			}
@@ -365,7 +365,7 @@ namespace Fred68.Tools.Matematica
 		/// <param name="rows">Righe</param>
 		/// <param name="cols">Colonne</param>
 		/// <returns></returns>
-		public bool Dim(int rows, int cols)					// Varia le dimensioni mantenendo il contenuto
+		public bool Dim(int rows,int cols)                  // Varia le dimensioni mantenendo il contenuto
 			{
 			return Dim(rows,cols,true);
 			}
@@ -373,7 +373,7 @@ namespace Fred68.Tools.Matematica
 		/// Azzera la matrice
 		/// Non esegue chiamate al gc
 		/// </summary>
-		public void Clear()									// Azzera la matrice (non chiama il gc)
+		public void Clear()                                 // Azzera la matrice (non chiama il gc)
 			{
 			row = col = 0;
 			dat = null;
@@ -384,33 +384,33 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="irow">Indice della riga</param>
 		/// <returns></returns>
-		public bool RemRow(int irow)							// Elimina riga
+		public bool RemRow(int irow)                            // Elimina riga
 			{
-			int rownew, colnew;									// Nuove dimensioni
-			int ir, ic;											// Indici nuova matrice
-			int irold, icold;									// Indici vecchia matrice
-			T[,] datnew;										// Nuovo array
+			int rownew, colnew;                                 // Nuove dimensioni
+			int ir, ic;                                         // Indici nuova matrice
+			int irold, icold;                                   // Indici vecchia matrice
+			T[,] datnew;                                        // Nuovo array
 
-			if ((irow < 0) || (irow >= row))					// Verifica correttezza indice
+			if((irow < 0) || (irow >= row))                 // Verifica correttezza indice
 				throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
-			rownew = row - 1;									// Nuove dimensioni
+			rownew = row - 1;                                   // Nuove dimensioni
 			colnew = col;
-			if((rownew <= 0) || (colnew <= 0))					// Se una dimensione e` nulla, azzera dati e dimensioni
+			if((rownew <= 0) || (colnew <= 0))                  // Se una dimensione e` nulla, azzera dati e dimensioni
 				{
 				row = col = 0;
 				dat = null;
-				return true;									// ed esce
+				return true;                                    // ed esce
 				}
-			datnew = new T[rownew, colnew];						// Alloca nuovo array
-			for (ir = 0, irold = 0; ir < rownew; ir++, irold++)	// Ciclo doppio su indici vecchi e nuovi
+			datnew = new T[rownew,colnew];                      // Alloca nuovo array
+			for(ir = 0, irold = 0;ir < rownew;ir++, irold++)    // Ciclo doppio su indici vecchi e nuovi
 				{
-				if (irold == irow) irold++;						// Incrementa (salta) se uguale all'indice eliminato
-				for (ic = 0, icold = 0; ic < colnew; ic++, icold++)
+				if(irold == irow) irold++;                      // Incrementa (salta) se uguale all'indice eliminato
+				for(ic = 0, icold = 0;ic < colnew;ic++, icold++)
 					datnew[ir,ic] = dat[irold,icold];
 				}
-			row = rownew;										// Imposta i nuovi indici
+			row = rownew;                                       // Imposta i nuovi indici
 			col = colnew;
-			dat = datnew;										// Imposta il nuovo array
+			dat = datnew;                                       // Imposta il nuovo array
 			return true;
 			}
 		/// <summary>
@@ -419,35 +419,35 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="icol"></param>
 		/// <returns></returns>
-		public bool RemCol(int icol)							// Elimina colonna
+		public bool RemCol(int icol)                            // Elimina colonna
 			{
-			int rownew, colnew;									// Nuove dimensioni
-			int ir, ic;											// Indici nuova matrice
-			int irold, icold;									// Indici vecchia matrice
-			T[,] datnew;										// Nuovo array
+			int rownew, colnew;                                 // Nuove dimensioni
+			int ir, ic;                                         // Indici nuova matrice
+			int irold, icold;                                   // Indici vecchia matrice
+			T[,] datnew;                                        // Nuovo array
 
-			if ((icol < 0) || (icol >= col))					// Verifica correttezza indice
+			if((icol < 0) || (icol >= col))                 // Verifica correttezza indice
 				throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
-			rownew = row;										// Nuove dimensioni
+			rownew = row;                                       // Nuove dimensioni
 			colnew = col - 1;
-			if ((rownew <= 0) || (colnew <= 0))					// Se una dimensione e` nulla, azzera dati e dimensioni
+			if((rownew <= 0) || (colnew <= 0))                  // Se una dimensione e` nulla, azzera dati e dimensioni
 				{
 				row = col = 0;
 				dat = null;
-				return true;									// ed esce
+				return true;                                    // ed esce
 				}
-			datnew = new T[rownew, colnew];						// Alloca nuovo array
-			for (ir = 0, irold = 0; ir < rownew; ir++, irold++)	// Ciclo doppio su indici vecchi e nuovi
+			datnew = new T[rownew,colnew];                      // Alloca nuovo array
+			for(ir = 0, irold = 0;ir < rownew;ir++, irold++)    // Ciclo doppio su indici vecchi e nuovi
 				{
-				for (ic = 0, icold = 0; ic < colnew; ic++, icold++)
+				for(ic = 0, icold = 0;ic < colnew;ic++, icold++)
 					{
-					if (icold == icol)	icold++;				// Incrementa (salta) se uguale all'indice eliminato
-					datnew[ir, ic] = dat[irold, icold];
+					if(icold == icol) icold++;              // Incrementa (salta) se uguale all'indice eliminato
+					datnew[ir,ic] = dat[irold,icold];
 					}
 				}
-			row = rownew;										// Imposta i nuovi indici
+			row = rownew;                                       // Imposta i nuovi indici
 			col = colnew;
-			dat = datnew;										// Imposta il nuovo array
+			dat = datnew;                                       // Imposta il nuovo array
 			return true;
 			}
 		/// <summary>
@@ -457,7 +457,7 @@ namespace Fred68.Tools.Matematica
 		/// <param name="irow"></param>
 		/// <param name="icol"></param>
 		/// <returns></returns>
-		public bool RemRowCol(int irow, int icol)				// DA SCRIVERE
+		public bool RemRowCol(int irow,int icol)                // DA SCRIVERE
 			{
 			Exception e;
 			throw e = new Exception("Funzione da scrivere");
@@ -503,22 +503,22 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="irow"></param>
 		/// <returns></returns>
-		public MatrixBase<T> GetRow(int irow)					// Restituisce una riga
+		public MatrixBase<T> GetRow(int irow)                   // Restituisce una riga
 			{
 			MatrixBase<T> m;
 			int i;
-			if((irow<0)||(irow>=row))					// Se indici non corretti o matrice iniziale con dimensione nulla...
+			if((irow < 0) || (irow >= row))                 // Se indici non corretti o matrice iniziale con dimensione nulla...
 				{
 				throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 				}
-			else if(col<=0)
+			else if(col <= 0)
 				{
 				throw new ArgumentOutOfRangeException(Error.NullMatrix.ToString());
 				}
-			m = new MatrixBase<T>(1, col);						// Crea matrice con una riga a tante colonne quanto la matrice dipartenza
-			for (i = 0; i < col; i++)							// Ricopia i valori della riga irow per tutte le colonne i
-				m.dat[0,i]= dat[irow, i];
-			return m;											// Restituisce il riferimento all'oggetto allocato
+			m = new MatrixBase<T>(1,col);                       // Crea matrice con una riga a tante colonne quanto la matrice dipartenza
+			for(i = 0;i < col;i++)                          // Ricopia i valori della riga irow per tutte le colonne i
+				m.dat[0,i] = dat[irow,i];
+			return m;                                           // Restituisce il riferimento all'oggetto allocato
 			}
 		/// <summary>
 		/// Restituisce una colonna
@@ -526,11 +526,11 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="icol"></param>
 		/// <returns></returns>
-		public MatrixBase<T> GetCol(int icol)					// Restituisce una colonna
+		public MatrixBase<T> GetCol(int icol)                   // Restituisce una colonna
 			{
 			MatrixBase<T> m;
 			int i;
-			if ((icol < 0) || (icol >= col))					// Se indici non corretti o matrice iniziale con dimensione nulla...
+			if((icol < 0) || (icol >= col))                 // Se indici non corretti o matrice iniziale con dimensione nulla...
 				{
 				throw new ArgumentOutOfRangeException(Error.OutOfRange.ToString());
 				}
@@ -539,37 +539,37 @@ namespace Fred68.Tools.Matematica
 				throw new ArgumentOutOfRangeException(Error.NullMatrix.ToString());
 				}
 
-			m = new MatrixBase<T>(row, 1);						// Crea matrice con una colonna a tante righe quanto la matrice dipartenza
-			for (i = 0; i < row; i++)							// Ricopia i valori della colonna icol per tutte le righe i
-				m.dat[i, 0] = dat[i, icol];
-			return m;											// Restituisce il riferimento all'oggetto allocato
+			m = new MatrixBase<T>(row,1);                       // Crea matrice con una colonna a tante righe quanto la matrice dipartenza
+			for(i = 0;i < row;i++)                          // Ricopia i valori della colonna icol per tutte le righe i
+				m.dat[i,0] = dat[i,icol];
+			return m;                                           // Restituisce il riferimento all'oggetto allocato
 			}
 		/// <summary>
 		/// Trasposta
 		/// </summary>
 		/// <param name="m"></param>
 		/// <returns></returns>
-		public static MatrixBase<T> operator !(MatrixBase<T> m)	// Trasposta
+		public static MatrixBase<T> operator !(MatrixBase<T> m) // Trasposta
 			{
-			MatrixBase<T> res = new MatrixBase<T>(m.Col, m.Row);	// Crea matrice con dimensioni scambiate
+			MatrixBase<T> res = new MatrixBase<T>(m.Col,m.Row); // Crea matrice con dimensioni scambiate
 			int ir, ic;
-			for (ir = 0; ir < m.row; ir++)							// Ricopia i valori, scambiandone le posizioni
-				for (ic = 0; ic < m.col; ic++)
-					res.dat[ic, ir] = m.dat[ir, ic];
+			for(ir = 0;ir < m.row;ir++)                         // Ricopia i valori, scambiandone le posizioni
+				for(ic = 0;ic < m.col;ic++)
+					res.dat[ic,ir] = m.dat[ir,ic];
 			return res;
 			}
 		/// <summary>
 		/// Trapone la matrice (DA VERIFICARE)
 		/// </summary>
 		/// <returns></returns>
-		public bool Transpose()									// Traspone la matrice DA VERIFICARE !!!!!
+		public bool Transpose()                                 // Traspone la matrice DA VERIFICARE !!!!!
 			{
-			T[,] res = new T[Col, Row];							// Crea array con dimensioni scambiate
+			T[,] res = new T[Col,Row];                          // Crea array con dimensioni scambiate
 			int ir, ic;
-			for (ir = 0; ir < row; ir++)						// Ricopia i valori, scambiandone le posizioni
-				for (ic = 0; ic < col; ic++)
-					res[ic, ir] = dat[ir, ic];
-			dat = res;											// Assegna il nuovo array
+			for(ir = 0;ir < row;ir++)                       // Ricopia i valori, scambiandone le posizioni
+				for(ic = 0;ic < col;ic++)
+					res[ic,ir] = dat[ir,ic];
+			dat = res;                                          // Assegna il nuovo array
 			return true;
 			}
 		#endregion
@@ -578,18 +578,18 @@ namespace Fred68.Tools.Matematica
 		/// ToString()
 		/// </summary>
 		/// <returns></returns>
-		public override string ToString()							// Conversione in stringa
+		public override string ToString()                           // Conversione in stringa
 			{
 			int ir, ic;
 			StringBuilder str = new StringBuilder("[");
-			if(!IsNull)												// Percorre la matrice solo se e` valida
+			if(!IsNull)                                             // Percorre la matrice solo se e` valida
 				{
-				for (ir = 0; ir < row; ir++)
+				for(ir = 0;ir < row;ir++)
 					{
-					for (ic = 0; ic < col; ic++)
+					for(ic = 0;ic < col;ic++)
 						{
-						if (dat[ir, ic] != null)							// Il default(T), usato nelle funzioni Dim(), mette null per i tipi riferimento
-							str.Append((dat[ir, ic]).ToString() + "\t");	// e darebbe errore il ToString()
+						if(dat[ir,ic] != null)                          // Il default(T), usato nelle funzioni Dim(), mette null per i tipi riferimento
+							str.Append((dat[ir,ic]).ToString() + "\t"); // e darebbe errore il ToString()
 						}
 					str.Append("\n ");
 					}
@@ -603,21 +603,21 @@ namespace Fred68.Tools.Matematica
 		/// <param name="format"></param>
 		/// <param name="formatProvider"></param>
 		/// <returns></returns>
-		public string ToString(string format, IFormatProvider formatProvider)
+		public string ToString(string format,IFormatProvider formatProvider)
 			{
-			if (format == null)										// Se formato nullo, restiruisce lo standard
+			if(format == null)                                      // Se formato nullo, restiruisce lo standard
 				return ToString();
 			string formatUp = format.ToUpper();
 			int ir, ic;
 			StringBuilder str = new StringBuilder("[");
-			if (!IsNull)											// Percorre la matrice solo se e` valida
+			if(!IsNull)                                         // Percorre la matrice solo se e` valida
 				{
-				for (ir = 0; ir < row; ir++)
+				for(ir = 0;ir < row;ir++)
 					{
-					for (ic = 0; ic < col; ic++)
+					for(ic = 0;ic < col;ic++)
 						{
-						if (dat[ir, ic] != null)							// Il default(T), usato nelle funzioni Dim(), mette null per i tipi riferimento
-							str.Append(dat[ir, ic].ToString() + '\t');		// e darebbe errore il ToString()
+						if(dat[ir,ic] != null)                          // Il default(T), usato nelle funzioni Dim(), mette null per i tipi riferimento
+							str.Append(dat[ir,ic].ToString() + '\t');       // e darebbe errore il ToString()
 						}
 					str.Append("\n ");
 					}
@@ -635,5 +635,5 @@ namespace Fred68.Tools.Matematica
 			}
 		#endregion
 		}
-	}	
+	}
 

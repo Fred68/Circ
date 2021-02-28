@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 //using System.Linq;
-using System.Text;
-using Fred68.Tools.Matematica;
 
 namespace Fred68.Tools.Matematica
 	{
 	/// <summary> Matrix with double data and operations only </summary>
-	public class Matrix : MatrixBase<double>
+	public class Matrix:MatrixBase<double>
 		{
 		#region COSTANTI
 		private static readonly double one = 1.0;
@@ -30,7 +27,7 @@ namespace Fred68.Tools.Matematica
 		/// <summary>
 		/// Costruttore
 		/// </summary>
-		public Matrix()	: base()									
+		public Matrix() : base()
 			{
 			}
 		/// <summary>
@@ -45,7 +42,7 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="rows"></param>
 		/// <param name="cols"></param>
-		public Matrix(int rows,int cols) : base(rows, cols)			
+		public Matrix(int rows,int cols) : base(rows,cols)
 			{
 			}
 		/// <summary>
@@ -53,7 +50,7 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="m">Matrice</param>
 		/// <param name="copy">true, copia i valori</param>
-		public Matrix(Matrix m, bool copy) : base(m, copy)			
+		public Matrix(Matrix m,bool copy) : base(m,copy)
 			{
 			}
 		/// <summary>
@@ -62,7 +59,7 @@ namespace Fred68.Tools.Matematica
 		/// <param name="rows"></param>
 		/// <param name="cols"></param>
 		/// <param name="val"></param>
-		public Matrix(int rows, int cols, double val) : base(rows, cols, val)
+		public Matrix(int rows,int cols,double val) : base(rows,cols,val)
 			{
 			}
 		//public double this[int r, int c] : base[int r, int c]
@@ -87,13 +84,13 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="m"></param>
 		/// <returns></returns>
-		public static Matrix operator!(Matrix m)					// Trasposta
+		public static Matrix operator !(Matrix m)                   // Trasposta
 			{
-			Matrix res = new Matrix(m.Col, m.Row);					// Crea matrice con dimensioni scambiate
+			Matrix res = new Matrix(m.Col,m.Row);                   // Crea matrice con dimensioni scambiate
 			int ir, ic;
-			for (ir = 0; ir < m.row; ir++)							// Ricopia i valori, scambiandone le posizioni
-				for (ic = 0; ic < m.col; ic++)
-					res.dat[ic, ir] = m.dat[ir, ic];
+			for(ir = 0;ir < m.row;ir++)                         // Ricopia i valori, scambiandone le posizioni
+				for(ic = 0;ic < m.col;ic++)
+					res.dat[ic,ir] = m.dat[ir,ic];
 			return res;
 			}
 		/// <summary>
@@ -102,17 +99,17 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator+(Matrix sx, Matrix dx)		// Somma
+		public static Matrix operator +(Matrix sx,Matrix dx)        // Somma
 			{
-			int i,j;
-			if ((sx.row != dx.row) || (sx.col != dx.col))
+			int i, j;
+			if((sx.row != dx.row) || (sx.col != dx.col))
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 
-			Matrix m = new Matrix(sx, false);						// Crea matrice delle dimensioni corrette ma vuota
-			for (i = 0; i < sx.row; i++)
-				for (j = 0; j < sx.col; j++)
+			Matrix m = new Matrix(sx,false);                        // Crea matrice delle dimensioni corrette ma vuota
+			for(i = 0;i < sx.row;i++)
+				for(j = 0;j < sx.col;j++)
 					{
-					m.dat[i,j] = (sx.dat[i, j]) + (dx.dat[i, j]);
+					m.dat[i,j] = (sx.dat[i,j]) + (dx.dat[i,j]);
 					}
 			return m;
 			}
@@ -122,17 +119,17 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator-(Matrix sx, Matrix dx)		// Sottrazione
+		public static Matrix operator -(Matrix sx,Matrix dx)        // Sottrazione
 			{
 			int i, j;
-			if ((sx.row != dx.row) || (sx.col != dx.col))			// Se dimensioni errate...
+			if((sx.row != dx.row) || (sx.col != dx.col))            // Se dimensioni errate...
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 
-			Matrix m = new Matrix(sx, false);						// Crea matrice delle dimensioni corrette ma vuota
-			for (i = 0; i < sx.row; i++)
-				for (j = 0; j < sx.col; j++)
+			Matrix m = new Matrix(sx,false);                        // Crea matrice delle dimensioni corrette ma vuota
+			for(i = 0;i < sx.row;i++)
+				for(j = 0;j < sx.col;j++)
 					{
-					m.dat[i, j] = (sx.dat[i, j]) - (dx.dat[i, j]);
+					m.dat[i,j] = (sx.dat[i,j]) - (dx.dat[i,j]);
 					}
 			return m;
 			}
@@ -141,14 +138,14 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="m"></param>
 		/// <returns></returns>
-		public static Matrix operator-(Matrix m)					// Cambio segno
+		public static Matrix operator -(Matrix m)                   // Cambio segno
 			{
 			int i, j;
-			Matrix mn = new Matrix(m, false);
-			for (i = 0; i < m.row; i++)
-				for (j = 0; j < m.col; j++)
+			Matrix mn = new Matrix(m,false);
+			for(i = 0;i < m.row;i++)
+				for(j = 0;j < m.col;j++)
 					{
-					mn.dat[i, j] = -m.dat[i, j];
+					mn.dat[i,j] = -m.dat[i,j];
 					}
 			return mn;
 			}
@@ -158,19 +155,19 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator*(Matrix sx, Matrix dx)		// Prodotto di matrici
+		public static Matrix operator *(Matrix sx,Matrix dx)        // Prodotto di matrici
 			{
 			int i, j, cc;
 			double sum;
-			if(sx.col != dx.row)									// Se dimensioni errate per prodotto righe-colonne...
+			if(sx.col != dx.row)                                    // Se dimensioni errate per prodotto righe-colonne...
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 
-			Matrix m = new Matrix(sx.row, dx.col);					// Crea matrice con dimensioni corrette
-			for (i = 0; i < m.row; i++)								// Cicli i,j riga,colonna
-				for (j = 0; j < m.col; j++)
+			Matrix m = new Matrix(sx.row,dx.col);                   // Crea matrice con dimensioni corrette
+			for(i = 0;i < m.row;i++)                                // Cicli i,j riga,colonna
+				for(j = 0;j < m.col;j++)
 					{
 					sum = 0;
-					for (cc = 0; cc < sx.col; cc++)					// Ciclo per sommatoria
+					for(cc = 0;cc < sx.col;cc++)                    // Ciclo per sommatoria
 						{
 						sum += sx.dat[i,cc] * dx.dat[cc,j];
 						}
@@ -184,14 +181,14 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator*(Matrix sx, double dx)		// Prodotto matrice * numero
+		public static Matrix operator *(Matrix sx,double dx)        // Prodotto matrice * numero
 			{
-			Matrix m = new Matrix(sx, false);						// Crea matrice delle dimensioni corrette ma vuota
+			Matrix m = new Matrix(sx,false);                        // Crea matrice delle dimensioni corrette ma vuota
 			int i, j;
-			for (i = 0; i < sx.row; i++)
-				for (j = 0; j < sx.col; j++)
+			for(i = 0;i < sx.row;i++)
+				for(j = 0;j < sx.col;j++)
 					{
-					m.dat[i, j] = (sx.dat[i, j]) * dx;
+					m.dat[i,j] = (sx.dat[i,j]) * dx;
 					}
 			return m;
 			}
@@ -201,14 +198,14 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator*(double sx, Matrix dx)		// Prodotto numero * matrice
+		public static Matrix operator *(double sx,Matrix dx)        // Prodotto numero * matrice
 			{
-			Matrix m = new Matrix(dx, false);						// Crea matrice delle dimensioni corrette ma vuota
+			Matrix m = new Matrix(dx,false);                        // Crea matrice delle dimensioni corrette ma vuota
 			int i, j;
-			for (i = 0; i < dx.row; i++)
-				for (j = 0; j < dx.col; j++)
+			for(i = 0;i < dx.row;i++)
+				for(j = 0;j < dx.col;j++)
 					{
-					m.dat[i, j] = (dx.dat[i, j]) * sx;				// Scrive i valori
+					m.dat[i,j] = (dx.dat[i,j]) * sx;                // Scrive i valori
 					}
 			return m;
 			}
@@ -218,18 +215,18 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator/(Matrix sx, double dx)		// Divisione matrice / numero
+		public static Matrix operator /(Matrix sx,double dx)        // Divisione matrice / numero
 			{
 			if(System.Math.Abs(dx) <= Matrix.Epsilon)
 				{
-				throw new InvalidOperationException(Error.DivisionByZero.ToString());		// Se divisione per zero: eccezione
+				throw new InvalidOperationException(Error.DivisionByZero.ToString());       // Se divisione per zero: eccezione
 				}
-			Matrix m = new Matrix(sx, false);						// Crea matrice delle dimensioni corrette ma vuota
+			Matrix m = new Matrix(sx,false);                        // Crea matrice delle dimensioni corrette ma vuota
 			int i, j;
-			for (i = 0; i < sx.row; i++)
-				for (j = 0; j < sx.col; j++)
+			for(i = 0;i < sx.row;i++)
+				for(j = 0;j < sx.col;j++)
 					{
-					m.dat[i, j] = (sx.dat[i, j]) / dx;				// Scrive i valori
+					m.dat[i,j] = (sx.dat[i,j]) / dx;                // Scrive i valori
 					}
 			return m;
 			}
@@ -239,17 +236,17 @@ namespace Fred68.Tools.Matematica
 		/// <param name="sx"></param>
 		/// <param name="dx"></param>
 		/// <returns></returns>
-		public static Matrix operator^(Matrix sx, Matrix dx)		// Prodotto a(ij) * b(ij)
+		public static Matrix operator ^(Matrix sx,Matrix dx)        // Prodotto a(ij) * b(ij)
 			{
-			int i,j;
-			if ((sx.row != dx.row) || (sx.col != dx.col))			// Se dimensioni errate...
+			int i, j;
+			if((sx.row != dx.row) || (sx.col != dx.col))            // Se dimensioni errate...
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 
-			Matrix m = new Matrix(sx, false);						// Crea matrice delle dimensioni corrette ma vuota
-			for (i = 0; i < sx.row; i++)
-				for (j = 0; j < sx.col; j++)
+			Matrix m = new Matrix(sx,false);                        // Crea matrice delle dimensioni corrette ma vuota
+			for(i = 0;i < sx.row;i++)
+				for(j = 0;j < sx.col;j++)
 					{
-					m.dat[i,j] = (sx.dat[i, j]) * (dx.dat[i, j]);
+					m.dat[i,j] = (sx.dat[i,j]) * (dx.dat[i,j]);
 					}
 			return m;
 			}
@@ -258,14 +255,14 @@ namespace Fred68.Tools.Matematica
 		/// </summary>
 		/// <param name="m"></param>
 		/// <returns></returns>
-		public static double Sum(Matrix m)							// Somma di tutti gli elementi della matrice
+		public static double Sum(Matrix m)                          // Somma di tutti gli elementi della matrice
 			{
 			int i, j;
 			double sum = 0.0;
-			for (i = 0; i < m.row; i++)
-				for (j = 0; j < m.col; j++)
+			for(i = 0;i < m.row;i++)
+				for(j = 0;j < m.col;j++)
 					{
-					sum += m.dat[i, j];
+					sum += m.dat[i,j];
 					}
 			return sum;
 			}
@@ -290,9 +287,9 @@ namespace Fred68.Tools.Matematica
 				{
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 				}
-			Matrix id = new Matrix(n, n);
-				for(int i=0; i<n; i++)
-					id.dat[i, i] = Matrix.one;
+			Matrix id = new Matrix(n,n);
+			for(int i = 0;i < n;i++)
+				id.dat[i,i] = Matrix.one;
 			return id;
 			}
 		/// <summary>
@@ -302,15 +299,15 @@ namespace Fred68.Tools.Matematica
 		/// <returns></returns>
 		public static Matrix Upper(int n)
 			{
-			if (n < 1)
+			if(n < 1)
 				{
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 				}
-			Matrix up = new Matrix(n, n);
-			int i,j;
-			for (i = 0; i < n; i++)
-				for (j=i; j < n; j++)
-					up.dat[i, j] = Matrix.one;
+			Matrix up = new Matrix(n,n);
+			int i, j;
+			for(i = 0;i < n;i++)
+				for(j = i;j < n;j++)
+					up.dat[i,j] = Matrix.one;
 			return up;
 			}
 		/// <summary>
@@ -320,15 +317,15 @@ namespace Fred68.Tools.Matematica
 		/// <returns></returns>
 		public static Matrix Lower(int n)
 			{
-			if (n < 1)
+			if(n < 1)
 				{
 				throw new InvalidOperationException(Error.MatrixWrongDimension.ToString());
 				}
-			Matrix low = new Matrix(n, n);
+			Matrix low = new Matrix(n,n);
 			int i, j;
-			for (i = 0; i < n; i++)
-				for (j = 0; j <= i; j++)
-					low.dat[i, j] = Matrix.one;
+			for(i = 0;i < n;i++)
+				for(j = 0;j <= i;j++)
+					low.dat[i,j] = Matrix.one;
 			return low;
 			}
 		/// <summary>
@@ -337,13 +334,13 @@ namespace Fred68.Tools.Matematica
 		/// <param name="rows"></param>
 		/// <param name="cols"></param>
 		/// <returns></returns>
-		public static Matrix Ones(int rows, int cols)
+		public static Matrix Ones(int rows,int cols)
 			{
-			Matrix ones = new Matrix(rows, cols);
+			Matrix ones = new Matrix(rows,cols);
 			int i, j;
-			for (i = 0; i < ones.Row; i++)
-				for (j = 0; j < ones.Col; j++)
-					ones.dat[i, j] = Matrix.one;
+			for(i = 0;i < ones.Row;i++)
+				for(j = 0;j < ones.Col;j++)
+					ones.dat[i,j] = Matrix.one;
 			return ones;
 			}
 		/// <summary>
@@ -352,13 +349,13 @@ namespace Fred68.Tools.Matematica
 		/// <param name="rows"></param>
 		/// <param name="cols"></param>
 		/// <returns></returns>
-		public static Matrix Zeros(int rows, int cols)
+		public static Matrix Zeros(int rows,int cols)
 			{
-			Matrix zeros = new Matrix(rows, cols);
+			Matrix zeros = new Matrix(rows,cols);
 			int i, j;
-			for (i = 0; i < zeros.Row; i++)
-				for (j = 0; j < zeros.Col; j++)
-					zeros.dat[i, j] = Matrix.zero;
+			for(i = 0;i < zeros.Row;i++)
+				for(j = 0;j < zeros.Col;j++)
+					zeros.dat[i,j] = Matrix.zero;
 			return zeros;
 			}
 		#endregion

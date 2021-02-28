@@ -1,51 +1,44 @@
-﻿using System;
+﻿using Fred68.Tools.Log;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.Drawing;
-
-using Fred68.Tools.Log;
 
 namespace Circ
 	{
 
 	public class DisplayList
 		{
-
-
 		private struct Command
 			{
-			public Elemento elemento;		// Puntatore all'elemento originario
-			public Def.Shape shape;			// Forma
-			public Point p1;				// Punto 1
-			public Point p2;				// Punto 2
-			public Colori.Colore colour;	// Colore
-			public Point center;			// Centro
+			public Elemento elemento;       // Puntatore all'elemento originario
+			public Def.Shape shape;         // Forma
+			public Point p1;                // Punto 1
+			public Point p2;                // Punto 2
+			//public Stile.Colore colour;    // Colore
+			public Point center;            // Centro
 			}
 
 		Vista vista;				// Vista (contenente i dati grafici)
-		Command[] com;				// Comandi della display list
-		int count;					// Numero di elementi
+		Command[] com;              // Comandi della display list
+		int count;                  // Numero di elementi
 
-		bool isDLU;					// La display list è aggiornata ?
+		bool isDLU;                 // La display list è aggiornata ?
 		public bool IsUpdated
 			{
-			get {return isDLU;}
-			set {isDLU = value;}
+			get { return isDLU; }
+			set { isDLU = value; }
 			}
 
-		public readonly List<int> indxList;	// Lista indici evidenziati nell'ultimo Play()
+		public readonly List<int> indxList; // Lista indici evidenziati nell'ultimo Play()
 
 		/// <summary>
 		/// Costruttore
 		/// </summary>
 		public DisplayList(Vista v)
 			{
-			
+
 			vista = v;
-			indxList  = new List<int>();			// Crea la lista degli indici
+			indxList = new List<int>();         // Crea la lista degli indici
 
 			/*
 			brush = new Brush[]
@@ -79,10 +72,10 @@ namespace Circ
 				throw new Exception("Brush array and Color enum do not match");
 			*/
 
-			com = new Command[Def.FREE_MAX];				// Array
-			#if(DEBUG)
+			com = new Command[Def.FREE_MAX];                // Array
+#if(DEBUG)
 			LOG.Write($"DisplayList.Command[{com.Length}]");
-			#endif
+#endif
 			count = 0;
 			}
 
@@ -96,7 +89,7 @@ namespace Circ
 			get
 				{
 				Elemento e = null;
-				if( (i>=0) && (i<count))
+				if((i >= 0) && (i < count))
 					e = com[i].elemento;
 				return e;
 				}
@@ -107,7 +100,7 @@ namespace Circ
 		/// </summary>
 		public int Count
 			{
-			get {return count;}
+			get { return count; }
 			}
 
 		/// <summary>
@@ -116,9 +109,9 @@ namespace Circ
 		/// <param name="p1">Point</param>
 		/// <param name="p2">Point</param>
 		/// <returns>Distanza al quadrato</returns>
-		public static int DistanceSquared(Point p1, Point p2)
+		public static int DistanceSquared(Point p1,Point p2)
 			{
-			return (p1.X-p2.X)*(p1.X-p2.X)+(p1.Y-p2.Y)*(p1.Y-p2.Y);
+			return (p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y);
 			}
 
 		/// <summary>
@@ -131,21 +124,21 @@ namespace Circ
 		/// <param name="y1">...e Y</param>
 		/// <param name="x2">Secondo punto: X...</param>
 		/// <param name="y2">...e Y</param>
-		public void Add(Elemento element, Def.Shape shape, Colori.Colore colour, int cx, int cy)
+		public void Add(Elemento element, Def.Shape shape, int cx, int cy)
 			{
 			com[count].elemento = element;
 			com[count].shape = shape;
-			com[count].colour = colour;
+			//com[count].colour = colour;
 			com[count].center.X = cx;
 			com[count].center.Y = cy;
-			if(element!=null)				
-				count++;				// Aggiunge all'array solo le l'elemento non è nullo
+			if(element != null)
+				count++;                // Aggiunge all'array solo le l'elemento non è nullo
 			if(com.Length - count < Def.FREE_MIN)
 				{
-				Array.Resize<Command>(ref com, count + Def.FREE_MAX);
-				#if(DEBUG)
+				Array.Resize<Command>(ref com,count + Def.FREE_MAX);
+#if(DEBUG)
 				LOG.Write($"DisplayList.Command[{com.Length}]+");
-				#endif
+#endif
 				}
 			return;
 			}
@@ -167,10 +160,10 @@ namespace Circ
 			indxList.Clear();
 			if(com.Length > Def.FREE_MAX)
 				{
-				Array.Resize<Command>(ref com, Def.FREE_MAX);
-				#if(DEBUG)
+				Array.Resize<Command>(ref com,Def.FREE_MAX);
+#if(DEBUG)
 				LOG.Write($"DisplayList.Command[{com.Length}]-");
-				#endif
+#endif
 				}
 			}
 
@@ -184,37 +177,35 @@ namespace Circ
 		/// <param name="distanceSq">Raggio di selezione al quadrato</param>
 		/// <param name="flags">Shape flag mask</param>
 		/// <returns>Numero degli oggetti evidenziati</returns>
-		public int Play(Graphics g, ref Point p, int distanceSq, Def.Shape flags = Def.Shape.Tutti)
+		public int Play(Graphics g,ref Point p,int distanceSq,Def.Shape flags = Def.Shape.Tutti)
 			{
 			indxList.Clear();
 
-			if(g == null)	return 0;
+			if(g == null) return 0;
 
-			int colour;
-			for(int i=0; i<count; i++)
+			bool sel, high;
+
+			for(int i = 0; i < count; i++)
 				{
-				colour = (int)(com[i].colour);
-
-				colour = com[i].elemento.Selected ? (int)Colori.Colore.Selected : (int)com[i].colour;  // Colore base o selezionato
-				if (distanceSq > 0)																		// Evidenziato
+				sel = com[i].elemento.Selected;
+				high = false;
+				if(distanceSq > 0)                                                                      // Evidenziato
 					{
-					if((com[i].shape & flags) != 0)			// Filtro per tipo di forma
+					if((com[i].shape & flags) != 0)         // Filtro per tipo di forma
 						{
-						if(DistanceSquared(com[i].center, p) < distanceSq)
+						if(DistanceSquared(com[i].center,p) < distanceSq)
 							{
-							colour = (int)Colori.Colore.Highlighted;
+							high = true;
 							indxList.Add(i);
 							}
 						}
 					}
-
-				com[i].elemento.Draw(g, vista.Clrs.PEN[colour], vista.Clrs.BRUSH[colour], vista.Clrs.FONT[0]);		// Disegna l'elemento su schermo graphics
-
+				com[i].elemento.Draw(g, vista, high, sel);     // Disegna l'elemento su schermo graphics
 				}
 			return indxList.Count;
 			}
 
-		#warning Aggiungere funzione per stampare proprietà aggiuntive: ID, Nome ecc... con Filtro flag aggiuntivo
+#warning Aggiungere funzione per stampare proprietà aggiuntive: ID, Nome ecc... con Filtro flag aggiuntivo
 
 		/// <summary>
 		/// Restituisce uno degli ultimi elementi evidenziati (il primo della lista)

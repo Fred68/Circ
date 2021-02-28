@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -16,7 +12,7 @@ namespace Circ
 		/// Indici dei colori
 		/// La dimensione deve corrispondere a pen[] e brush[]
 		/// </summary>
-		
+
 
 #warning Usare classi aggiuntive per i dati degli elementi, oppure derivare da Nodo e Ramo ?
 
@@ -40,18 +36,18 @@ namespace Circ
 				{
 				int n = Enum.GetNames(typeof(Name)).Length;
 				shapes = new GraphicsPath[n];
-				for(int i = 0; i < n; i++)
+				for(int i = 0;i < n;i++)
 					{
 					shapes[i] = new GraphicsPath();
 					}
 
-				shapes[(int)Name.Circle].AddEllipse(-Def.NODE_HALFSIZE, -Def.NODE_HALFSIZE, Def.NODE_HALFSIZE * 2, Def.NODE_HALFSIZE * 2);
+				shapes[(int)Name.Circle].AddEllipse(-Def.NODE_HALFSIZE,-Def.NODE_HALFSIZE,Def.NODE_HALFSIZE * 2,Def.NODE_HALFSIZE * 2);
 
-				shapes[(int)Name.Rectangle].AddRectangle(new Rectangle(-Def.SHAPE_HALFSIZE, -Def.SHAPE_HALFSIZE / 3, 2 * Def.SHAPE_HALFSIZE, 2 * Def.SHAPE_HALFSIZE / 3));
+				shapes[(int)Name.Rectangle].AddRectangle(new Rectangle(-Def.SHAPE_HALFSIZE,-Def.SHAPE_HALFSIZE / 3,2 * Def.SHAPE_HALFSIZE,2 * Def.SHAPE_HALFSIZE / 3));
 
-				shapes[(int)Name.Arrow].AddLine(-Def.SHAPE_HALFSIZE,0, Def.SHAPE_HALFSIZE,0);
-				shapes[(int)Name.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0,	Def.SHAPE_HALFSIZE/3, Def.SHAPE_HALFSIZE/3);
-				shapes[(int)Name.Arrow].AddLine(Def.SHAPE_HALFSIZE, 0, Def.SHAPE_HALFSIZE/3, -Def.SHAPE_HALFSIZE/3);
+				shapes[(int)Name.Arrow].AddLine(-Def.SHAPE_HALFSIZE,0,Def.SHAPE_HALFSIZE,0);
+				shapes[(int)Name.Arrow].AddLine(Def.SHAPE_HALFSIZE,0,Def.SHAPE_HALFSIZE / 3,Def.SHAPE_HALFSIZE / 3);
+				shapes[(int)Name.Arrow].AddLine(Def.SHAPE_HALFSIZE,0,Def.SHAPE_HALFSIZE / 3,-Def.SHAPE_HALFSIZE / 3);
 				}
 
 			public static GraphicsPath GetShape(Name sh)
@@ -66,78 +62,77 @@ namespace Circ
 		/// Nomi degli oggetti grafici, delle forme nella display list e dei flag per gli evidenziati
 		/// </summary>
 		[Flags]
-		public enum Shape 
+		public enum Shape
 			{
-			None		=	0,
-			Nodo		=	1 << 0,
-			Ramo		=	1 << 1,
-			Cornice		=	1 << 2,
-			Tutti		=	-1
+			None = 0,
+			Nodo = 1 << 0,
+			Ramo = 1 << 1,
+			Cornice = 1 << 2,
+			Tutti = -1
 			};
 
 		[Flags]
-		public enum Stat				// Stato inserimento e filtro per scelta Elementi
-			{							//	Stato		Filtro		Altro
-			None		=	0,			//	-			nulla
-			Edit		=	1 << 0,		//	Edit		-
-			Nodi		=	1 << 1,		//	Nodi		Nodi
-			Rami		=	1 << 2,		//	Rami		Rami
-			Vista		=	1 << 3,		//	Vista		-
-			//Pan			=	1 << 4,		//	Pan		-		ANNULLATO: usare flag dragging in Mainform
-			//Drag		=	1 << 5,			//	Drag	-		ANNULLATO: usare flag dragging in Mainform	
-			Tutti		=	-1			//	-			Tutto
+		public enum Stat                // Stato inserimento e filtro per scelta Elementi
+			{                           //	Stato		Filtro		Altro
+			None = 0,           //	-			nulla
+			Edit = 1 << 0,      //	Edit		-
+			Nodi = 1 << 1,      //	Nodi		Nodi
+			Rami = 1 << 2,      //	Rami		Rami
+			Vista = 1 << 3,     //	Vista		-
+								//Pan			=	1 << 4,		//	Pan		-		ANNULLATO: usare flag dragging in Mainform
+								//Drag		=	1 << 5,			//	Drag	-		ANNULLATO: usare flag dragging in Mainform	
+			Tutti = -1          //	-			Tutto
 			}
 
 		[Flags]
 		public enum ClipFlag
 			{
-			Inside		=	0b0000,		// Inside: 0
-			Left		=	0b0001,
-			Right		=	0b0010,
-			Bottom		=	0b0100,
-			Top			=	0b1000,
-			Outside		=	-1			// All Ones...
+			Inside = 0b0000,        // Inside: 0
+			Left = 0b0001,
+			Right = 0b0010,
+			Bottom = 0b0100,
+			Top = 0b1000,
+			Outside = -1            // All Ones...
 			}
 
 
-		public enum InputType {String, Int, Double}
+		public enum InputType { String, Int, Double }
 
-		public static readonly int RAGGIO_SELEZIONE = 10;		// Raggio di selezioni per evidenziazione
-		public static readonly int DRG_MIN = 15;				// Minima distanza di trascinamento
+		public static readonly int RAGGIO_SELEZIONE = 10;       // Raggio di selezioni per evidenziazione
+		public static readonly int DRG_MIN = 15;                // Minima distanza di trascinamento
 
-		public static int FREE_MIN = 5;							// Spazio libero minimo e massimo dell'array della Display List [10]
-		public static int FREE_MAX = 10;						// [100]
+		public static int FREE_MIN = 5;                         // Spazio libero minimo e massimo dell'array della Display List [10]
+		public static int FREE_MAX = 10;                        // [100]
 
-		public static uint NUM_NODI_MAX = 10000;				// Numero massimo di elementi
+		public static uint NUM_NODI_MAX = 10000;                // Numero massimo di elementi
 		public static uint NUM_RAMI_MAX = 10000;
-		public static uint ID_NODI_MAX = 20000;					// Max ID
+		public static uint ID_NODI_MAX = 20000;                 // Max ID
 		public static uint ID_RAMI_MAX = 20000;
 
-		public static double EPSILON = double.Epsilon * 10;		// Epsilon per i calcoli
-		public static double MAX_VALUE = double.MaxValue/10;	// Valore massimo
-		public static double MIN_VALUE = double.MinValue/10;	// Valore minimo
+		public static double EPSILON = double.Epsilon * 10;     // Epsilon per i calcoli
+		public static double MAX_VALUE = double.MaxValue / 10;  // Valore massimo
+		public static double MIN_VALUE = double.MinValue / 10;  // Valore minimo
 
-		public static double ZOOM_DEFAULT_SIZE = 5;				// Semiampiezza finestra di zoom se un solo punto
-		public static double ZOOM_FIT_ENLARGE = 1.2;			// Ingrandimento finestra oltre lo zoom ottimale
-		public static double ZOOM_STEP = 1.1;					// Incremento dello zoom
+		public static double ZOOM_DEFAULT_SIZE = 5;             // Semiampiezza finestra di zoom se un solo punto
+		public static double ZOOM_FIT_ENLARGE = 1.2;            // Ingrandimento finestra oltre lo zoom ottimale
+		public static double ZOOM_STEP = 1.1;                   // Incremento dello zoom
 
-		public static string FONT_NAME = "Arial";				// Carattere nella finestra grafica
+		public static string FONT_NAME = "Arial";               // Carattere nella finestra grafica
 		public static int FONT_SIZE = 8;
 
-		public static string FONT_D_NAME = "Arial";				// Carattere nelle dialog box
+		public static string FONT_D_NAME = "Arial";             // Carattere nelle dialog box
 		public static int FONT_D_SIZE = 9;
 
-		public static int NODE_HALFSIZE = 3;					// Dimensioni del nodo disegnato
-		public static int SHAPE_HALFSIZE = 30;					// Dimensioni della sagoma disegnata
-		public static int MAX_GRID_POINTS = 70;					// Numero massimo di divisioni della griglia
-
-		
-
-		public static int TIMER_REFRESH = 300;				// Intervallo di refresh di alcune scritte (tra cui il nome file da salvare)
+		public static int NODE_HALFSIZE = 3;                    // Dimensioni del nodo disegnato
+		public static int SHAPE_HALFSIZE = 30;                  // Dimensioni della sagoma disegnata
+		public static int MAX_GRID_POINTS = 70;                 // Numero massimo di divisioni della griglia
 
 
-		
+
+		public static int TIMER_REFRESH = 300;              // Intervallo di refresh di alcune scritte (tra cui il nome file da salvare)
+
+
+
 		}
-	
+
 	}
-	 

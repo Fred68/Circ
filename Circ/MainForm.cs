@@ -1,49 +1,44 @@
-﻿using System;
+﻿using Fred68.Tools.Log;                     // Per Log e debug
+using Fred68.Tools.Matematica;              // Matrici e varie
+using Fred68.Tools.Messaggi;                // Messaggi di errore
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Diagnostics;                   // Per Process.Start
 using System.Drawing;
+using System.IO;                            // Per FileInfo
 using System.Linq;
+using System.Reflection;                    // Per Assembly()
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using System.Reflection;					// Per Assembly()
-using System.IO;							// Per FileInfo
-using System.Diagnostics;					// Per Process.Start
-
-using Fred68.Tools.Log;						// Per Log e debug
-using Fred68.Tools.Messaggi;				// Messaggi di errore
-using Fred68.Tools.Matematica;				// Matrici e varie
 
 namespace Circ
 	{
-	public partial class MainForm : Form
+	public partial class MainForm:Form
 		{
-		CircuitoDoc doc;							// Documento
-		StatoAttivo stato;							// Stato
-		Vista vista;								// Vista
-		Panel drwPanel;								// Pannello di disegno
+		CircuitoDoc doc;                            // Documento
+		StatoAttivo stato;                          // Stato
+		Vista vista;                                // Vista
+		Panel drwPanel;                             // Pannello di disegno
 
-		readonly System.Windows.Forms.Timer timerUpdate;	// Timer per aggiornare 
-		Dictionary<string,TsBarRef> ts;						// Dati delle toolbar (per costruire il menù)
-		readonly EventHandler menuClickHandler;				// Handler unico dei click per i comandi del menù
-		
+		readonly System.Windows.Forms.Timer timerUpdate;    // Timer per aggiornare 
+		Dictionary<string,TsBarRef> ts;                     // Dati delle toolbar (per costruire il menù)
+		readonly EventHandler menuClickHandler;             // Handler unico dei click per i comandi del menù
+
 		//Point dragIniRel;							// Punto inizio drag relativo (azzerato in Pan ad ogni mouse move=
 		//Point dragIniFix;							// Punto inizio drag fisso
 
-		Point pini,pfin,pold;						// Punti per disegno dinamico linea si schermo
-		bool firstLine;								// Flag per il disegno in inverso
+		Point pini, pfin, pold;                     // Punti per disegno dinamico linea si schermo
+		bool firstLine;                             // Flag per il disegno in inverso
 
 
 		#region COSTRUTTORE E INIZIALIZZAZIONE
 
 		class TsBarRef
 			{
-			public ToolStrip tstrip;	
+			public ToolStrip tstrip;
 			public ToolStripMenuItem mitem;
 			public bool visible;
-			public TsBarRef(ToolStrip t, ToolStripMenuItem it, bool vis)
+			public TsBarRef(ToolStrip t,ToolStripMenuItem it,bool vis)
 				{
 				tstrip = t;
 				mitem = it;
@@ -57,72 +52,75 @@ namespace Circ
 		public MainForm()
 			{
 			LOG.active = true;
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("MainForm()");
-			#endif
+#endif
 
 			InitializeComponent();
 			timerUpdate = new Timer();
 			timerUpdate.Tick += new EventHandler(UpdateViewsHandler);
 			menuClickHandler = new EventHandler(MenuClickHandlerFunc);
 			}
-	
+
 		/// <summary>
 		/// On Load
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MainForm_Load(object sender, EventArgs e)
+		private void MainForm_Load(object sender,EventArgs e)
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("MainForm_Load()");
-			#endif
+#endif
 
-			doc = null;							// Azzera il documento
+			doc = null;                         // Azzera il documento
 
-			drwPanel = CreatePanel(this);		// Crea il pannello
+			drwPanel = CreatePanel(this);       // Crea il pannello
 
-			stato = new StatoAttivo();			// Crea lo stato
-			vista = new Vista(drwPanel);		// Crea la vista
+			stato = new StatoAttivo();          // Crea lo stato
+			vista = new Vista(drwPanel);        // Crea la vista
 
-			ToolStripMenuItem m = new ToolStripMenuItem();		// Aggiunge il menù delle toolbar
+			ToolStripMenuItem m = new ToolStripMenuItem();      // Aggiunge il menù delle toolbar
 			menuStrip.Items.Insert(1,m);
 			m.Text = "Toolbars";
 
-			ts = new Dictionary<string, TsBarRef>();			// Aggiunge i menuitem delle toolbar al menù
-			foreach(Control ctrl in GetControls(this))
+			ts = new Dictionary<string,TsBarRef>();         // Aggiunge i menuitem delle toolbar al menù
+
+			List<Control> tmp = new List<Control>();
+			foreach(Control ctrl in GetControls(this)) tmp.Add(ctrl);   // Temporanea, per avere l'ordine inverso
+			foreach(Control ctrl in tmp.Reverse<Control>())
 				{
 				if(ctrl.GetType() == typeof(ToolStrip))
 					{
 					ts[ctrl.Text] = new TsBarRef((ToolStrip)ctrl,(ToolStripMenuItem)m.DropDownItems.Add(ctrl.Text,null,menuClickHandler),ctrl.Enabled);
 					}
 				}
-			foreach (KeyValuePair<string, TsBarRef> kv in ts)
+			foreach(KeyValuePair<string,TsBarRef> kv in ts)
 				{
 				kv.Value.mitem.Checked = kv.Value.visible;
 				kv.Value.tstrip.Visible = kv.Value.visible;
 				kv.Value.tstrip.Enabled = true;
 				}
 
-			drwPanel.BringToFront();							// Porta il pannello di disegno in primo piano (se no resta dietro dopo il docking)
-			drwPanel.Dock = DockStyle.Fill;						// Estende il pannello
-			drwPanel.BackColor = Colori.BackgroundColor;		// Colore di sfondo
+			drwPanel.BringToFront();                            // Porta il pannello di disegno in primo piano (se no resta dietro dopo il docking)
+			drwPanel.Dock = DockStyle.Fill;                     // Estende il pannello
+			drwPanel.BackColor = Stile.BackgroundColor;        // Colore di sfondo
 
 			pini = pfin = pold = new Point(0,0);
 			firstLine = true;
 
-			this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.drwPanel_Wheel);		// L'evento MouseWheel è catturato dal Form principale
+			this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.drwPanel_Wheel);     // L'evento MouseWheel è catturato dal Form principale
 
-			#if(DEBUG)
+#if(DEBUG)
 			debugToolStripMenuItem.Enabled = debugToolStripMenuItem.Visible = true;
-			#else
+#else
 			debugToolStripMenuItem.Enabled = debugToolStripMenuItem.Visible = false;
-			#endif
+#endif
 
-			UpdateMenus();										// Aggiorna i menù
-			timerUpdate.Interval = Def.TIMER_REFRESH;		// Refresh del controllo se il documento è da salvare
-			UpdateToolStrips();									// Aggiorna le barre
-			
+			UpdateMenus();                                      // Aggiorna i menù
+			timerUpdate.Interval = Def.TIMER_REFRESH;       // Refresh del controllo se il documento è da salvare
+			UpdateToolStrips();                                 // Aggiorna le barre
+
 			// MessageBox.Show((Point2D.Zero + new Point2D(Math.PI/2, -1.5)).ToString());
 
 			}
@@ -144,7 +142,7 @@ namespace Circ
 			p.MouseMove += new System.Windows.Forms.MouseEventHandler(this.drwPanel_MouseMove);
 			p.MouseUp += new System.Windows.Forms.MouseEventHandler(this.drwPanel_MouseUp);
 			p.Resize += new System.EventHandler(this.drwPanel_Resize);
-			
+
 			// Attenzione: l'evento MouseWheel non è catturato dal Pannello, quindi non usare:
 			// p.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.drwPanel_Wheel);
 
@@ -158,7 +156,7 @@ namespace Circ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MainFormClosing(object sender, FormClosingEventArgs e)
+		private void MainFormClosing(object sender,FormClosingEventArgs e)
 			{
 			if(MessageBox.Show(Messaggi.MSG.EXIT,"Chiusura programma",MessageBoxButtons.YesNo) != DialogResult.Yes)
 				{
@@ -172,11 +170,11 @@ namespace Circ
 				{
 				e.Cancel = true;
 				}
-			#if DEBUG		
+#if DEBUG
 			LOG.Write("...MainFormClosing()");
 			LOG.Close();
 			Process.Start(LOG.LOGFILE);
-			#endif
+#endif
 			}
 
 		/// <summary>
@@ -184,17 +182,17 @@ namespace Circ
 		/// </summary>
 		/// <returns></returns>
 		public static string Version()
-            {
-            StringBuilder strb = new StringBuilder();
+			{
+			StringBuilder strb = new StringBuilder();
 			FileInfo fi = new FileInfo(Assembly.GetExecutingAssembly().Location);
-            strb.Append("Informazioni sul programma" + System.Environment.NewLine+System.Environment.NewLine);
+			strb.Append("Informazioni sul programma" + System.Environment.NewLine + System.Environment.NewLine);
 			strb.Append(Application.ProductName + System.Environment.NewLine);
 			strb.Append("Copyright " + Application.CompanyName + System.Environment.NewLine);
 			strb.Append("Versione: " + Application.ProductVersion + System.Environment.NewLine);
-            strb.Append("Build: " + Build() + System.Environment.NewLine);
+			strb.Append("Build: " + Build() + System.Environment.NewLine);
 			strb.Append("Eseguibile: " + fi.FullName + System.Environment.NewLine);
-            return strb.ToString();
-            }
+			return strb.ToString();
+			}
 
 		/// <summary>
 		/// Stringa con la 'build'
@@ -215,11 +213,11 @@ namespace Circ
 		/// </summary>
 		private void SalvaDoc()
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("SalvaDoc()");
-			#endif
+#endif
 
-			doc.Dati.PassoGriglia = vista.GridStep;		// Copia il passo della griglia prima del salvataggio
+			doc.Dati.PassoGriglia = vista.GridStep;     // Copia il passo della griglia prima del salvataggio
 
 			Messaggi.Clear();
 			bool ok = false;
@@ -228,7 +226,7 @@ namespace Circ
 			sfd.FilterIndex = 1;
 			sfd.RestoreDirectory = true;
 			sfd.FileName = doc.Dati.Nome;
-			if(sfd.ShowDialog()==DialogResult.OK)
+			if(sfd.ShowDialog() == DialogResult.OK)
 				{
 				if((stream = sfd.OpenFile()) != null)
 					{
@@ -240,7 +238,7 @@ namespace Circ
 				{
 				Messaggi.AddMessage(Messaggi.ERR.ERRORE_SAVE,$"Salvataggio del file: {doc.Dati.Nome} non eseguito !",Messaggi.Tipo.Errori);
 				}
-			if(Messaggi.hasError)	MessageBox.Show(Messaggi.MessaggiCompleti());
+			if(Messaggi.hasError) MessageBox.Show(Messaggi.MessaggiCompleti());
 			UpdateMenus();
 			vista.SetOutdatedDL();
 			vista.RegenDL(true);
@@ -254,16 +252,16 @@ namespace Circ
 		/// <param name="asText"></param>
 		private void ApriDoc(bool asText = false)
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("ApriDoc()");
-			#endif
+#endif
 			Messaggi.Clear();
 			bool ok = false;
 			Stream stream;
 			ofd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
 			ofd.FilterIndex = 1;
 			ofd.RestoreDirectory = true;
-			if(ofd.ShowDialog()==DialogResult.OK)
+			if(ofd.ShowDialog() == DialogResult.OK)
 				{
 				ChiudiDoc();
 				NuovoDoc();
@@ -271,12 +269,12 @@ namespace Circ
 					{
 					if(asText)
 						{
-						Process.Start(ofd.FileName);			// Apre in formato testo con editor di default
+						Process.Start(ofd.FileName);            // Apre in formato testo con editor di default
 						ok = true;
 						}
 					else
 						{
-						ok = doc.Open(stream,ofd.FileName);		// Apre normalmente
+						ok = doc.Open(stream,ofd.FileName);     // Apre normalmente
 						stream.Close();
 						}
 					}
@@ -286,17 +284,17 @@ namespace Circ
 				Messaggi.AddMessage(Messaggi.ERR.ERRORE_OPEN,$"Errore nell'apertura del file: {ofd.FileName}",Messaggi.Tipo.Errori);
 				ChiudiDoc();
 				}
-			if(asText)											// Se in formato testo, chiude subito il documento
+			if(asText)                                          // Se in formato testo, chiude subito il documento
 				{
 				ChiudiDoc();
-				ok = false;										// Inibisce le operazioni successive
+				ok = false;                                     // Inibisce le operazioni successive
 				}
-			if(Messaggi.hasError)	MessageBox.Show(Messaggi.MessaggiCompleti());
+			if(Messaggi.hasError) MessageBox.Show(Messaggi.MessaggiCompleti());
 			UpdateMenus();
 			if(ok)
 				{
-				vista.GridStep = doc.Dati.PassoGriglia;			// Ricopia il passo della griglia dal documento alla vista
-				UpdateToolStrips();								// Aggiorna la statusBar con i dti della griglia
+				vista.GridStep = doc.Dati.PassoGriglia;         // Ricopia il passo della griglia dal documento alla vista
+				UpdateToolStrips();                             // Aggiorna la statusBar con i dti della griglia
 				vista.SetElements(doc.Dati.Elementi());
 				vista.SetOutdatedDL();
 				}
@@ -312,14 +310,14 @@ namespace Circ
 		/// </summary>
 		private void ChiudiDoc()
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("ChiudiDoc()");
-			#endif
+#endif
 			if(doc != null)
 				{
 				if(doc.IsModified)
 					{
-					if(MessageBox.Show(String.Format(Messaggi.MSG.SALVARE_FILE, doc.Dati.Nome),"Salvataggio documento",MessageBoxButtons.YesNo) == DialogResult.Yes)
+					if(MessageBox.Show(String.Format(Messaggi.MSG.SALVARE_FILE,doc.Dati.Nome),"Salvataggio documento",MessageBoxButtons.YesNo) == DialogResult.Yes)
 						{
 						SalvaDoc();
 						}
@@ -333,7 +331,7 @@ namespace Circ
 				vista.RegenDL(true);
 				}
 			UpdateMenus();
-			
+
 			}
 
 		/// <summary>
@@ -343,9 +341,9 @@ namespace Circ
 		/// </summary>
 		private void NuovoDoc()
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("NuovoDoc()");
-			#endif
+#endif
 			ChiudiDoc();
 			doc = new CircuitoDoc();
 			vista.SetElements(doc.Dati.Elementi());
@@ -361,7 +359,7 @@ namespace Circ
 		/// </summary>
 		/// <param name="Sender"></param>
 		/// <param name="e"></param>
-		private void UpdateViewsHandler(object Sender, EventArgs e)
+		private void UpdateViewsHandler(object Sender,EventArgs e)
 			{
 			UpdateDocName();
 			UpdateIDStats();
@@ -393,7 +391,7 @@ namespace Circ
 				lbRamoFree.Text = $"frR:{doc.Dati.FreeIDRamo.ToString()}";
 				}
 			}
-		
+
 		/// <summary>
 		/// (Dis)Abilita i menù e le toolbar
 		/// se c'é un doc aperto
@@ -403,20 +401,18 @@ namespace Circ
 			bool enbl;
 			if(doc != null)
 				{
-				enbl = true; 
+				enbl = true;
 				}
 			else
 				{
 				this.Text = "---";
-				enbl = false; 
+				enbl = false;
 				}
 			//this.saveButton.Enabled = enbl;
 			this.toolStripFile.Enabled = enbl;
 			this.saveToolStripMenuItem.Enabled = enbl;
 			this.closeToolStripMenuItem.Enabled = enbl;
 			this.toolStripEditor.Enabled = enbl;
-			this.aggiungiNodoToolStripMenuItem.Enabled = enbl;
-			this.aggiungiRamoToolStripMenuItem.Enabled = enbl;
 			this.toolStripVista.Enabled = this.vistaToolStripMenuItem.Enabled = enbl;
 			this.toolStripSelect.Enabled = enbl;
 			this.toolStripModifica.Enabled = enbl;
@@ -429,14 +425,14 @@ namespace Circ
 		/// </summary>
 		private void UpdateToolStrips()
 			{
-			#warning	Spostare stato e grid in un'altra funzione (e aggiornare le molte chiamate)
-			foreach(KeyValuePair<string, TsBarRef> kv in ts)
+#warning	Spostare stato e grid in un'altra funzione (e aggiornare le molte chiamate)
+			foreach(KeyValuePair<string,TsBarRef> kv in ts)
 				{
 				kv.Value.mitem.Checked = kv.Value.visible;
 				kv.Value.tstrip.Visible = kv.Value.visible;
 				}
-			labelStat.Text = stato.Stato.ToString();
-			lbGrid.Text = vista.IsGridOn ? string.Format("Gr: {0}", vista.GridStep.ToString("#.##")) : "Gr: off";
+			labelStat.Text = stato.Stato.ToString().ToUpper();
+			lbGrid.Text = vista.IsGridOn ? string.Format("Gr: {0}",vista.GridStep.ToString("#.##")) : "Gr: OFF";
 			}
 
 		/// <summary>
@@ -444,7 +440,7 @@ namespace Circ
 		/// </summary>
 		/// <param name="Sender"></param>
 		/// <param name="e"></param>
-		private void MenuClickHandlerFunc(object Sender, EventArgs e)
+		private void MenuClickHandlerFunc(object Sender,EventArgs e)
 			{
 			ts[Sender.ToString()].visible = !ts[Sender.ToString()].visible;
 			UpdateToolStrips();
@@ -482,18 +478,18 @@ namespace Circ
 													new InputForm.InputData("Delta X", Def.InputType.Double, "0"),
 													new InputForm.InputData("Delta Y", Def.InputType.Double, "0")
 													};
-				InputForm inpf = new InputForm("Sposta elementi selezionati", ref dat);
+				InputForm inpf = new InputForm("Sposta elementi selezionati",ref dat);
 
 				if(inpf.ShowDialog() == DialogResult.OK)
 					{
-					double x,y;
-					if( double.TryParse(dat[0].Contenuto, out x) && double.TryParse(dat[1].Contenuto, out y))
+					double x, y;
+					if(double.TryParse(dat[0].Contenuto,out x) && double.TryParse(dat[1].Contenuto,out y))
 						{
 						doc.Dati.MuoviSelezionati(new Point2D(x,y));
 						vista.SetOutdatedDL();
 						vista.RegenDL(true);
 						}
-						
+
 					}
 				}
 			}
@@ -504,18 +500,18 @@ namespace Circ
 		private void EliminaSelezionati()
 			{
 			if(doc != null)
+				{
+				Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
+				if((t.Item1 > 0) || (t.Item2 > 0))
 					{
-					Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
-					if((t.Item1>0)||(t.Item2>0))
+					if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI,t.Item1,t.Item2),"Conferma",MessageBoxButtons.YesNo) == DialogResult.Yes)
 						{
-						if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI, t.Item1, t.Item2),"Conferma",MessageBoxButtons.YesNo)==DialogResult.Yes)
-							{
-							doc.Dati.EliminaSelezionati();
-							vista.SetOutdatedDL();
-							vista.RegenDL(true);
-							}
+						doc.Dati.EliminaSelezionati();
+						vista.SetOutdatedDL();
+						vista.RegenDL(true);
 						}
 					}
+				}
 			}
 
 		/// <summary>
@@ -534,20 +530,20 @@ namespace Circ
 													new InputForm.InputData("Id vecchio", Def.InputType.Int, x.ID.ToString(), true),
 													new InputForm.InputData("Id nuovo", Def.InputType.Int, "0")
 													};
-					InputForm inpf = new InputForm("Rinumera ID", ref dat);
+					InputForm inpf = new InputForm("Rinumera ID",ref dat);
 
 					if(inpf.ShowDialog() == DialogResult.OK)
 						{
 						int n;
-						if(int.TryParse(dat[1].Contenuto, out n))
+						if(int.TryParse(dat[1].Contenuto,out n))
 							{
 							if(x is Nodo)
 								{
-								doc.Dati.RinumeraIDnodo(x.ID, (uint)n);
+								doc.Dati.RinumeraIDnodo(x.ID,(uint)n);
 								}
 							else if(x is Ramo)
 								{
-								doc.Dati.RinumeraIDramo(x.ID, (uint)n);
+								doc.Dati.RinumeraIDramo(x.ID,(uint)n);
 								}
 							vista.SetOutdatedDL();
 							vista.RegenDL(true);
@@ -585,16 +581,16 @@ namespace Circ
 														new InputForm.InputData("X", Def.InputType.Double, ((Nodo)e).P.X.ToString()),
 														new InputForm.InputData("Y", Def.InputType.Double, ((Nodo)e).P.Y.ToString())
 														};
-						InputForm inpf = new InputForm("Coordinate nodo", ref dat);
+						InputForm inpf = new InputForm("Coordinate nodo",ref dat);
 
 						if(inpf.ShowDialog() == DialogResult.OK)
 							{
 							double x, y;
-							if(double.TryParse(dat[0].Contenuto, out x) && double.TryParse(dat[1].Contenuto, out y))
+							if(double.TryParse(dat[0].Contenuto,out x) && double.TryParse(dat[1].Contenuto,out y))
 								{
 								((Nodo)e).P.X = x;
 								((Nodo)e).P.Y = y;
-								doc.IsModified=true;
+								doc.IsModified = true;
 								vista.SetOutdatedDL();
 								vista.RegenDL(true);
 								}
@@ -639,32 +635,32 @@ namespace Circ
 		/// <param name="select">seleziona o deseleziona</param>
 		/// <param name="st">Stato attuale usato come filtro: nodi o rami; se Edit: tutti</param>
 		/// <param name="doc">documento</param>
-		private void SelectAll(bool select, Def.Stat st, CircuitoDoc doc)
+		private void SelectAll(bool select,Def.Stat st,CircuitoDoc doc)
 			{
 			if(doc != null)
 				{
-				Def.Stat previousSt = doc.Dati.ViewFilter;			// Memorizza il filtro preesistente
-				doc.Dati.ViewFilter = st;							// Filtro = stato attuale: Nodi o Rami					
+				Def.Stat previousSt = doc.Dati.ViewFilter;          // Memorizza il filtro preesistente
+				doc.Dati.ViewFilter = st;                           // Filtro = stato attuale: Nodi o Rami					
 				if(st == Def.Stat.Edit)
-					doc.Dati.ViewFilter = Def.Stat.Tutti;			// Stato Edit: filtro Tutti
+					doc.Dati.ViewFilter = Def.Stat.Tutti;           // Stato Edit: filtro Tutti
 				foreach(Elemento el in doc.Dati.Elementi())
 					{
 					el.Selected = select;
 					}
-				 doc.Dati.ViewFilter = previousSt;					// Lo ripristina
+				doc.Dati.ViewFilter = previousSt;                   // Lo ripristina
 				}
 			}
 
 		/// <summary>
 		/// Paint
 		/// </summary>
-		private void drwPanel_Paint(object sender, PaintEventArgs e)
+		private void drwPanel_Paint(object sender,PaintEventArgs e)
 			{
 			if(doc != null)
 				{
-				#if(DEBUG)
-				LOG.Write("drwPanel_Paint()", 2);
-				#endif
+#if(DEBUG)
+				LOG.Write("drwPanel_Paint()",2);
+#endif
 				vista.RegenDL(true);
 				}
 			}
@@ -672,11 +668,11 @@ namespace Circ
 		/// <summary>
 		/// Resize
 		/// </summary>
-		private void drwPanel_Resize(object sender, EventArgs e)
+		private void drwPanel_Resize(object sender,EventArgs e)
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write("drwPanel_Resize()");
-			#endif
+#endif
 			vista.Resize();
 			vista.RegenDL(true);
 			}
@@ -688,79 +684,79 @@ namespace Circ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e">e.X, e.Y sono le coordinate del mouse</param>
-		private void drwPanel_MouseMove(object sender, MouseEventArgs e)
+		private void drwPanel_MouseMove(object sender,MouseEventArgs e)
 			{
 			switch(stato.Stato)
 				{
 				case Def.Stat.Vista:
-					{
-					if(stato.Dragging)
 						{
-						#if(DEBUG)
-						LOG.Write("drwPanel_MouseMove():case Def.Stat.Vista + dragging", 2);
-						#endif
+						if(stato.Dragging)
+							{
+#if(DEBUG)
+							LOG.Write("drwPanel_MouseMove():case Def.Stat.Vista + dragging",2);
+#endif
 
-						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
+							DrawScreenReverseLine(e.Location);      // Disegna la linea (reverse, cancellabile)
 
-						Point delta = new Point(e.Location.X - stato.dragIniRel.X, e.Location.Y - stato.dragIniRel.Y);
-						
-						Point2D pan = vista.ScalaVettore(delta);
+							Point delta = new Point(e.Location.X - stato.dragIniRel.X,e.Location.Y - stato.dragIniRel.Y);
 
-						vista.SetCursor(false);					// Disabilita evidenziazione degli elementi
-						vista.Pan(pan);
-						vista.RegenDL(true);
-						stato.dragIniRel = e.Location;
-						vista.SetCursor(false);					// Disabilita evidenziazione
+							Point2D pan = vista.ScalaVettore(delta);
+
+							vista.SetCursor(false);                 // Disabilita evidenziazione degli elementi
+							vista.Pan(pan);
+							vista.RegenDL(true);
+							stato.dragIniRel = e.Location;
+							vista.SetCursor(false);                 // Disabilita evidenziazione
+							}
 						}
-					}
 					break;
 				case Def.Stat.Edit:
-					{
-					if(stato.Dragging)
 						{
-						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
-						vista.RegenDL(true);
+						if(stato.Dragging)
+							{
+							DrawScreenReverseLine(e.Location);      // Disegna la linea (reverse, cancellabile)
+							vista.RegenDL(true);
+							}
+						else
+							{
+							vista.SetCursor(true,e.Location.X,e.Location.Y);    // Abilita evidenziazione degli elementi vicini al cursore
+							vista.Redraw(false);
+							}
 						}
-					else
-						{
-						vista.SetCursor(true, e.Location.X, e.Location.Y);	// Abilita evidenziazione degli elementi vicini al cursore
-						vista.Redraw(false);
-						}
-					}
 					break;
 				case Def.Stat.Rami:
-					{
-					vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi (anche in dragging)
-					if(stato.Dragging)
 						{
-						DrawScreenReverseLine(e.Location);		// Disegna la linea (reverse, cancellabile)
-						vista.RegenDL(true);
+						vista.SetCursor(true,e.Location.X,e.Location.Y,Def.Shape.Nodo); // Abilita evidenziazione dei nodi (anche in dragging)
+						if(stato.Dragging)
+							{
+							DrawScreenReverseLine(e.Location);      // Disegna la linea (reverse, cancellabile)
+							vista.RegenDL(true);
+							}
+						else
+							{
+							vista.Redraw(false);
+							}
 						}
-					else
-						{
-						vista.Redraw(false);
-						}
-					}
 					break;
 				case Def.Stat.Nodi:
-					{
-					vista.SetCursor(false);			// Disabilita evidenziazione 
-					vista.Redraw(false);
-					}
+						{
+						vista.SetCursor(false);         // Disabilita evidenziazione 
+						vista.Redraw(false);
+						}
 					break;
 				}
 
-			Point2D p;							// Aggiorna le ccordinate del cursore. Se dragging: mostra il vettore di spostamento
-			if(stato.Dragging)					// Trascinamento: scala il vettore
+			Point2D p;                          // Aggiorna le ccordinate del cursore. Se dragging: mostra il vettore di spostamento
+			if(stato.Dragging)                  // Trascinamento: scala il vettore
 				{
-				p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X , e.Y - stato.dragIniFix.Y));
+				p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X,e.Y - stato.dragIniFix.Y));
 				}
-			else								// Movimento normale: scala il punto del cursore
+			else                                // Movimento normale: scala il punto del cursore
 				{
-				p = vista.Scala(new Point(e.X, e.Y));
+				p = vista.Scala(new Point(e.X,e.Y));
 				}
-			xPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("X:{0:0.###}", p.X)}";
-			yPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("Y:{0:0.###}", p.Y)}";
+			xPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("X:{0:0.###}",p.X)}";
+			yPos.Text = $"{ (stato.Dragging ? "D" : "") }{String.Format("Y:{0:0.###}",p.Y)}";
 			}
 
 		/// <summary>
@@ -768,57 +764,57 @@ namespace Circ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e">Contiene i dati dell'evento</param>
-		private void drwPanel_MouseClick(object sender, MouseEventArgs e)
+		private void drwPanel_MouseClick(object sender,MouseEventArgs e)
 			{
 			switch(stato.Stato)
 				{
 				case Def.Stat.Vista:
-					{
-					}
+						{
+						}
 					break;
 
 				case Def.Stat.Nodi:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseClick():case Def.Stat.Nodi");
-					#endif
-					if(e.Button == MouseButtons.Left)
 						{
-						if(doc != null)
-							doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
+#if(DEBUG)
+						LOG.Write("drwPanel_MouseClick():case Def.Stat.Nodi");
+#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							if(doc != null)
+								doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
+							}
 						}
-					}
 					break;
 
 				case Def.Stat.Rami:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseClick():case Def.Stat.Rami");
-					#endif
-					if(e.Button == MouseButtons.Left)
 						{
-						vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Nodo);	// Abilita evidenziazione dei nodi vicini al cursore
-						vista.Redraw(false);
-						if(doc != null)
-							doc.SelectLastElement(vista);
+#if(DEBUG)
+						LOG.Write("drwPanel_MouseClick():case Def.Stat.Rami");
+#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							vista.SetCursor(true,e.Location.X,e.Location.Y,Def.Shape.Nodo); // Abilita evidenziazione dei nodi vicini al cursore
+							vista.Redraw(false);
+							if(doc != null)
+								doc.SelectLastElement(vista);
+							}
 						}
-					}
 					break;
 				case Def.Stat.Edit:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseClick():case Def.Stat.Edit");
-					#endif
-					if(e.Button == MouseButtons.Left)
 						{
-						vista.SetCursor(true, e.Location.X, e.Location.Y, Def.Shape.Tutti);	// Abilita evidenziazione degli elementi vicini al cursore
-						vista.Redraw(false);
-						if(doc != null)
-							doc.SelectLastElement(vista);
+#if(DEBUG)
+						LOG.Write("drwPanel_MouseClick():case Def.Stat.Edit");
+#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							vista.SetCursor(true,e.Location.X,e.Location.Y,Def.Shape.Tutti);    // Abilita evidenziazione degli elementi vicini al cursore
+							vista.Redraw(false);
+							if(doc != null)
+								doc.SelectLastElement(vista);
+							}
 						}
-					}
 					break;
 				}
 			}
@@ -828,68 +824,68 @@ namespace Circ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void drwPanel_MouseDown(object sender, MouseEventArgs e)
+		private void drwPanel_MouseDown(object sender,MouseEventArgs e)
 			{
 			switch(stato.Stato)
 				{
 				case Def.Stat.Vista:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseDown():case Def.Stat.View");
-					#endif
-					if(e.Button == MouseButtons.Left)
 						{
-						stato.dragIniRel = stato.dragIniFix = e.Location;
-						stato.Dragging = true;
-						firstLine = true;
-						if(doc != null)
-							doc.Dati.ViewFilter = Def.Stat.Nodi;
-						UpdateToolStrips();
-						}
-					}
-					break;
-				case Def.Stat.Nodi:
-					{
-					
-					}
-					break;
-				case Def.Stat.Rami:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseDown():case Def.Stat.Rami");
-					#endif
-					if(e.Button == MouseButtons.Left)
-						{
-						Elemento el = vista.GetLastHighLighted();
-						if(el != null)
-							{
-							stato.dragIniRel = stato.dragIniFix = el.Center;
-							stato.dragFromElement = el;
-							}
-						else
+#if(DEBUG)
+						LOG.Write("drwPanel_MouseDown():case Def.Stat.View");
+#endif
+						if(e.Button == MouseButtons.Left)
 							{
 							stato.dragIniRel = stato.dragIniFix = e.Location;
-							stato.dragFromElement = null;
+							stato.Dragging = true;
+							firstLine = true;
+							if(doc != null)
+								doc.Dati.ViewFilter = Def.Stat.Nodi;
+							UpdateToolStrips();
 							}
-						stato.Dragging = true;
-						firstLine = true;
-						UpdateToolStrips();
 						}
-					}
+					break;
+				case Def.Stat.Nodi:
+						{
+
+						}
+					break;
+				case Def.Stat.Rami:
+						{
+#if(DEBUG)
+						LOG.Write("drwPanel_MouseDown():case Def.Stat.Rami");
+#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							Elemento el = vista.GetLastHighLighted();
+							if(el != null)
+								{
+								stato.dragIniRel = stato.dragIniFix = el.Center;
+								stato.dragFromElement = el;
+								}
+							else
+								{
+								stato.dragIniRel = stato.dragIniFix = e.Location;
+								stato.dragFromElement = null;
+								}
+							stato.Dragging = true;
+							firstLine = true;
+							UpdateToolStrips();
+							}
+						}
 					break;
 				case Def.Stat.Edit:
-					{
-					#if(DEBUG)
-					LOG.Write("drwPanel_MouseDown():case Def.Stat.Edit");
-					#endif
-					if(e.Button == MouseButtons.Left)
 						{
-						stato.dragIniRel = stato.dragIniFix = e.Location;
-						stato.Dragging = true;
-						firstLine = true;
-						UpdateToolStrips();
+#if(DEBUG)
+						LOG.Write("drwPanel_MouseDown():case Def.Stat.Edit");
+#endif
+						if(e.Button == MouseButtons.Left)
+							{
+							stato.dragIniRel = stato.dragIniFix = e.Location;
+							stato.Dragging = true;
+							firstLine = true;
+							UpdateToolStrips();
+							}
 						}
-					}
 					break;
 				}
 			}
@@ -899,132 +895,131 @@ namespace Circ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void drwPanel_MouseUp(object sender, MouseEventArgs e)
+		private void drwPanel_MouseUp(object sender,MouseEventArgs e)
 			{
-			if(stato.Dragging)					// Se sta eseguendo un dragging...
-				if(  !(stato.Stato==Def.Stat.Vista) )	// ...ma non in Vista
-				{								// Se lo spostamento è piccolo...
-				if((Math.Abs(e.Location.X - stato.dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - stato.dragIniFix.Y) < Def.DRG_MIN))
-					{
-					stato.Dragging = false;		// ...annulla il dragging per distinguere un click da un drag.
-					vista.RegenDL(false);
+			if(stato.Dragging)                  // Se sta eseguendo un dragging...
+				if(!(stato.Stato == Def.Stat.Vista))    // ...ma non in Vista
+					{                               // Se lo spostamento è piccolo...
+					if((Math.Abs(e.Location.X - stato.dragIniFix.X) < Def.DRG_MIN) && (Math.Abs(e.Location.Y - stato.dragIniFix.Y) < Def.DRG_MIN))
+						{
+						stato.Dragging = false;     // ...annulla il dragging per distinguere un click da un drag.
+						vista.RegenDL(false);
+						}
 					}
-				}
 
 			switch(stato.Stato)
 				{
 				case Def.Stat.Vista:
-					{
-					if(stato.Dragging)
 						{
-						#if(DEBUG)
-						LOG.Write("drwPanel_MouseUp():case Def.Stat.Pan");
-						#endif
-						if(e.Button == MouseButtons.Left)
+						if(stato.Dragging)
 							{
-							stato.Stato = Def.Stat.Vista;
-							Point2D p;
-							p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X , e.Y - stato.dragIniFix.Y));
+#if(DEBUG)
+							LOG.Write("drwPanel_MouseUp():case Def.Stat.Pan");
+#endif
+							if(e.Button == MouseButtons.Left)
+								{
+								stato.Stato = Def.Stat.Vista;
+								Point2D p;
+								p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X,e.Y - stato.dragIniFix.Y));
 
-							stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
-							if(doc != null)
-								doc.Dati.ViewFilter = Def.Stat.Nodi | Def.Stat.Rami;
-							UpdateToolStrips();
-							vista.RecalcSzWlorld();
+								stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
+								if(doc != null)
+									doc.Dati.ViewFilter = Def.Stat.Nodi | Def.Stat.Rami;
+								UpdateToolStrips();
+								vista.RecalcSzWlorld();
+								vista.SetOutdatedDL();
+								vista.RegenDL(true);
+								}
+							}
+						}
+					break;
+				case Def.Stat.Nodi:
+						{
+
+						}
+					break;
+				case Def.Stat.Rami:
+						{
+						if(stato.Dragging)
+							{
+#if(DEBUG)
+							LOG.Write("drwPanel_MouseUp():case Def.Stat.Rami");
+#endif
+							if(e.Button == MouseButtons.Left)
+								{
+								Elemento hi = vista.GetLastHighLighted();
+								stato.Stato = Def.Stat.Rami;
+								if(doc != null)
+									{
+									uint id1, id2;
+									if(stato.dragFromElement != null)           // Primo nodo
+										{
+										id1 = stato.dragFromElement.ID;
+										}
+									else
+										{
+										Nodo n = (Nodo)doc.AddNodo(vista.Scala(stato.dragIniFix));
+										if(n != null)
+											{
+											id1 = n.ID;
+											}
+										else
+											{
+											id1 = Elemento.UNASSIGNED;
+											}
+										}
+
+									if(hi != null)                              // Secondo nodo
+										{
+										id2 = hi.ID;
+										}
+									else
+										{
+										Nodo n = (Nodo)doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
+										if(n != null)
+											{
+											id2 = n.ID;
+											}
+										else
+											{
+											id2 = Elemento.UNASSIGNED;
+											}
+										}
+
+									doc.AddRamo(id1,id2);
+
+									}
+								stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
+								UpdateToolStrips();
+								}
 							vista.SetOutdatedDL();
 							vista.RegenDL(true);
 							}
 						}
-					}
-					break;
-				case Def.Stat.Nodi:
-					{
-					
-					}
-					break;
-				case Def.Stat.Rami:
-					{
-					if(stato.Dragging)
-						{
-						#if(DEBUG)
-						LOG.Write("drwPanel_MouseUp():case Def.Stat.Rami");
-						#endif
-						if(e.Button == MouseButtons.Left)
-							{
-							Elemento hi = vista.GetLastHighLighted();
-							stato.Stato = Def.Stat.Rami;
-							if(doc != null)
-								{
-								uint id1, id2;
-								if(stato.dragFromElement != null)			// Primo nodo
-									{
-									id1 = stato.dragFromElement.ID;
-									}
-								else
-									{
-									Nodo n = (Nodo)doc.AddNodo(vista.Scala(stato.dragIniFix));
-									if(n != null)
-										{
-										id1 = n.ID;
-										}
-									else
-										{
-										id1 = Elemento.UNASSIGNED;
-										}
-									}
-
-								if(hi != null)								// Secondo nodo
-									{
-									id2 = hi.ID;
-									}
-								else
-									{
-									Nodo n = (Nodo)doc.AddNodo(vista.Scala(new Point(e.X,e.Y)));
-									if(n != null)
-										{
-										id2 = n.ID;
-										}
-									else
-										{
-										id2 = Elemento.UNASSIGNED;
-										}
-									}
-
-								doc.AddRamo(id1, id2);
-								
-								}
-							stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
-							UpdateToolStrips();
-							}
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
-						}
-					}
 					break;
 				case Def.Stat.Edit:
-					{
-					if(stato.Dragging)
 						{
-						#if(DEBUG)
-						LOG.Write("drwPanel_MouseUp():case Def.Stat.Move");
-						#endif
-						if(e.Button == MouseButtons.Left)
+						if(stato.Dragging)
 							{
-							stato.Stato = Def.Stat.Edit;
-							Point2D p;
-							p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X , e.Y - stato.dragIniFix.Y));
-							stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
-							if(doc != null)
+#if(DEBUG)
+							LOG.Write("drwPanel_MouseUp():case Def.Stat.Move");
+#endif
+							if(e.Button == MouseButtons.Left)
 								{
-								doc.Dati.MuoviSelezionati(p);
+								stato.Stato = Def.Stat.Edit;
+								Point2D p;
+								p = vista.ScalaVettore(new Point(e.X - stato.dragIniFix.X,e.Y - stato.dragIniFix.Y));
+								stato.dragIniRel.X = stato.dragIniRel.Y = stato.dragIniFix.X = stato.dragIniFix.Y = 0;
+								if(doc != null)
+									{
+									doc.Dati.MuoviSelezionati(p);
+									}
+								UpdateToolStrips();
 								}
-							UpdateToolStrips();
-							
+							vista.SetOutdatedDL();
+							vista.RegenDL(true);
 							}
-						vista.SetOutdatedDL();
-						vista.RegenDL(true);
 						}
-					}
 					break;
 				}
 			}
@@ -1035,13 +1030,13 @@ namespace Circ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void drwPanel_Wheel(object sender, MouseEventArgs e)
+		private void drwPanel_Wheel(object sender,MouseEventArgs e)
 			{
 			if(doc != null)
 				{
-				#if(DEBUG)
+#if(DEBUG)
 				LOG.Write("drwPanel_Wheel():case Def.Stat.Vista");
-				#endif
+#endif
 				if(!stato.Dragging)
 					{
 					if((e.Delta > 0) || (e.Delta < 0))
@@ -1094,16 +1089,16 @@ namespace Circ
 		/// <param name="loc"></param>
 		private void DrawScreenReverseLine(Point loc)
 			{
-			pfin = new Point(loc.X + drwPanel.Location.X, loc.Y + drwPanel.Location.Y);
+			pfin = new Point(loc.X + drwPanel.Location.X,loc.Y + drwPanel.Location.Y);
 			if(firstLine)
 				{
-				pini = new Point(stato.dragIniFix.X + drwPanel.Location.X, stato.dragIniFix.Y + drwPanel.Location.Y);
-				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.Blue);
+				pini = new Point(stato.dragIniFix.X + drwPanel.Location.X,stato.dragIniFix.Y + drwPanel.Location.Y);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini),PointToScreen(pfin),Color.Blue);
 				}
 			else
 				{
-				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pold), Color.White);
-				ControlPaint.DrawReversibleLine(PointToScreen(pini), PointToScreen(pfin), Color.White);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini),PointToScreen(pold),Color.White);
+				ControlPaint.DrawReversibleLine(PointToScreen(pini),PointToScreen(pfin),Color.White);
 				}
 			pold = pfin;
 			firstLine = false;
@@ -1123,7 +1118,7 @@ namespace Circ
 				Invalidate();
 				}
 			}
-		
+
 		/// <summary>
 		/// Inverte i rami selezionati
 		/// </summary>
@@ -1157,7 +1152,7 @@ namespace Circ
 			{
 			if(doc != null)
 				{
-				string x = (doc.Dati.VerificaNodiIsolati(true)==true) ? "" : "non ";
+				string x = (doc.Dati.VerificaNodiIsolati(true) == true) ? "" : "non ";
 				vista.SetOutdatedDL();
 				vista.RegenDL(true);
 				MessageBox.Show($"Il circuito {x}è connesso");
@@ -1165,7 +1160,7 @@ namespace Circ
 			}
 		#region TEST
 
-		private void rinumeraNodoToolStripMenuItem_Click(object sender, EventArgs e)
+		private void rinumeraNodoToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			InputForm.InputData[] dat = new InputForm.InputData[] {
 																new InputForm.InputData("Id vecchio", Def.InputType.Int, "0"),
@@ -1176,13 +1171,13 @@ namespace Circ
 				{
 				if(doc != null)
 					{
-					int v,n;
+					int v, n;
 					if(
-						int.TryParse(dat[0].Contenuto, out v)
+						int.TryParse(dat[0].Contenuto,out v)
 						&&
-						int.TryParse(dat[1].Contenuto, out n) )
+						int.TryParse(dat[1].Contenuto,out n))
 						{
-						doc.Dati.RinumeraIDnodo((uint)v, (uint)n);
+						doc.Dati.RinumeraIDnodo((uint)v,(uint)n);
 						vista.SetOutdatedDL();
 						vista.RegenDL(true);
 						}
@@ -1193,7 +1188,7 @@ namespace Circ
 
 
 
-		private void rinumeraRamoToolStripMenuItem_Click(object sender, EventArgs e)
+		private void rinumeraRamoToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			InputForm.InputData[] dat = new InputForm.InputData[] {
 																new InputForm.InputData("Id vecchio", Def.InputType.Int, "0"),
@@ -1204,13 +1199,13 @@ namespace Circ
 				{
 				if(doc != null)
 					{
-					int v,n;
+					int v, n;
 					if(
-						int.TryParse(dat[0].Contenuto, out v)
+						int.TryParse(dat[0].Contenuto,out v)
 						&&
-						int.TryParse(dat[1].Contenuto, out n) )
+						int.TryParse(dat[1].Contenuto,out n))
 						{
-						doc.Dati.RinumeraIDramo((uint)v, (uint)n);
+						doc.Dati.RinumeraIDramo((uint)v,(uint)n);
 						vista.SetOutdatedDL();
 						vista.RegenDL(true);
 						}
@@ -1219,7 +1214,7 @@ namespace Circ
 				}
 			}
 
-		private void testDialogToolStripMenuItem_Click(object sender, EventArgs e)
+		private void testDialogToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			InputForm.InputData[] dat = new InputForm.InputData[] {
 																new InputForm.InputData("Testo", Def.InputType.String, "Uno"),
@@ -1236,15 +1231,15 @@ namespace Circ
 				}
 			}
 
-		private void controllaNodiIsolatiToolStripMenuItem_Click(object sender, EventArgs e)
+		private void controllaNodiIsolatiToolStripMenuItem_Click(object sender,EventArgs e)
 			{
-			
+
 			}
 
 
 		private void gridToolStripMenuItem_Click(object sender,EventArgs e)
 			{
-			if(doc!=null)
+			if(doc != null)
 				{
 				vista.SetOutdatedDL();
 				vista.RegenDL(true);
@@ -1254,80 +1249,80 @@ namespace Circ
 			}
 		#endregion
 
-		
+
 
 
 		#region HANDLER DI MENU E PULSANTI
 
-		private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+		private void ExitToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			Close();
 			}
 
-		private void AboutToolStripMenuItem1_Click(object sender, EventArgs e)
+		private void AboutToolStripMenuItem1_Click(object sender,EventArgs e)
 			{
 			MessageBox.Show(Version());
 			}
 
-		private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+		private void SaveToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			SalvaDoc();
 			}
 
-		private void SaveStripButton_Click(object sender, EventArgs e)
+		private void SaveStripButton_Click(object sender,EventArgs e)
 			{
 			SalvaDoc();
 			}
 
-		private void NewToolStripMenuItem_Click(object sender, EventArgs e)
+		private void NewToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			NuovoDoc();
 			}
 
-		private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
+		private void OpenToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			ApriDoc();
 			}
 
-		private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
+		private void CloseToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			ChiudiDoc();
 			}
-	
-		private void NodoMode_TB_Click(object sender, EventArgs e)
+
+		private void NodoMode_TB_Click(object sender,EventArgs e)
 			{
-			if(doc == null)		return;
+			if(doc == null) return;
 			stato.Stato = Def.Stat.Nodi;
 			UpdateToolStrips();
 			}
 
-		private void RamoMode_TB_Click(object sender, EventArgs e)
+		private void RamoMode_TB_Click(object sender,EventArgs e)
 			{
-			if(doc == null)		return;
-			if(stato.Stato != Def.Stat.Rami)		// Cambia modo
+			if(doc == null) return;
+			if(stato.Stato != Def.Stat.Rami)        // Cambia modo
 				{
 				stato.Stato = Def.Stat.Rami;
 				}
-			else								// Se è già in modalità Rami, aggiunge il ramo tra i due nodi selezionati
+			else                                // Se è già in modalità Rami, aggiunge il ramo tra i due nodi selezionati
 				{
 				bool ramok = false;
 				if(doc.selezionati.Count == 2)
 					{
-					if( ((doc.selezionati[0]).GetType() == typeof(Nodo)) && ((doc.selezionati[1]).GetType() == typeof(Nodo)) )
+					if(((doc.selezionati[0]).GetType() == typeof(Nodo)) && ((doc.selezionati[1]).GetType() == typeof(Nodo)))
 						{
-						if( doc.AddRamo(doc.selezionati[0].ID, doc.selezionati[1].ID) != null)
+						if(doc.AddRamo(doc.selezionati[0].ID,doc.selezionati[1].ID) != null)
 							{
 							ramok = true;
 							}
 						}
-					doc.UnselectAll();			// Dopo aver aggiunto il ramo, deseleziona tutto
+					doc.UnselectAll();          // Dopo aver aggiunto il ramo, deseleziona tutto
 					vista.RegenDL(true);
 					}
-				doc.UnselectAll();				// Deseleziona tutto, in ogni caso, per evitare problemi ala selezione successiva.
+				doc.UnselectAll();              // Deseleziona tutto, in ogni caso, per evitare problemi ala selezione successiva.
 				if(!ramok)
 					{
-					#warning Spostare tutti i messaggi da popup/dialog a toolbar
-					MessageBox.Show(Messaggi.MSG.SELEZIONARE_DUE_NODI);		
+#warning Spostare tutti i messaggi da popup/dialog a toolbar
+					MessageBox.Show(Messaggi.MSG.SELEZIONARE_DUE_NODI);
 					}
 				}
 
@@ -1337,57 +1332,47 @@ namespace Circ
 			UpdateToolStrips();
 			}
 
-		private void ViewMode_TB_Click(object sender, EventArgs e)
+		private void ViewMode_TB_Click(object sender,EventArgs e)
 			{
-			if(doc == null)		return;
+			if(doc == null) return;
 			stato.Stato = Def.Stat.Vista;
 			UpdateToolStrips();
 			}
 
-		private void EditMode_TB_Click(object sender, EventArgs e)
+		private void EditMode_TB_Click(object sender,EventArgs e)
 			{
-			if(doc == null)		return;
+			if(doc == null) return;
 			stato.Stato = Def.Stat.Edit;
 			UpdateToolStrips();
 			}
 
-		private void AggiungiNodoToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			#warning Scrivere inserimento nodo manuale (usare dialog dell'edit)
-			}
-
-		private void AggiungiRamoToolStripMenuItem_Click(object sender, EventArgs e)
-			{
-			#warning Scrivere inserimento ramo manuale (usare dialog dell'edit)
-			}
-
-		private void Ridisegna_M_Click(object sender, EventArgs e)
+		private void Ridisegna_M_Click(object sender,EventArgs e)
 			{
 			vista.RegenDL(true);
 			}
 
-		private void Ridisegna_TB_Click(object sender, EventArgs e)
+		private void Ridisegna_TB_Click(object sender,EventArgs e)
 			{
 			vista.SetOutdatedDL();
 			vista.RegenDL(true);
 			}
 
-		private void openAsTxtToolStripMenuItem_Click(object sender, EventArgs e)
+		private void openAsTxtToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			ApriDoc(true);
 			}
 
-		private void ZoomInToolStripButton_Click(object sender, EventArgs e)
+		private void ZoomInToolStripButton_Click(object sender,EventArgs e)
 			{
 			vista.Zoom(Def.ZOOM_STEP);
 			vista.RegenDL(true);
 			}
-		private void ZoomOutToolStripButton_Click(object sender, EventArgs e)
+		private void ZoomOutToolStripButton_Click(object sender,EventArgs e)
 			{
-			vista.Zoom(1/Def.ZOOM_STEP);
+			vista.Zoom(1 / Def.ZOOM_STEP);
 			vista.RegenDL(true);
 			}
-		private void ZoomFitToolStripButton_Click(object sender, EventArgs e)
+		private void ZoomFitToolStripButton_Click(object sender,EventArgs e)
 			{
 			if(doc != null)
 				{
@@ -1396,56 +1381,56 @@ namespace Circ
 				}
 			}
 
-		private void SelectAlltoolStripButton_Click(object sender, EventArgs e)
+		private void SelectAlltoolStripButton_Click(object sender,EventArgs e)
 			{
-			SelectAll(true, stato.Stato, doc);		// Seleziona in base allo stato attuale
+			SelectAll(true,stato.Stato,doc);        // Seleziona in base allo stato attuale
 			vista.SetOutdatedDL();
 			vista.Redraw();
 			}
 
-		private void SelectNonetoolStripButton_Click(object sender, EventArgs e)
+		private void SelectNonetoolStripButton_Click(object sender,EventArgs e)
 			{
-			SelectAll(false, Def.Stat.Tutti, doc);
+			SelectAll(false,Def.Stat.Tutti,doc);
 			vista.SetOutdatedDL();
 			vista.Redraw();
 			}
 
-		private void RinumeraToolStripButton_Click(object sender, EventArgs e)
+		private void RinumeraToolStripButton_Click(object sender,EventArgs e)
 			{
 			Rinumera();
 			}
 
-		private void CompattaIDToolStripButton_Click(object sender, EventArgs e)
+		private void CompattaIDToolStripButton_Click(object sender,EventArgs e)
 			{
 			CompattaID();
 			}
 
-		private void EliminaToolStripButton_Click(object sender, EventArgs e)
+		private void EliminaToolStripButton_Click(object sender,EventArgs e)
 			{
 			EliminaSelezionati();
 			}
 
-		private void eliminaToolStripMenuItem_Click(object sender, EventArgs e)
+		private void eliminaToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			EliminaSelezionati();
 			}
 
-		private void spostaToolStripMenuItem_Click(object sender, EventArgs e)
+		private void spostaToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			SpostaSelezionati();
 			}
 
-		private void inserisciCoordinateToolStripMenuItem_Click(object sender, EventArgs e)
+		private void inserisciCoordinateToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			CoordinateNodo();
 			}
 
-		private void controllaNodiIsolatiToolStripMenuItem_Click_1(object sender, EventArgs e)
+		private void controllaNodiIsolatiToolStripMenuItem_Click_1(object sender,EventArgs e)
 			{
 			ControllaNodiIsolati();
 			}
 
-		private void creaMatriceDiIncidenzaToolStripMenuItem_Click(object sender, EventArgs e)
+		private void creaMatriceDiIncidenzaToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			if(doc != null)
 				{
@@ -1458,12 +1443,12 @@ namespace Circ
 				}
 			}
 
-		private void DivideToolStripButton_Click(object sender, EventArgs e)
+		private void DivideToolStripButton_Click(object sender,EventArgs e)
 			{
 			DivideSelezionati();
 			}
 
-		private void dividiRamoToolStripMenuItem_Click(object sender, EventArgs e)
+		private void dividiRamoToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			DivideSelezionati();
 			}
@@ -1479,7 +1464,7 @@ namespace Circ
 
 		private void GrigliaPiùFitta_Click(object sender,EventArgs e)
 			{
-			vista.GrigliaStepMultiply(1/Def.ZOOM_STEP);
+			vista.GrigliaStepMultiply(1 / Def.ZOOM_STEP);
 			UpdateToolStrips();
 			vista.SetOutdatedDL();
 			vista.RegenDL(true);
@@ -1498,22 +1483,22 @@ namespace Circ
 			InputForm.InputData[] dat = new InputForm.InputData[] {
 										new InputForm.InputData("Passo", Def.InputType.Double, vista.GridStep.ToString()),
 										};
-					InputForm inpf = new InputForm("Passo griglia", ref dat);
+			InputForm inpf = new InputForm("Passo griglia",ref dat);
 
-					if(inpf.ShowDialog() == DialogResult.OK)
+			if(inpf.ShowDialog() == DialogResult.OK)
+				{
+				double p;
+				if(double.TryParse(dat[0].Contenuto,out p))
+					{
+					if(p > Def.EPSILON)
 						{
-						double p;
-						if(double.TryParse(dat[0].Contenuto, out p))
-							{
-							if(p > Def.EPSILON)
-								{
-								vista.GridStep = p;
-								}
-							UpdateToolStrips();
-							vista.SetOutdatedDL();
-							vista.RegenDL(true);
-							}
+						vista.GridStep = p;
 						}
+					UpdateToolStrips();
+					vista.SetOutdatedDL();
+					vista.RegenDL(true);
+					}
+				}
 			}
 
 		private void allineaAllaGriglia_Click(object sender,EventArgs e)
@@ -1538,7 +1523,7 @@ namespace Circ
 
 		private void inverteSel_Click(object sender,EventArgs e)
 			{
-			if(doc!=null)
+			if(doc != null)
 				{
 				doc.InverteSelezione();
 				vista.SetOutdatedDL();
@@ -1563,13 +1548,13 @@ namespace Circ
 			ControllaNodiIsolati();
 			}
 
-		private void inverteAsseXToolStripMenuItem_Click(object sender, EventArgs e)
+		private void inverteAsseXToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			vista.SwapAxisX();
 			vista.RegenDL(true);
 			}
 
-		private void inverteAsseYToolStripMenuItem_Click(object sender, EventArgs e)
+		private void inverteAsseYToolStripMenuItem_Click(object sender,EventArgs e)
 			{
 			vista.SwapAxisY();
 			vista.RegenDL(true);
@@ -1577,6 +1562,6 @@ namespace Circ
 
 		#endregion
 
-	
+
 		}
 	}

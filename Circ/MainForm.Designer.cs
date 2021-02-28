@@ -54,8 +54,6 @@ namespace Circ
 			this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.aggiungiNodoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.aggiungiRamoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.eliminaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.collassaNodiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.spostaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -189,6 +187,7 @@ namespace Circ
 			// 
 			// toolStripLabel1
 			// 
+			this.toolStripLabel1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.toolStripLabel1.Name = "toolStripLabel1";
 			this.toolStripLabel1.Size = new System.Drawing.Size(18, 22);
 			this.toolStripLabel1.Text = "M";
@@ -250,6 +249,7 @@ namespace Circ
 			// 
 			// toolStripLabel3
 			// 
+			this.toolStripLabel3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.toolStripLabel3.Name = "toolStripLabel3";
 			this.toolStripLabel3.Size = new System.Drawing.Size(13, 22);
 			this.toolStripLabel3.Text = "F";
@@ -344,8 +344,6 @@ namespace Circ
 			// editToolStripMenuItem
 			// 
 			this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aggiungiNodoToolStripMenuItem,
-            this.aggiungiRamoToolStripMenuItem,
             this.eliminaToolStripMenuItem,
             this.collassaNodiToolStripMenuItem,
             this.spostaToolStripMenuItem,
@@ -357,24 +355,6 @@ namespace Circ
 			this.editToolStripMenuItem.Name = "editToolStripMenuItem";
 			this.editToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
 			this.editToolStripMenuItem.Text = "Modifica";
-			// 
-			// aggiungiNodoToolStripMenuItem
-			// 
-			this.aggiungiNodoToolStripMenuItem.Enabled = false;
-			this.aggiungiNodoToolStripMenuItem.Name = "aggiungiNodoToolStripMenuItem";
-			this.aggiungiNodoToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-			this.aggiungiNodoToolStripMenuItem.Text = "Aggiungi nodo";
-			this.aggiungiNodoToolStripMenuItem.Visible = false;
-			this.aggiungiNodoToolStripMenuItem.Click += new System.EventHandler(this.AggiungiNodoToolStripMenuItem_Click);
-			// 
-			// aggiungiRamoToolStripMenuItem
-			// 
-			this.aggiungiRamoToolStripMenuItem.Enabled = false;
-			this.aggiungiRamoToolStripMenuItem.Name = "aggiungiRamoToolStripMenuItem";
-			this.aggiungiRamoToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-			this.aggiungiRamoToolStripMenuItem.Text = "Aggiungi ramo";
-			this.aggiungiRamoToolStripMenuItem.Visible = false;
-			this.aggiungiRamoToolStripMenuItem.Click += new System.EventHandler(this.AggiungiRamoToolStripMenuItem_Click);
 			// 
 			// eliminaToolStripMenuItem
 			// 
@@ -609,14 +589,15 @@ namespace Circ
             this.toolStripButton8});
 			this.toolStripVista.Location = new System.Drawing.Point(176, 0);
 			this.toolStripVista.Name = "toolStripVista";
-			this.toolStripVista.Size = new System.Drawing.Size(210, 25);
+			this.toolStripVista.Size = new System.Drawing.Size(211, 25);
 			this.toolStripVista.TabIndex = 3;
 			this.toolStripVista.Text = "Vista";
 			// 
 			// toolStripLabel2
 			// 
+			this.toolStripLabel2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.toolStripLabel2.Name = "toolStripLabel2";
-			this.toolStripLabel2.Size = new System.Drawing.Size(14, 22);
+			this.toolStripLabel2.Size = new System.Drawing.Size(15, 22);
 			this.toolStripLabel2.Text = "V";
 			this.toolStripLabel2.ToolTipText = "vista";
 			// 
@@ -706,16 +687,17 @@ namespace Circ
             this.SelectAlltoolStripButton,
             this.SelectNonetoolStripButton,
             this.toolStripButton6});
-			this.toolStripSelect.Location = new System.Drawing.Point(386, 0);
+			this.toolStripSelect.Location = new System.Drawing.Point(387, 0);
 			this.toolStripSelect.Name = "toolStripSelect";
-			this.toolStripSelect.Size = new System.Drawing.Size(94, 25);
+			this.toolStripSelect.Size = new System.Drawing.Size(95, 25);
 			this.toolStripSelect.TabIndex = 4;
 			this.toolStripSelect.Text = "Seleziona";
 			// 
 			// toolStripLabel4
 			// 
+			this.toolStripLabel4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.toolStripLabel4.Name = "toolStripLabel4";
-			this.toolStripLabel4.Size = new System.Drawing.Size(13, 22);
+			this.toolStripLabel4.Size = new System.Drawing.Size(14, 22);
 			this.toolStripLabel4.Text = "S";
 			this.toolStripLabel4.ToolTipText = "Selezione";
 			// 
@@ -759,7 +741,7 @@ namespace Circ
             this.toolStripButton5,
             this.EliminaToolStripButton,
             this.toolStripButton7});
-			this.toolStripModifica.Location = new System.Drawing.Point(480, 0);
+			this.toolStripModifica.Location = new System.Drawing.Point(482, 0);
 			this.toolStripModifica.Name = "toolStripModifica";
 			this.toolStripModifica.Size = new System.Drawing.Size(145, 25);
 			this.toolStripModifica.TabIndex = 5;
@@ -767,6 +749,7 @@ namespace Circ
 			// 
 			// toolStripLabel5
 			// 
+			this.toolStripLabel5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.toolStripLabel5.Name = "toolStripLabel5";
 			this.toolStripLabel5.Size = new System.Drawing.Size(18, 22);
 			this.toolStripLabel5.Text = "M";
@@ -839,17 +822,19 @@ namespace Circ
             this.toolStripLabel6,
             this.compattaToolStrip,
             this.nodiIsolatiToolStrip});
-			this.toolStripStrumenti.Location = new System.Drawing.Point(625, 0);
+			this.toolStripStrumenti.Location = new System.Drawing.Point(627, 0);
 			this.toolStripStrumenti.Name = "toolStripStrumenti";
-			this.toolStripStrumenti.Size = new System.Drawing.Size(102, 25);
+			this.toolStripStrumenti.Size = new System.Drawing.Size(72, 25);
 			this.toolStripStrumenti.TabIndex = 6;
-			this.toolStripStrumenti.Text = "toolStrip1";
+			this.toolStripStrumenti.Text = "Strumenti";
 			// 
 			// toolStripLabel6
 			// 
+			this.toolStripLabel6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.toolStripLabel6.Name = "toolStripLabel6";
-			this.toolStripLabel6.Size = new System.Drawing.Size(13, 22);
+			this.toolStripLabel6.Size = new System.Drawing.Size(14, 22);
 			this.toolStripLabel6.Text = "S";
+			this.toolStripLabel6.ToolTipText = "Strumenti";
 			// 
 			// compattaToolStrip
 			// 
@@ -1047,8 +1032,6 @@ namespace Circ
 		private System.Windows.Forms.OpenFileDialog ofd;
 		private System.Windows.Forms.SaveFileDialog sfd;
 		private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem aggiungiNodoToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem aggiungiRamoToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem vistaToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem ridisegnaToolStripMenuItem;
 		private System.Windows.Forms.ToolStrip toolStripVista;

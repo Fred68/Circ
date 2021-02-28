@@ -1,39 +1,33 @@
-﻿using System;
+﻿using Fred68.Tools.Messaggi;
+using Newtonsoft.Json;              // Serializzazione in Json
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-
-using System.Drawing;				// Point struct
-using Newtonsoft.Json;				// Serializzazione in Json
-using Fred68.Tools.Messaggi;
 
 namespace Circ
 	{
 
 	class CircuitoDoc
 		{
-		static int indx = 1;			// Indice per il nome del documento
-		string filename;				// Nome file completo
-		bool _isModified;				// flag, se ci sono modiiche da salvare
+		static int indx = 1;            // Indice per il nome del documento
+		string filename;                // Nome file completo
+		bool _isModified;               // flag, se ci sono modiiche da salvare
 
-		Dati dati;						// Classe con i dati del circuito
+		Dati dati;                      // Classe con i dati del circuito
 
 		public readonly List<Elemento> selezionati;     // Lista elementi selezionati
 
 #warning	Selezioni varie: tutte con pulsante destro
 #warning	Dragging con dx: finestra rettangolare
-#warning	Contaext menù con tasto destro
+#warning	Context menù con tasto destro
 
 #warning	Aggiungere comando Duplica elementi
 
-#warning	Lampeggiare gli element selezionati (sfruttare il timer)
+#warning	Far lampeggiare gli elementi selezionati (sfruttare il timer)
 #warning	Messaggi: correggere il testo, in base alla selezione. Es. "Eliminare 1 nodo selezionato" e non "Eliminare 1 nodi 0 rami selezionati"
 
 #warning	Testo con sfondo
 #warning	Sagome 2D con colore di sfondo
-#warning	Spostare colori e penne sotto vista ed usarla per disegnare; le funzioni Draw passano solo gli indici, non le penne.
 #warning	Aggiungere testo per dati aggiuntivi
 #warning	Menù checked con gli oggetti da vedere nella descrizione (dinamico, usare Reflection)
 
@@ -52,15 +46,16 @@ namespace Circ
 		/// </summary>
 		public Dati Dati
 			{
-			get {return dati;}
-			set {dati = value;}
+			get { return dati; }
+			set { dati = value; }
 			}
 
 		[JsonIgnore]
 		public bool IsModified
 			{
-			get {return _isModified;}
-			set {							// Ammette soltanto di attivare _isModified, non di azzerarlo !
+			get { return _isModified; }
+			set
+				{                           // Ammette soltanto di attivare _isModified, non di azzerarlo !
 				if(value == true)
 					_isModified = true;
 				}
@@ -75,12 +70,12 @@ namespace Circ
 			{
 			dati = new Dati();
 			selezionati = new List<Elemento>();
-			dati.Nome = "Circuito"+(indx.ToString()).PadLeft(3,'0');
+			dati.Nome = "Circuito" + (indx.ToString()).PadLeft(3,'0');
 			indx++;
 			filename = string.Empty;
 			_isModified = false;
 			}
-		
+
 		/// <summary>
 		/// Chiude il documento
 		/// </summary>
@@ -95,25 +90,25 @@ namespace Circ
 		/// <param name="stream"></param>
 		/// <param name="fileName"></param>
 		/// <returns>true se ok</returns>
-		public bool Save(Stream stream, string fileName)
+		public bool Save(Stream stream,string fileName)
 			{
 			bool ok = true;
 			selezionati.Clear();
 			this.filename = fileName;
-			#if(DEBUG)
+#if(DEBUG)
 			System.Windows.Forms.MessageBox.Show(filename);
-			#endif
+#endif
 			try
 				{
 				dati.Nome = Path.GetFileName(this.filename);
 				}
 			catch(Exception e)
-					{
-					ok = false;
-					Messaggi.AddMessage(Messaggi.ERR.ERRORE_FILE,e.ToString(),Messaggi.Tipo.Errori);
-					}
+				{
+				ok = false;
+				Messaggi.AddMessage(Messaggi.ERR.ERRORE_FILE,e.ToString(),Messaggi.Tipo.Errori);
+				}
 
-			if (ok)
+			if(ok)
 				{
 				try
 					{
@@ -143,7 +138,7 @@ namespace Circ
 		/// <param name="stream"></param>
 		/// <param name="fileName"></param>
 		/// <returns>true se ok</returns>
-		public bool Open(Stream stream, string fileName)
+		public bool Open(Stream stream,string fileName)
 			{
 			bool ok = true;
 			selezionati.Clear();
@@ -153,7 +148,7 @@ namespace Circ
 				using(StreamReader sr = new StreamReader(stream))
 					{
 					var serializer = new JsonSerializer();
-					dati = (Dati) serializer.Deserialize(sr,typeof(Dati));
+					dati = (Dati)serializer.Deserialize(sr,typeof(Dati));
 					}
 				}
 			catch(Exception e)
@@ -162,7 +157,7 @@ namespace Circ
 				Messaggi.AddMessage(Messaggi.ERR.ERRORE_OPEN,e.ToString(),Messaggi.Tipo.Errori);
 				}
 			int failed;
-			if( (failed = dati.AggiornaRiferimenti()) > 0)
+			if((failed = dati.AggiornaRiferimenti()) > 0)
 				{
 				ok = false;
 				Messaggi.AddMessage(Messaggi.ERR.AGGIORNA_RIFERIMENTI,$"Falliti {failed} rami",Messaggi.Tipo.Errori);
@@ -196,7 +191,7 @@ namespace Circ
 		/// <param name="id1">primo id</param>
 		/// <param name="id2">secondo id</param>
 		/// <returns>Elemento o null</returns>
-		public Elemento AddRamo(uint id1, uint id2)
+		public Elemento AddRamo(uint id1,uint id2)
 			{
 			Ramo r = new Ramo();
 			r.N1 = id1;
@@ -215,12 +210,12 @@ namespace Circ
 		/// <param name="id1">id primo nodo </param>
 		/// <param name="p2">Point2d secondo nodo</param>
 		/// <returns>Elemento o null</returns>
-		public Elemento AddRamo(uint id1, Point2D p2)
+		public Elemento AddRamo(uint id1,Point2D p2)
 			{
 			Ramo r = null;
 			Nodo n2 = (Nodo)AddNodo(p2);
 			if(n2 != null)
-				r = (Ramo)AddRamo(id1, n2.ID);
+				r = (Ramo)AddRamo(id1,n2.ID);
 			return r;
 			}
 
@@ -230,13 +225,13 @@ namespace Circ
 		/// <param name="p1">Point2d</param>
 		/// <param name="p2">Point2d</param>
 		/// <returns>Elemento o null</returns>
-		public Elemento AddRamo(Point2D p1, Point2D p2)
+		public Elemento AddRamo(Point2D p1,Point2D p2)
 			{
 			Ramo r = null;
 			Nodo n1 = (Nodo)AddNodo(p1);
 			Nodo n2 = (Nodo)AddNodo(p2);
-			if((n1 != null)&&(n2 != null))
-				r = (Ramo)AddRamo(n1.ID, n2.ID);
+			if((n1 != null) && (n2 != null))
+				r = (Ramo)AddRamo(n1.ID,n2.ID);
 			return r;
 			}
 
@@ -255,7 +250,7 @@ namespace Circ
 					selezionati.Remove(el);
 				}
 			}
-		
+
 		/// <summary>
 		/// Deseleziona tutti gli elementi
 		/// </summary>
@@ -273,7 +268,7 @@ namespace Circ
 		/// </summary>
 		public void DivideSelezionati()
 			{
-			List<Elemento> sel = dati.GetSelezionati(true);		// Cerca gli elementi selezionati
+			List<Elemento> sel = dati.GetSelezionati(true);     // Cerca gli elementi selezionati
 			foreach(Elemento e in sel)
 				{
 				if(e is Ramo)
@@ -294,7 +289,7 @@ namespace Circ
 		/// </summary>
 		public void InverteRamiSelezionati()
 			{
-			List<Elemento> sel = dati.GetSelezionati(true);		// Cerca gli elementi selezionati
+			List<Elemento> sel = dati.GetSelezionati(true);     // Cerca gli elementi selezionati
 			foreach(Elemento e in sel)
 				{
 				if(e is Ramo)
@@ -311,19 +306,19 @@ namespace Circ
 		/// <param name="r"></param>
 		private void DivideRamo(Ramo r)
 			{
-			Nodo n = (Nodo)AddNodo(Point2D.Midpoint(r.Nd1.P, r.Nd2.P));		// Nuovo nodo nel punto medio
+			Nodo n = (Nodo)AddNodo(Point2D.Midpoint(r.Nd1.P,r.Nd2.P));      // Nuovo nodo nel punto medio
 			uint id1, id2, id3;
-			id1 = r.N1;							// I nuovi id degli estremi
+			id1 = r.N1;                         // I nuovi id degli estremi
 			id2 = n.ID;
 			id3 = r.N2;
 
-			dati.EliminaRamo(r.ID);				// Elimina il ramo r
-			Ramo r1 = (Ramo)AddRamo(id1,id2);	// Crea i nuovi rami
+			dati.EliminaRamo(r.ID);             // Elimina il ramo r
+			Ramo r1 = (Ramo)AddRamo(id1,id2);   // Crea i nuovi rami
 			Ramo r2 = (Ramo)AddRamo(id2,id3);
 
-			r1.CopyData(r);						// Copia le proprietà
+			r1.CopyData(r);                     // Copia le proprietà
 			r2.CopyData(r);
-			r1.Name += ".1";					// Diversifica i nomi		
+			r1.Name += ".1";                    // Diversifica i nomi		
 			r2.Name += ".2";
 			}
 
@@ -347,20 +342,20 @@ namespace Circ
 						{
 						((Ramo)r).N1 = nn.ID;
 						((Ramo)r).Nd1 = nn;
-						spost = (((Ramo)r).Nd2.P - ((Ramo)r).Nd1.P)/10;
+						spost = (((Ramo)r).Nd2.P - ((Ramo)r).Nd1.P) / 10;
 						}
 					else
 						{
 						((Ramo)r).N2 = nn.ID;
 						((Ramo)r).Nd2 = nn;
-						spost = (((Ramo)r).Nd1.P - ((Ramo)r).Nd2.P)/10;
+						spost = (((Ramo)r).Nd1.P - ((Ramo)r).Nd2.P) / 10;
 						}
 					nn.P += spost;
 					}
 				}
-			#if DEBUG
+#if DEBUG
 			System.Windows.Forms.MessageBox.Show($"count = {count}");
-			#endif	
+#endif
 			}
 		/// <summary>
 		/// Scambia i nodi del ramo
@@ -388,9 +383,9 @@ namespace Circ
 				{
 				if(el is Nodo)
 					{
-					Point2D rp = ((Nodo)el).P/v.GridStep;		// Rapporti 
-					rp.X = Math.Round(rp.X,0)*v.GridStep;
-					rp.Y = Math.Round(rp.Y,0)*v.GridStep;
+					Point2D rp = ((Nodo)el).P / v.GridStep;     // Rapporti 
+					rp.X = Math.Round(rp.X,0) * v.GridStep;
+					rp.Y = Math.Round(rp.Y,0) * v.GridStep;
 					((Nodo)el).P.X = rp.X;
 					((Nodo)el).P.Y = rp.Y;
 					}
@@ -407,20 +402,20 @@ namespace Circ
 			{
 			int count = 0;
 			List<Elemento> sel;
-			sel = dati.GetSelezionati(true,Def.Stat.Nodi);			// Cerca i nodi selezionati
-			if(sel.Count > 1)										// Se sono selezionati almeno due nodi
+			sel = dati.GetSelezionati(true,Def.Stat.Nodi);          // Cerca i nodi selezionati
+			if(sel.Count > 1)                                       // Se sono selezionati almeno due nodi
 				{
-				for(int i=1; i<sel.Count; i++)						// Percorre la lista dal 2° elemento
+				for(int i = 1;i < sel.Count;i++)                        // Percorre la lista dal 2° elemento
 					{
-					dati.CollassaNodi(sel[0].ID, sel[i].ID);		// Collassa i nodi sul primo nodo
+					dati.CollassaNodi(sel[0].ID,sel[i].ID);     // Collassa i nodi sul primo nodo
 					if(removeNodes)
 						{
-						dati.EliminaNodo(sel[i].ID);				// Elimina i nodi, se richiesto (e se è possibile)
+						dati.EliminaNodo(sel[i].ID);                // Elimina i nodi, se richiesto (e se è possibile)
 						}
 					_isModified = true;
 					}
 				}
-			sel = dati.GetSelezionati(true,Def.Stat.Rami);			// Cerca i rami selezionati
+			sel = dati.GetSelezionati(true,Def.Stat.Rami);          // Cerca i rami selezionati
 			foreach(Elemento e in sel)
 				{
 				dati.EliminaRamo(e.ID,true);
@@ -441,7 +436,7 @@ namespace Circ
 				}
 			}
 
-		}	// Fine classe CircuitoDoc
+		}   // Fine classe CircuitoDoc
 
 
 	}

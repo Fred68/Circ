@@ -1,63 +1,57 @@
-﻿using System;
+﻿using Fred68.Tools.Log;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Windows.Forms;
 using System.Drawing;
-
-using Fred68.Tools.Log;
+using System.Windows.Forms;
 
 namespace Circ
 	{
 	public class Vista
 		{
 
-		readonly Panel p;						// Pannello su cui disegnare
-		Graphics g;								// Oggetto per la grafica
+		readonly Panel p;                       // Pannello su cui disegnare
+		Graphics g;                             // Oggetto per la grafica
 
-		DisplayList dl;							// DisplayList
-	
-		Point cursor;							// Posizione del cursore nella vista
-		int raggioSelezioneSq;					// Raggio di selezione standard (al quadrato)
-		int raggioSq;							// Raggio di selezione al quadrato (nullo se non deve selezionare)
-		Def.Shape filter;						// Filtro selezione
+		DisplayList dl;                         // DisplayList
 
-		Size szClient;							// Dimensioni del pannello su cui disegnare
-		Point cenClient;						// e suo centro
-		
-		Point2D centro;							// Centro vista
-		Point2D scalaXY;						// Scala
-		Point	verso;							// +-1 world rispetto allo schermo (che è positivo vs. dx e vs. basso).
-		Point2D szWorldTopLeft;					// Limiti della vista reali
+		Stile clrs;							// Colori
+
+		Griglia grid;							// Griglia
+
+		Point cursor;                           // Posizione del cursore nella vista
+		int raggioSelezioneSq;                  // Raggio di selezione standard (al quadrato)
+		int raggioSq;                           // Raggio di selezione al quadrato (nullo se non deve selezionare)
+		Def.Shape filter;                       // Filtro selezione
+
+		Size szClient;                          // Dimensioni del pannello su cui disegnare
+		Point cenClient;                        // e suo centro
+
+		Point2D centro;                         // Centro vista
+		Point2D scalaXY;                        // Scala
+		Point verso;                            // +-1 world rispetto allo schermo (che è positivo vs. dx e vs. basso).
+		Point2D szWorldTopLeft;                 // Limiti della vista reali
 		Point2D szWorldBottomRight;
 
-		IEnumerable<Elemento> elEnum;			// Enumeratore degli elementi nella lista degli oggetti grafici
+		IEnumerable<Elemento> elEnum;           // Enumeratore degli elementi nella lista degli oggetti grafici
 
-		Griglia grid;
 
-		Colori clrs;
-
-		
-		
 
 		#region PROPRIETÀ PUBBLICHE
-		
+
 		/// <summary>
 		/// Oggetto grafico
 		/// </summary>
 		public Graphics G
 			{
-			get {return g;}
+			get { return g; }
 			}
-		
+
 		/// <summary>
 		/// Centro della Client Area
 		/// </summary>
 		public Point CenClient
 			{
-			get {return cenClient;}
+			get { return cenClient; }
 			}
 
 		/// <summary>
@@ -65,15 +59,15 @@ namespace Circ
 		/// </summary>
 		public Point2D Centro
 			{
-			get {return centro;}
+			get { return centro; }
 			}
-		
+
 		/// <summary>
 		/// Limiti della vista in coordinate World
 		/// </summary>
 		public Tuple<Point2D,Point2D> SzWorld
 			{
-			get {return new Tuple<Point2D,Point2D>(szWorldTopLeft,szWorldBottomRight);}
+			get { return new Tuple<Point2D,Point2D>(szWorldTopLeft,szWorldBottomRight); }
 			}
 
 		/// <summary>
@@ -81,45 +75,58 @@ namespace Circ
 		/// </summary>
 		public Point2D ScalaXY
 			{
-			get {return scalaXY;}
+			get { return scalaXY; }
 			}
-		
+
 		/// <summary>
 		/// Orientamento asse Y (1 in basso, -1 in alto)
 		/// </summary>
 		public Point2D Verso
 			{
-			get {return verso;}
+			get { return verso; }
 			}
 
 		/// <summary>
 		/// Limiti dell'area visualizzata in coordinate World
 		/// </summary>
 		public Point2D SzWorldTopLeft
-			{get {return szWorldTopLeft;}}
+			{ get { return szWorldTopLeft; } }
 		public Point2D SzWorldBottomRight
-			{get {return szWorldBottomRight;}}
+			{ get { return szWorldBottomRight; } }
 
 		/// <summary>
 		/// Restituisce lo stato della griglia
 		/// </summary>
 		public bool IsGridOn
-			{get {return grid.Active;}}
+			{ get { return grid.Active; } }
 		/// <summary>
 		/// Imposta il passo della griglia
 		/// </summary>
 		public double GridStep
 			{
-			get {return grid.Step;}
-			set {grid.Step=value;}
+			get { return grid.Step; }
+			set { grid.Step = value; }
 			}
 
-		public Colori Clrs
+		public Stile Clrs
 			{
-			get {return clrs;}
+			get { return clrs; }
+			}
+
+		public Pen Pen(Stile.Colore color)
+			{
+			return clrs.PEN[(int)color];
+			}
+		public Brush Brush(Stile.Colore color)
+			{
+			return clrs.BRUSH[(int)color];
+			}
+		public Font Font(int index)
+			{
+			return clrs.FONT[index];
 			}
 		#endregion
-	
+
 		/// <summary>
 		/// Costruttore
 		/// </summary>
@@ -128,18 +135,18 @@ namespace Circ
 			{
 			p = obj;
 
-			clrs = new Colori();
+			clrs = new Stile();
 
-			#warning Aggiungere proprietà e controllo scala > epsilon
+#warning Aggiungere proprietà e controllo scala > epsilon
 			centro = new Point2D(0,0);
 			scalaXY = new Point2D(1,1);
 			verso = new Point(1,-1);
 
 			dl = new DisplayList(this);
-			
+
 			cursor = new Point(0,0);
 			raggioSq = 0;
-			raggioSelezioneSq = Def.RAGGIO_SELEZIONE*Def.RAGGIO_SELEZIONE;
+			raggioSelezioneSq = Def.RAGGIO_SELEZIONE * Def.RAGGIO_SELEZIONE;
 			filter = Def.Shape.Tutti;
 
 			grid = new Griglia();
@@ -151,11 +158,11 @@ namespace Circ
 
 		public void Resize()
 			{
-			#if DEBUG
+#if DEBUG
 			LOG.Write("Resize");
-			#endif
+#endif
 			szClient = p.ClientSize;
-			cenClient = new Point(szClient.Width/2, szClient.Height/2);
+			cenClient = new Point(szClient.Width / 2,szClient.Height / 2);
 			RecalcSzWlorld();
 			dl.IsUpdated = false;
 			}
@@ -164,9 +171,9 @@ namespace Circ
 			{
 			if((x > 0.05) && (x < 20))
 				{
-				#if DEBUG
+#if DEBUG
 				LOG.Write("Zoom()");
-				#endif
+#endif
 				scalaXY = scalaXY * x;
 				RecalcSzWlorld();
 				dl.IsUpdated = false;
@@ -177,22 +184,22 @@ namespace Circ
 			{
 			Tuple<Point2D,Point2D> wrldExt = dt.GetExtension();
 			Point2D szw = wrldExt.Item2 - wrldExt.Item1;
-			Point2D cnw = (wrldExt.Item2 + wrldExt.Item1)/2;
-			centro = cnw;													// Pan ottimale: nel centro
+			Point2D cnw = (wrldExt.Item2 + wrldExt.Item1) / 2;
+			centro = cnw;                                                   // Pan ottimale: nel centro
 			Point2D szc = new Point2D(szClient.Width,szClient.Height);
 			Point2D cnc = cenClient;
-			Point2D scala_tmp = szw / szc;									// Scale in X e in Y
+			Point2D scala_tmp = szw / szc;                                  // Scale in X e in Y
 			double scala_opt = Math.Max(scala_tmp.X,scala_tmp.Y) * Def.ZOOM_FIT_ENLARGE;
-			scalaXY.X = scalaXY.Y = 1/scala_opt;							// Scala ottimale
+			scalaXY.X = scalaXY.Y = 1 / scala_opt;                          // Scala ottimale
 			RecalcSzWlorld();
 			dl.IsUpdated = false;
 			return;
 			}
 		public void Pan(Point2D pan)
 			{
-			#if DEBUG
+#if DEBUG
 			LOG.Write("Pan()");
-			#endif
+#endif
 			centro = centro - pan;
 			RecalcSzWlorld();
 			dl.IsUpdated = false;
@@ -225,7 +232,7 @@ namespace Circ
 		/// <param name="x">x cursore</param>
 		/// <param name="y">x cursore</param>
 		/// <param name="flt">Def.Shape filtro</param>
-		public void SetCursor(bool on, int x=0, int y=0, Def.Shape flt = Def.Shape.Tutti)
+		public void SetCursor(bool on,int x = 0,int y = 0,Def.Shape flt = Def.Shape.Tutti)
 			{
 			if(!on)
 				{
@@ -249,9 +256,9 @@ namespace Circ
 			{
 			if(elementnumerator != null)
 				{
-				#if(DEBUG)
+#if(DEBUG)
 				LOG.Write(@"SetElements()");
-				#endif
+#endif
 				elEnum = elementnumerator;
 				}
 			else
@@ -266,9 +273,9 @@ namespace Circ
 		/// </summary>
 		public void ClearElements()
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write(@"ClearElements()");
-			#endif
+#endif
 			elEnum = null;
 			dl.Reset();
 			}
@@ -285,9 +292,9 @@ namespace Circ
 		/// <param name="y2"></param>
 		/// <param name="cx">Centro</param>
 		/// <param name="cy"></param>
-		public void AddDL(Elemento element, Def.Shape shape, Colori.Colore colour, int cx, int cy)
+		public void AddDL(Elemento element,Def.Shape shape,int cx,int cy)
 			{
-			dl.Add(element, shape, colour, cx, cy);
+			dl.Add(element,shape,cx,cy);
 			}
 
 		/// <summary>
@@ -297,7 +304,7 @@ namespace Circ
 		/// </summary>
 		/// <param name="redraw">true per ridisegnare la vista</param>
 		/// <param name="elementEnumerator"></param>
-		public void RegenDL(bool redraw, IEnumerable<Elemento> elementEnumerator = null)
+		public void RegenDL(bool redraw,IEnumerable<Elemento> elementEnumerator = null)
 			{
 			if(elementEnumerator != null)
 				{
@@ -307,16 +314,16 @@ namespace Circ
 			dl.indxList.Clear();
 			if(elEnum != null)
 				{
-				#if(DEBUG)
+#if(DEBUG)
 				LOG.Write(@"RegenDL()");
 				uint _debug_clipped = 0;
-				#endif
+#endif
 				if(!dl.IsUpdated)
 					{
 					dl.Clear();
 					ClipElementi();
-					
-					foreach (Elemento e in elEnum)
+
+					foreach(Elemento e in elEnum)
 						{
 						if(e.Clipped == Def.ClipFlag.Inside)
 							{
@@ -324,23 +331,23 @@ namespace Circ
 							}
 						else
 							{
-							#if(DEBUG)
+#if(DEBUG)
 							_debug_clipped++;
-							#endif
+#endif
 							}
 						}
 					dl.IsUpdated = true;
 					}
-				#if(DEBUG)
-				if(_debug_clipped > 0)	LOG.Write(@"RegenDL(): eseguito clip su "+_debug_clipped.ToString() + " elementi");
-				#endif
+#if(DEBUG)
+				if(_debug_clipped > 0) LOG.Write(@"RegenDL(): eseguito clip su " + _debug_clipped.ToString() + " elementi");
+#endif
 				}
 			if(redraw)
 				{
 				Redraw();
 				}
-			}	
-		
+			}
+
 		/// <summary>
 		/// Ridisegna il contenuto della vista
 		/// senza aggiornare la Display List
@@ -348,18 +355,18 @@ namespace Circ
 		/// </summary>
 		public void Redraw(bool clear = true)
 			{
-			#if(DEBUG)
+#if(DEBUG)
 			LOG.Write(@"Redraw()");
-			#endif
+#endif
 			g = p.CreateGraphics();
-			if(clear)	g.Clear(Colori.BackgroundColor);
-			g.DrawRectangle(clrs.PEN[(int)Colori.Colore.Nodo],1,1,p.Width-2,p.Height-2);		// Cornice
-			grid.Draw(g,this,clrs.PEN[(int)Colori.Colore.Griglia]);
-			DrawWorldAxes(g);															// Assi
-			dl.Play(g, ref cursor, raggioSq, filter);									// Disegna la D.L.
+			if(clear) g.Clear(Stile.BackgroundColor);
+			g.DrawRectangle(clrs.PEN[(int)Stile.Colore.Nodo],1,1,p.Width - 2,p.Height - 2);        // Cornice
+			grid.Draw(g,this,clrs.PEN[(int)Stile.Colore.Griglia]);
+			DrawWorldAxes(g);                                                           // Assi
+			dl.Play(g,ref cursor,raggioSq,filter);                                  // Disegna la D.L.
 			g.Dispose();
 			}
-		
+
 
 		/// <summary>
 		/// Disegna gli assi X Y world sullo schermo
@@ -367,20 +374,20 @@ namespace Circ
 		/// <param name="g"></param>
 		private void DrawWorldAxes(Graphics g)
 			{
-			Point origin = Scala(Point2D.Zero);															// Origine world
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X,origin.Y-5*verso.Y,origin.X,origin.Y+15*verso.Y);
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X-3*verso.X,origin.Y+10*verso.Y,origin.X,origin.Y+15*verso.Y);
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X+3*verso.X,origin.Y+10*verso.Y,origin.X,origin.Y+15*verso.Y);
+			Point origin = Scala(Point2D.Zero);                                                         // Origine world
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Ramo],origin.X,origin.Y - 5 * verso.Y,origin.X,origin.Y + 15 * verso.Y);
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Ramo],origin.X - 3 * verso.X,origin.Y + 10 * verso.Y,origin.X,origin.Y + 15 * verso.Y);
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Ramo],origin.X + 3 * verso.X,origin.Y + 10 * verso.Y,origin.X,origin.Y + 15 * verso.Y);
 
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X-5*verso.X,origin.Y,origin.X+15*verso.X,origin.Y);
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X+10*verso.X,origin.Y-3*verso.Y,origin.X+15*verso.X,origin.Y);
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Ramo],origin.X+10*verso.X,origin.Y+3*verso.Y,origin.X+15*verso.X,origin.Y);
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Ramo],origin.X - 5 * verso.X,origin.Y,origin.X + 15 * verso.X,origin.Y);
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Ramo],origin.X + 10 * verso.X,origin.Y - 3 * verso.Y,origin.X + 15 * verso.X,origin.Y);
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Ramo],origin.X + 10 * verso.X,origin.Y + 3 * verso.Y,origin.X + 15 * verso.X,origin.Y);
 
-			#if(DEBUG)
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Griglia],cenClient.X,cenClient.Y-5,cenClient.X,cenClient.Y+5);	// Centro client
-			g.DrawLine(clrs.PEN[(int)Colori.Colore.Griglia],cenClient.X-5,cenClient.Y,cenClient.X+5,cenClient.Y);
-			g.DrawEllipse(clrs.PEN[(int)Colori.Colore.Griglia],Scala(centro).X-5,Scala(centro).Y-5,10,10);			// Centro vista
-			#endif
+#if(DEBUG)
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Griglia],cenClient.X,cenClient.Y - 5,cenClient.X,cenClient.Y + 5);   // Centro client
+			g.DrawLine(clrs.PEN[(int)Stile.Colore.Griglia],cenClient.X - 5,cenClient.Y,cenClient.X + 5,cenClient.Y);
+			g.DrawEllipse(clrs.PEN[(int)Stile.Colore.Griglia],Scala(centro).X - 5,Scala(centro).Y - 5,10,10);          // Centro vista
+#endif
 			}
 
 		/// <summary>
@@ -388,7 +395,7 @@ namespace Circ
 		/// </summary>
 		public void SwapAxisX()
 			{
-			verso.X = - verso.X;
+			verso.X = -verso.X;
 			Resize();
 			SetOutdatedDL();
 			}
@@ -398,13 +405,13 @@ namespace Circ
 		/// </summary>
 		public void SwapAxisY()
 			{
-			verso.Y = - verso.Y;
+			verso.Y = -verso.Y;
 			Resize();
 			SetOutdatedDL();
 			}
 
 		#region TRASFORMAZIONI DI SCALA da World a Client e viceversa
-		
+
 		/// <summary>
 		/// Scala da World a Client
 		/// </summary>
@@ -412,7 +419,7 @@ namespace Circ
 		/// <returns></returns>
 		public Point Scala(Point2D p)
 			{
-			Point pt = (Point)((p-centro)*scalaXY*verso);
+			Point pt = (Point)((p - centro) * scalaXY * verso);
 			return new Point(pt.X + cenClient.X,pt.Y + cenClient.Y);
 			}
 
@@ -423,8 +430,8 @@ namespace Circ
 		/// <returns></returns>
 		public Point2D Scala(Point p)
 			{
-			Point pt = new Point(p.X-cenClient.X, p.Y-cenClient.Y);
-			return verso*(pt/scalaXY) + centro;
+			Point pt = new Point(p.X - cenClient.X,p.Y - cenClient.Y);
+			return verso * (pt / scalaXY) + centro;
 			}
 
 		/// <summary>
@@ -434,7 +441,7 @@ namespace Circ
 		/// <returns></returns>
 		public Point2D ScalaVettore(Point p)
 			{
-			return verso*(p/scalaXY);
+			return verso * (p / scalaXY);
 			}
 		#endregion
 
@@ -455,15 +462,15 @@ namespace Circ
 		public Def.ClipFlag IsInsideWorld(Point2D p)
 			{
 			Def.ClipFlag pos = Def.ClipFlag.Inside;
-			if((p.X - szWorldTopLeft.X)*verso.X < 0)
+			if((p.X - szWorldTopLeft.X) * verso.X < 0)
 				pos |= Def.ClipFlag.Left;
-			else if((p.X - szWorldBottomRight.X)*verso.X > 0)
+			else if((p.X - szWorldBottomRight.X) * verso.X > 0)
 				pos |= Def.ClipFlag.Right;
 
-			if((p.Y - szWorldTopLeft.Y)*verso.Y < 0)
+			if((p.Y - szWorldTopLeft.Y) * verso.Y < 0)
 				pos |= Def.ClipFlag.Top;
-			else if((p.Y - szWorldBottomRight.Y)*verso.Y > 0)
-				pos |= Def.ClipFlag.Bottom;		
+			else if((p.Y - szWorldBottomRight.Y) * verso.Y > 0)
+				pos |= Def.ClipFlag.Bottom;
 
 			return pos;
 			}
@@ -476,13 +483,13 @@ namespace Circ
 		void ClipElementi()
 			{
 			// Già verificato (elEnum != null) prima della chiamata, in RegenDL(...)
-			filter = Def.Shape.Nodo;			// Prima i nodi
-			foreach (Elemento e in elEnum)
+			filter = Def.Shape.Nodo;            // Prima i nodi
+			foreach(Elemento e in elEnum)
 				{
 				e.Clip(this);
 				}
-			filter = Def.Shape.Ramo;			// Poi i rami
-			foreach (Elemento e in elEnum)
+			filter = Def.Shape.Ramo;            // Poi i rami
+			foreach(Elemento e in elEnum)
 				{
 				e.Clip(this);
 				}

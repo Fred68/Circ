@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Fred68.Tools.Messaggi
@@ -15,7 +14,7 @@ namespace Fred68.Tools.Messaggi
 		{
 		public string Messaggio { get; set; }
 		public string Dettaglio { get; set; }
-		public MessaggioErrore(string msg, string det)
+		public MessaggioErrore(string msg,string det)
 			{
 			Messaggio = msg;
 			Dettaglio = det;
@@ -36,10 +35,10 @@ namespace Fred68.Tools.Messaggi
 		static int[] _ultimiMsg = new int[LISTE];
 
 		public static string SeparatoreMsg = " - ";
-  
+
 		/// <summary>
-        /// Messaggi di errore
-        /// </summary>
+		/// Messaggi di errore
+		/// </summary>
 		public struct ERR
 			{
 			public static string CIRCUITO_NON_CONNESSO = "Circuito non connesso";
@@ -52,10 +51,10 @@ namespace Fred68.Tools.Messaggi
 			public static string ERRORE_OPEN = "Errore nell'apertura del file";
 			public static string AGGIORNA_RIFERIMENTI = "Errore nell'aggiornamento dei riferimenti";
 			}
- 
-			/// <summary>
-        /// Messaggi informativi
-        /// </summary>
+
+		/// <summary>
+		/// Messaggi informativi
+		/// </summary>
 		public struct MSG
 			{
 			public static string SELEZIONARE_UN_NODO = "Selezionare un nodo";
@@ -92,12 +91,12 @@ namespace Fred68.Tools.Messaggi
 				/// <summary>
 				/// Pulsanti ed altre entità
 				/// </summary>
-				public static string TOOLTIP2= @"Tooltip";
-				
+				public static string TOOLTIP2 = @"Tooltip";
+
 				}
 			}
-		
-		public enum Tipo {Messaggi=0, Errori, NUM};
+
+		public enum Tipo { Messaggi = 0, Errori, NUM };
 
 
 		/// <summary>
@@ -105,19 +104,19 @@ namespace Fred68.Tools.Messaggi
 		/// </summary>
 		static Messaggi()
 			{
-			for(int i=0; i < (int)Tipo.NUM; i++)
+			for(int i = 0;i < (int)Tipo.NUM;i++)
 				{
 				_msg[i] = new List<MessaggioErrore>();
 				}
 			Reset();
-			}		
+			}
 
 		/// <summary>
 		/// Proprietà che indica se ci sono errori
 		/// </summary>
 		public static bool hasError
 			{
-			get {return (_msg[(int)Tipo.Errori].Count>0); }
+			get { return (_msg[(int)Tipo.Errori].Count > 0); }
 			}
 
 		/// <summary>
@@ -126,12 +125,12 @@ namespace Fred68.Tools.Messaggi
 		/// <param name="msg">Messaggio, string</param>
 		/// <param name="dett">Dettagli, string</param>
 		/// <param name="typ">Tipo: errore o messaggio</param>
-		public static void AddMessage(string msg, string dett = "", Tipo typ = Tipo.Messaggi)
+		public static void AddMessage(string msg,string dett = "",Tipo typ = Tipo.Messaggi)
 			{
 			int i = (int)typ;
-			if( (i>=0) && (i<(int)Tipo.NUM) )
+			if((i >= 0) && (i < (int)Tipo.NUM))
 				{
-				_msg[i].Add(new MessaggioErrore(msg, dett));
+				_msg[i].Add(new MessaggioErrore(msg,dett));
 				_ultimiMsg[i]++;
 				}
 			}
@@ -145,12 +144,12 @@ namespace Fred68.Tools.Messaggi
 			{
 			MessaggioErrore msg = null;
 			int i = (int)typ;
-			if( (i>=0) && (i<(int)Tipo.NUM) )
+			if((i >= 0) && (i < (int)Tipo.NUM))
 				{
 				msg = _msg[i].Last();
 				}
 			if(msg == null)
-				msg = new MessaggioErrore(String.Empty, String.Empty);
+				msg = new MessaggioErrore(String.Empty,String.Empty);
 			return msg;
 			}
 
@@ -161,15 +160,15 @@ namespace Fred68.Tools.Messaggi
 		public static void Clear(Tipo typ = Tipo.NUM)
 			{
 			int i = (int)typ;
-			if (i == (int)Tipo.NUM)
+			if(i == (int)Tipo.NUM)
 				{
-				foreach (List<MessaggioErrore> lst in _msg)
+				foreach(List<MessaggioErrore> lst in _msg)
 					{
 					lst.Clear();
 					}
 				Reset();
 				}
-			else if ((i >= 0) && (i < (int)Tipo.NUM))
+			else if((i >= 0) && (i < (int)Tipo.NUM))
 				{
 				_msg[i].Clear();
 				Reset(typ);
@@ -183,14 +182,14 @@ namespace Fred68.Tools.Messaggi
 		public static void Reset(Tipo typ = Tipo.NUM)
 			{
 			int i = (int)typ;
-			if (i == (int)Tipo.NUM)
+			if(i == (int)Tipo.NUM)
 				{
-				for (int ii=0; ii<LISTE; ii++)
+				for(int ii = 0;ii < LISTE;ii++)
 					{
 					_ultimiMsg[ii] = 0;
 					}
 				}
-			else if ((i >= 0) && (i < (int)Tipo.NUM))
+			else if((i >= 0) && (i < (int)Tipo.NUM))
 				_ultimiMsg[i] = 0;
 			}
 
@@ -204,7 +203,7 @@ namespace Fred68.Tools.Messaggi
 			int i = (int)typ;
 			if((i >= 0) && (i < (int)Tipo.NUM))
 				{
-				foreach (MessaggioErrore m in _msg[i])
+				foreach(MessaggioErrore m in _msg[i])
 					yield return m;
 				}
 			yield break;
@@ -221,9 +220,9 @@ namespace Fred68.Tools.Messaggi
 			int i = (int)typ;
 			if((i >= 0) && (i < (int)Tipo.NUM))
 				{
-				for(int ii = 0; ii < NumLastMessages(typ); ii++)
+				for(int ii = 0;ii < NumLastMessages(typ);ii++)
 					{
-					m = (_msg[i])[_msg[i].Count-ii-1];
+					m = (_msg[i])[_msg[i].Count - ii - 1];
 					yield return m;
 					}
 				}
@@ -238,8 +237,8 @@ namespace Fred68.Tools.Messaggi
 		public static int NumMessages(Tipo typ)
 			{
 			int n = 0;
-			int i = (int) typ;
-			if ((i >= 0) && (i < (int)Tipo.NUM))
+			int i = (int)typ;
+			if((i >= 0) && (i < (int)Tipo.NUM))
 				{
 				n = _msg[i].Count;
 				}
@@ -254,8 +253,8 @@ namespace Fred68.Tools.Messaggi
 		public static int NumLastMessages(Tipo typ)
 			{
 			int n = 0;
-			int i = (int) typ;
-			if ((i >= 0) && (i < (int)Tipo.NUM))
+			int i = (int)typ;
+			if((i >= 0) && (i < (int)Tipo.NUM))
 				{
 				n = _ultimiMsg[i];
 				}
@@ -270,7 +269,7 @@ namespace Fred68.Tools.Messaggi
 		public static bool HasMessages(Tipo typ)
 			{
 			bool hasMsg = false;
-			if (NumMessages(typ) > 0)
+			if(NumMessages(typ) > 0)
 				hasMsg = true;
 			return hasMsg;
 			}
@@ -283,7 +282,7 @@ namespace Fred68.Tools.Messaggi
 		public static bool HasLastMessages(Tipo typ)
 			{
 			bool hasLastMsg = false;
-			if (NumLastMessages(typ) > 0)
+			if(NumLastMessages(typ) > 0)
 				hasLastMsg = true;
 			return hasLastMsg;
 			}
@@ -294,23 +293,23 @@ namespace Fred68.Tools.Messaggi
 		/// <param name="typ"></param>
 		/// <param name="lastMessages"></param>
 		/// <returns></returns>
-		public static string ToString(Messaggi.Tipo typ, bool lastMessages = false)
+		public static string ToString(Messaggi.Tipo typ,bool lastMessages = false)
 			{
 			StringBuilder strb = new StringBuilder();
 			List<string> lm = new List<string>();
 			if(lastMessages)
 				{
-				foreach (MessaggioErrore msg in LastMessages(typ))
+				foreach(MessaggioErrore msg in LastMessages(typ))
 					lm.Add(msg.ToLine());
 				}
 			else
 				{
-				foreach (MessaggioErrore msg in Messages(typ))
+				foreach(MessaggioErrore msg in Messages(typ))
 					lm.Add(msg.ToLine());
 				}
 			lm = lm.Distinct().ToList();
 
-			foreach (string str in lm)
+			foreach(string str in lm)
 				strb.Append(str);
 			return strb.ToString();
 			}
@@ -319,17 +318,17 @@ namespace Fred68.Tools.Messaggi
 		/// Estrae i messaggi completi
 		/// </summary>
 		/// <returns>string</returns>
-        public static string MessaggiCompleti()
-            {
-            StringBuilder strb = new StringBuilder();
+		public static string MessaggiCompleti()
+			{
+			StringBuilder strb = new StringBuilder();
 			string s1, s2;
 			s1 = Messaggi.ToString(Messaggi.Tipo.Errori);
 			s2 = Messaggi.ToString(Messaggi.Tipo.Messaggi);
 			if(s1.Length > 0)
-				strb.Append("Errori"+ System.Environment.NewLine + s1+ Environment.NewLine);
+				strb.Append("Errori" + System.Environment.NewLine + s1 + Environment.NewLine);
 			if(s2.Length > 0)
-				strb.Append("Avvisi"+ System.Environment.NewLine + s2);
-            return strb.ToString();
-            }
-        }
+				strb.Append("Avvisi" + System.Environment.NewLine + s2);
+			return strb.ToString();
+			}
+		}
 	}
