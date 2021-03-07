@@ -103,22 +103,6 @@ namespace Circ
 			g.DrawString(id.ToString(), v.Font(0), v.Brush(col), pc.X + Def.NODE_HALFSIZE * 2,pc.Y + Def.NODE_HALFSIZE * 2);
 
 			}
-		//public override void Draw(Graphics g,Pen pn,Brush br,Font fn)
-		//	{
-		//	g.DrawLine(pn,nd[0].Ps,nd[1].Ps);         // Disegna prima la linea, poi sovrappone una figura con il simbolo
-
-		//	if(Point2D.Mod(new Point(nd[1].Ps.X - nd[0].Ps.X,nd[1].Ps.Y - nd[0].Ps.Y)) > Def.SHAPE_HALFSIZE * Def.SHAPE_HALFSIZE * 4)
-		//		{
-		//		//GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Shape.Rectangle).Clone();
-		//		GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Name.Arrow).Clone();
-		//		pth.Transform(m);
-		//		g.DrawPath(pn,pth);
-		//		//g.FillPath(br,pth);
-		//		}
-
-		//	g.DrawString(id.ToString(),fn,br,pc.X + Def.NODE_HALFSIZE * 2,pc.Y + Def.NODE_HALFSIZE * 2);
-
-		//	}
 
 		public override void CopyData(Elemento e)
 			{

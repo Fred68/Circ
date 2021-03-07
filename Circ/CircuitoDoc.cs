@@ -33,11 +33,23 @@ namespace Circ
 
 #warning	Eseguibile separato nello stesso progetto
 #warning	Eseguibile separato per il calcolo e la semplificazione (console) e salvataggio su file di scambio
-#warning	Dati aggiuntivi ai nodi
+#warning	Dati aggiuntivi fisici. Usare array di double + puntatore a funzione.
+#warning	VEDERE APPUNTI SPECIFICI PER I CALCOLI
 #warning	Suoni
 #warning	Spostare tutte le modifiche ai dati sotto documento (per impostare il flag privato _isModied)
 #warning	Importante: per gli errori, usare messaggi.clear() nella chiamata più a monte (in mainform.cs, possibilmente)
 
+
+/*
+ 
+A nodi e rami si devono associare alcune grandezze (double), in base al tipo di calcolo.
+Elettrico: R1, R2 (R nelle due direzioni; R interna ecc...), I (corrente imposta), U (tensione imposta), V (potenziale), i (corrente).
+Fluido: P (press.), Q (portata), D (diametro), eps (scabrezza ass.), Re (numero di Reynolds), L (lunghezza), csi (perdita concentrata), H (altezza)...
+Altri valori: T (temperatura), Potenza dissipata, ecc...
+
+Vedere appunti specifici
+
+ */
 
 		#region PROPRIETÀ (e SERIALIZZAZIONE)
 
