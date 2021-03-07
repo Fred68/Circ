@@ -121,6 +121,7 @@ namespace Colebrook
 			nu = new Dato(0d,true,"Viscosità cinematica [m2/s]", 0, nameof(nu));
 			Re = new Dato(0d,true,"Numero di Reynolds []", 2000, nameof(Re));
 			eD = new Dato(0d,true,"Rugosità relativa[]", 0.1, nameof(eD));
+
 			ResetDefaults();
 			}
 
