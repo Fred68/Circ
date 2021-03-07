@@ -37,7 +37,7 @@ namespace Circ
 
 		#endregion
 
-		public override void Regen(Vista v,bool addToDisplayList = true)
+		public override void Regen(Vista v, bool addToDisplayList = true)
 			{
 			ps = v.Scala(p);
 			if(addToDisplayList)
@@ -65,20 +65,6 @@ namespace Circ
 			//g.FillRectangle(     ,ps.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2, ps.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2,sz.Width,sz.Height);
 			g.DrawString(str,v.Font(0),v.Brush(col),ps.X - 2 * Def.FONT_SIZE - Def.NODE_HALFSIZE * 2,ps.Y - Def.FONT_SIZE - Def.NODE_HALFSIZE * 2);
 			}
-
-		//public override void Draw(Graphics g,Pen pn,Brush br,Font fn)
-		//	{
-		//	GraphicsPath pth = (GraphicsPath)Def.Shape2D.GetShape(Def.Shape2D.Name.Circle).Clone();
-		//	Matrix m = new Matrix();
-		//	m.Translate(ps.X,ps.Y);
-		//	pth.Transform(m);
-		//	g.DrawPath(pn,pth);
-		//	string str = id.ToString() + System.Environment.NewLine + "---";
-		//	SizeF sz = g.MeasureString(str,fn);
-		//	g.DrawRectangle(pn,ps.X - 2 * Def.FONT_SIZE - Def.NODE_HALFSIZE * 2,ps.Y - Def.FONT_SIZE - Def.NODE_HALFSIZE * 2,sz.Width,sz.Height);
-		//	//g.FillRectangle(     ,ps.X-2*Def.FONT_SIZE-Def.NODE_HALFSIZE*2, ps.Y-Def.FONT_SIZE-Def.NODE_HALFSIZE*2,sz.Width,sz.Height);
-		//	g.DrawString(str,fn,br,ps.X - 2 * Def.FONT_SIZE - Def.NODE_HALFSIZE * 2,ps.Y - Def.FONT_SIZE - Def.NODE_HALFSIZE * 2);
-		//	}
 
 		public override void CopyData(Elemento e)
 			{

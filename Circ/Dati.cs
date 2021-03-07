@@ -689,7 +689,6 @@ namespace Circ
 			return ok;
 			}
 
-
 		/// <summary>
 		/// Elimina il nodo ID, se non è utilizzato
 		/// </summary>
