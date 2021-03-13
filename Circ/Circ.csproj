@@ -69,6 +69,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircuitoDoc.cs" />
+    <Compile Include="IPhysRamo.cs" />
+    <Compile Include="IPhysNodo.cs" />
+    <Compile Include="PhNodo.cs" />
+    <Compile Include="PhRamo.cs" />
+    <Compile Include="Resistore.cs" />
     <Compile Include="Stile.cs" />
     <Compile Include="Dati.cs" />
     <Compile Include="Def.cs" />

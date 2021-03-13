@@ -8,28 +8,30 @@ namespace Fred68.Tools.Messaggi
 	{
 
 	/// <summary>
-	/// Singolo messaggio
-	/// </summary>
-	public class MessaggioErrore
-		{
-		public string Messaggio { get; set; }
-		public string Dettaglio { get; set; }
-		public MessaggioErrore(string msg,string det)
-			{
-			Messaggio = msg;
-			Dettaglio = det;
-			}
-		public string ToLine()
-			{
-			return Messaggio + ((Dettaglio.Length > 0) ? Messaggi.SeparatoreMsg : "") + Dettaglio + System.Environment.NewLine;
-			}
-		}
-
-	/// <summary>
 	/// Classe con tutti i messaggi
 	/// </summary>
 	static public class Messaggi
 		{
+		/// <summary>
+		/// Singolo messaggio
+		/// </summary>
+		public class MessaggioErrore
+			{
+			public string Messaggio { get; set; }
+			public string Dettaglio { get; set; }
+			public MessaggioErrore(string msg,string det)
+				{
+				Messaggio = msg;
+				Dettaglio = det;
+				}
+			public string ToLine()
+				{
+				return Messaggio + ((Dettaglio.Length > 0) ? Messaggi.SeparatoreMsg : "") + Dettaglio + System.Environment.NewLine;
+				}
+			}
+
+
+
 		static int LISTE = 2;
 		static List<MessaggioErrore>[] _msg = new List<MessaggioErrore>[LISTE];
 		static int[] _ultimiMsg = new int[LISTE];

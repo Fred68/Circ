@@ -6,7 +6,7 @@ using System.Text;
 namespace Colebrook
 	{
 
-	class Program
+	class ColebrookProgram
 		{
 		static void Main(string[] args)
 			{
@@ -41,25 +41,38 @@ namespace Colebrook
 		public string desc;
 		public string name;
 		public double defval;
+		public readonly double conv;
+		public string unit;
+		public string inpUnit;
 
-		public Dato(double val, bool ok, string desc, double defval, string name = "")
+		public Dato(double val, string desc, string unit, double defval, string name , string inpUnit = "", double conv = 1.0)
 			{
 			this.v = val;
-			this.ok = ok;
+			this.ok = false;
 			this.desc = desc;
-			this.defval = defval;
 			this.name = name;
+			this.defval = defval;
+			this.unit = unit;
+			this.inpUnit = inpUnit;
+			this.conv = conv;
+
+			if(inpUnit == "")
+				{
+				this.inpUnit = this.unit;
+				this.conv = 1.0;
+				}
+
 			}
 
 		public override string ToString()
 			{
-			return $"{desc} {name} = {v.ToString()} [{defval.ToString()}]";
+			return $"{desc} {name} = {v.ToString()} {unit.Trim(new char[]{' ', '[', ']'})} [{defval.ToString()}]";
 			}
 
 		public bool Get()
 			{
 			double x = 0;
-			Console.Write(desc + ":\t");
+			Console.Write($"{desc} {inpUnit}:\t");
 			string s = Console.ReadLine();
 			if(s == "d")
 				{
@@ -70,7 +83,7 @@ namespace Colebrook
 				ok = double.TryParse(s, out x);
 				if(ok)
 					{
-					this.v = x;
+					this.v = x * conv;
 					}
 				}
 			return ok;
@@ -111,16 +124,16 @@ namespace Colebrook
 					nomi.Add(inf.Name);
 					}
 				}
-			Fa = new Dato(0d,true,"Fattore di attrito []", 0.001, nameof(Fa));
-			D = new Dato(0d,true,"Diametro interno [m]", 0.020, nameof(D));
-			ro = new Dato(0d,true,"Densità [kg/m3]", 1000, nameof(ro));
-			v = new Dato(0d,true,"Velocità [m/s]", 1, nameof(v));
-			r = new Dato(0d,true,"Perdita di carico unitaria [Pa/m]", 0, nameof(r));
-			e = new Dato(0d,true,"Rugosità [m]", 0.0001, nameof(e));
-			mu = new Dato(0d,true,"Viscosità dinamica [Pa s]", 8.94e-4, nameof(mu));
-			nu = new Dato(0d,true,"Viscosità cinematica [m2/s]", 0, nameof(nu));
-			Re = new Dato(0d,true,"Numero di Reynolds []", 2000, nameof(Re));
-			eD = new Dato(0d,true,"Rugosità relativa[]", 0.1, nameof(eD));
+			Fa = new Dato(0,"Fattore di attrito []","[]",0.001, nameof(Fa));
+			D = new Dato(0,"Diametro interno", "[m]", 0.020, nameof(D),"[mm]",0.001);
+			ro = new Dato(0,"Densità","[kg/m3]", 1000, nameof(ro));
+			v = new Dato(0,"Velocità","[m/s]", 1, nameof(v));
+			r = new Dato(0,"Perdita di carico unitaria","[Pa/m]", 0, nameof(r));
+			e = new Dato(0,"Rugosità","[m]", 0.0001, nameof(e),"[mm]",0.001);
+			mu = new Dato(0,"Viscosità dinamica", "[Pa s]", 8.94e-4, nameof(mu));
+			nu = new Dato(0,"Viscosità cinematica", "[m2/s]", 0, nameof(nu));
+			Re = new Dato(0,"Numero di Reynolds","[]", 2000, nameof(Re));
+			eD = new Dato(0,"Rugosità relativa","[]", 0.1, nameof(eD));
 
 			ResetDefaults();
 			}
@@ -207,6 +220,11 @@ namespace Colebrook
 						ok = false;
 						Console.WriteLine($"Colebrook non converge dopo {cicli} cicli, errore {diff}");
 						}
+					}
+				if(ok)				// Prosegue se è riuscito a calcolare Fa, prosegue
+					{
+					r.v = Fa.v * ro.v * v.v * v.v / (2 * D.v);		// Perdita di carico continua (Darcy)
+
 					}
 				}
 			catch

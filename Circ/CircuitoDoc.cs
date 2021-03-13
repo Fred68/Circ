@@ -31,12 +31,14 @@ namespace Circ
 #warning	Aggiungere testo per dati aggiuntivi
 #warning	Menù checked con gli oggetti da vedere nella descrizione (dinamico, usare Reflection)
 
-#warning	Eseguibile separato nello stesso progetto
-#warning	Eseguibile separato per il calcolo e la semplificazione (console) e salvataggio su file di scambio
-#warning	Dati aggiuntivi fisici. Usare array di double + puntatore a funzione.
+#warning	Eseguibile separato per il calcolo e salvataggio su file di scambio (meglio se in C++, non .NET).
+//			Dati aggiuntivi fisici. double[] + delegate. No, perché i calcoli sono differenti per acqua, aria, elettricità.
+#warning	Usare classi per dati nodo e dati ramo + interfaccia per le funzioni comuni
+#warning	Per i nomi delle grandezze, usare Reflection (oppure lista), ma non per i calcoli.
 #warning	VEDERE APPUNTI SPECIFICI PER I CALCOLI
+
 #warning	Suoni
-#warning	Spostare tutte le modifiche ai dati sotto documento (per impostare il flag privato _isModied)
+#warning	Spostare tutte le modifiche ai dati sotto documento (per impostare il flag privato _isModfied)
 #warning	Importante: per gli errori, usare messaggi.clear() nella chiamata più a monte (in mainform.cs, possibilmente)
 
 
