@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Phys
 	{
-	class PhRamo : IPhysRamo
+	public class PhRamo : IPhysRamo
 		{
 		double i;
 		double v;

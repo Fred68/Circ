@@ -399,9 +399,11 @@ namespace Circ
 		private void UpdateMenus()
 			{
 			bool enbl;
+			Def.TipoCircuito tp = Def.TipoCircuito.None;
 			if(doc != null)
 				{
 				enbl = true;
+				tp = doc.Dati.TipoCirc;
 				}
 			else
 				{
@@ -418,6 +420,39 @@ namespace Circ
 			this.toolStripModifica.Enabled = enbl;
 			this.editToolStripMenuItem.Enabled = enbl;
 			this.strumentiToolStripMenuItem.Enabled = enbl;
+			this.componentiToolStripMenuItem.Enabled = enbl;
+			switch(tp)
+				{
+				case Def.TipoCircuito.Elettrico:
+					{
+					elettricoToolStripSubMenu.Visible = true;
+					idraulicoToolStripSubMenu.Visible = false;
+					pneumaticoToolStripSubMenu.Visible = false;
+					}
+					break;
+				case Def.TipoCircuito.Liquido:
+					{
+					elettricoToolStripSubMenu.Visible = false;
+					idraulicoToolStripSubMenu.Visible = true;
+					pneumaticoToolStripSubMenu.Visible = false;
+					}
+					break;
+				case Def.TipoCircuito.Gas:
+					{
+					elettricoToolStripSubMenu.Visible = false;
+					idraulicoToolStripSubMenu.Visible = false;
+					pneumaticoToolStripSubMenu.Visible = true;
+					}
+					break;
+				default:
+					{
+					elettricoToolStripSubMenu.Visible = false;
+					idraulicoToolStripSubMenu.Visible = false;
+					pneumaticoToolStripSubMenu.Visible = false;
+					}
+					break;
+
+				}
 			}
 
 		/// <summary>
@@ -504,8 +539,9 @@ namespace Circ
 				Tuple<uint,uint> t = doc.Dati.ContaNodiRamiSelezionati();
 				if((t.Item1 > 0) || (t.Item2 > 0))
 					{
-					if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI,t.Item1,t.Item2),"Conferma",MessageBoxButtons.YesNo) == DialogResult.Yes)
+					if(MessageBox.Show(String.Format(Messaggi.MSG.ELIMINARE_ELEMENTI, t.Item1, t.Item2, t.Item1==1?"o":"i", t.Item2==1?"o":"i", (t.Item1+t.Item2)==1?"o":"i"),"Conferma",MessageBoxButtons.YesNo) == DialogResult.Yes)
 						{
+						
 						doc.Dati.EliminaSelezionati();
 						vista.SetOutdatedDL();
 						vista.RegenDL(true);
@@ -1147,7 +1183,10 @@ namespace Circ
 				Invalidate();
 				}
 			}
-
+		
+		/// <summary>
+		/// Controlla se il circuito è connesso
+		/// </summary>
 		private void ControllaNodiIsolati()
 			{
 			if(doc != null)
@@ -1158,6 +1197,13 @@ namespace Circ
 				MessageBox.Show($"Il circuito {x}è connesso");
 				}
 			}
+
+		private bool ConfermaCambioTipo()
+			{
+			MessageBox.Show(Messaggi.MSG.CAMBIO_TIPO);
+			return true;
+			}
+
 		#region TEST
 
 		private void rinumeraNodoToolStripMenuItem_Click(object sender,EventArgs e)
@@ -1546,6 +1592,55 @@ namespace Circ
 		private void controllaIsolati_toolStrip_Click(object sender,EventArgs e)
 			{
 			ControllaNodiIsolati();
+			}
+
+		private void elettricoToolStripMenuItem_Click(object sender,EventArgs e)
+			{
+			if(doc != null)
+				{
+				if(ConfermaCambioTipo())
+					{
+					doc.Dati.TipoCirc = Def.TipoCircuito.Elettrico;
+					elettricoToolStripMenuItem.Checked = true;
+					idraulicoToolStripMenuItem.Checked = pneumaticoToolStripMenuItem.Checked = false;
+					elettricoToolStripSubMenu.Visible = true;
+					idraulicoToolStripSubMenu.Visible = false;
+					pneumaticoToolStripSubMenu.Visible = false;
+					}
+				}
+			}
+
+		private void idraulicoToolStripMenuItem_Click(object sender,EventArgs e)
+			{
+			if(doc != null)
+				{
+				if(ConfermaCambioTipo())
+					{
+					doc.Dati.TipoCirc = Def.TipoCircuito.Elettrico;
+					idraulicoToolStripMenuItem.Checked = true;
+					elettricoToolStripMenuItem.Checked = pneumaticoToolStripMenuItem.Checked = false;
+					elettricoToolStripSubMenu.Visible = false;
+					idraulicoToolStripSubMenu.Visible = true;
+					pneumaticoToolStripSubMenu.Visible = false;
+					}
+				}
+			}
+
+		private void pneumaticoToolStripMenuItem_Click(object sender,EventArgs e)
+			{
+			if(doc != null)
+				{
+				if(ConfermaCambioTipo())
+					{
+					doc.Dati.TipoCirc = Def.TipoCircuito.Elettrico;
+					pneumaticoToolStripMenuItem.Checked = true;
+					idraulicoToolStripMenuItem.Checked = elettricoToolStripMenuItem.Checked = false;
+					elettricoToolStripSubMenu.Visible = false;
+					idraulicoToolStripSubMenu.Visible = false;
+					pneumaticoToolStripSubMenu.Visible = true;
+
+					}
+				}
 			}
 
 		private void inverteAsseXToolStripMenuItem_Click(object sender,EventArgs e)

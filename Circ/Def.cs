@@ -8,13 +8,16 @@ namespace Circ
 	{
 	public static class Def
 		{
-		/// <summary>
-		/// Indici dei colori
-		/// La dimensione deve corrispondere a pen[] e brush[]
-		/// </summary>
 
+#warning Usare classi aggiuntive per i dati degli elementi
 
-#warning Usare classi aggiuntive per i dati degli elementi, oppure derivare da Nodo e Ramo ?
+		public enum TipoCircuito
+			{
+			None = 0,
+			Elettrico,
+			Liquido,
+			Gas
+			}
 
 		public class Shape2D
 			{
@@ -55,8 +58,6 @@ namespace Circ
 				return shapes[(int)sh];
 				}
 			}
-
-
 
 		/// <summary>
 		/// Nomi degli oggetti grafici, delle forme nella display list e dei flag per gli evidenziati

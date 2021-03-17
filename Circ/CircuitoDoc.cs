@@ -24,7 +24,6 @@ namespace Circ
 #warning	Aggiungere comando Duplica elementi
 
 #warning	Far lampeggiare gli elementi selezionati (sfruttare il timer)
-#warning	Messaggi: correggere il testo, in base alla selezione. Es. "Eliminare 1 nodo selezionato" e non "Eliminare 1 nodi 0 rami selezionati"
 
 #warning	Testo con sfondo
 #warning	Sagome 2D con colore di sfondo

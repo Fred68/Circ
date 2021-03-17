@@ -74,6 +74,11 @@ namespace Circ
 			this.controllaNodiIsolatiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.creaMatriceDiIncidenzaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.compattaIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.componentiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.tipoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.elettricoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.idraulicoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.pneumaticoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -121,6 +126,24 @@ namespace Circ
 			this.lbRamoFree = new System.Windows.Forms.Label();
 			this.lbGrid = new System.Windows.Forms.Label();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+			this.elettricoToolStripSubMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.idraulicoToolStripSubMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.pneumaticoToolStripSubMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.resistoreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.generatoreDiTensioneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.generatoreDiCorrenteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.tuboToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.pompaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.pressioneliquidoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.nonRitornoliquidoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.scaricoliquidoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.tuboToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.pompaToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.pressionegasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.nonRitornogasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.scaicogasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.diodoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.terraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripEditor.SuspendLayout();
 			this.toolStripFile.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -278,6 +301,7 @@ namespace Circ
             this.editToolStripMenuItem,
             this.vistaToolStripMenuItem,
             this.strumentiToolStripMenuItem,
+            this.componentiToolStripMenuItem,
             this.aboutToolStripMenuItem,
             this.debugToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
@@ -506,6 +530,48 @@ namespace Circ
 			this.compattaIDToolStripMenuItem.Text = "Compatta ID";
 			this.compattaIDToolStripMenuItem.Click += new System.EventHandler(this.compattaIDToolStrip_Click);
 			// 
+			// componentiToolStripMenuItem
+			// 
+			this.componentiToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tipoToolStripMenuItem,
+            this.elettricoToolStripSubMenu,
+            this.idraulicoToolStripSubMenu,
+            this.pneumaticoToolStripSubMenu});
+			this.componentiToolStripMenuItem.Name = "componentiToolStripMenuItem";
+			this.componentiToolStripMenuItem.Size = new System.Drawing.Size(86, 20);
+			this.componentiToolStripMenuItem.Text = "Componenti";
+			// 
+			// tipoToolStripMenuItem
+			// 
+			this.tipoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.elettricoToolStripMenuItem,
+            this.idraulicoToolStripMenuItem,
+            this.pneumaticoToolStripMenuItem});
+			this.tipoToolStripMenuItem.Name = "tipoToolStripMenuItem";
+			this.tipoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.tipoToolStripMenuItem.Text = "Tipo";
+			// 
+			// elettricoToolStripMenuItem
+			// 
+			this.elettricoToolStripMenuItem.Name = "elettricoToolStripMenuItem";
+			this.elettricoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.elettricoToolStripMenuItem.Text = "Elettrico";
+			this.elettricoToolStripMenuItem.Click += new System.EventHandler(this.elettricoToolStripMenuItem_Click);
+			// 
+			// idraulicoToolStripMenuItem
+			// 
+			this.idraulicoToolStripMenuItem.Name = "idraulicoToolStripMenuItem";
+			this.idraulicoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.idraulicoToolStripMenuItem.Text = "Idraulico";
+			this.idraulicoToolStripMenuItem.Click += new System.EventHandler(this.idraulicoToolStripMenuItem_Click);
+			// 
+			// pneumaticoToolStripMenuItem
+			// 
+			this.pneumaticoToolStripMenuItem.Name = "pneumaticoToolStripMenuItem";
+			this.pneumaticoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.pneumaticoToolStripMenuItem.Text = "Pneumatico";
+			this.pneumaticoToolStripMenuItem.Click += new System.EventHandler(this.pneumaticoToolStripMenuItem_Click);
+			// 
 			// aboutToolStripMenuItem
 			// 
 			this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -517,7 +583,7 @@ namespace Circ
 			// aboutToolStripMenuItem1
 			// 
 			this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-			this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
+			this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
 			this.aboutToolStripMenuItem1.Text = "About";
 			this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.AboutToolStripMenuItem1_Click);
 			// 
@@ -974,6 +1040,132 @@ namespace Circ
 			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
 			this.toolStripButton1.Text = "toolStripButton1";
 			// 
+			// elettricoToolStripSubMenu
+			// 
+			this.elettricoToolStripSubMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resistoreToolStripMenuItem,
+            this.generatoreDiTensioneToolStripMenuItem,
+            this.generatoreDiCorrenteToolStripMenuItem,
+            this.diodoToolStripMenuItem,
+            this.terraToolStripMenuItem});
+			this.elettricoToolStripSubMenu.Name = "elettricoToolStripSubMenu";
+			this.elettricoToolStripSubMenu.Size = new System.Drawing.Size(180, 22);
+			this.elettricoToolStripSubMenu.Text = "Elettrico";
+			// 
+			// idraulicoToolStripSubMenu
+			// 
+			this.idraulicoToolStripSubMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tuboToolStripMenuItem,
+            this.pompaToolStripMenuItem,
+            this.pressioneliquidoToolStripMenuItem,
+            this.nonRitornoliquidoToolStripMenuItem,
+            this.scaricoliquidoToolStripMenuItem});
+			this.idraulicoToolStripSubMenu.Name = "idraulicoToolStripSubMenu";
+			this.idraulicoToolStripSubMenu.Size = new System.Drawing.Size(180, 22);
+			this.idraulicoToolStripSubMenu.Text = "Idraulico";
+			// 
+			// pneumaticoToolStripSubMenu
+			// 
+			this.pneumaticoToolStripSubMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tuboToolStripMenuItem1,
+            this.pompaToolStripMenuItem1,
+            this.pressionegasToolStripMenuItem,
+            this.nonRitornogasToolStripMenuItem,
+            this.scaicogasToolStripMenuItem});
+			this.pneumaticoToolStripSubMenu.Name = "pneumaticoToolStripSubMenu";
+			this.pneumaticoToolStripSubMenu.Size = new System.Drawing.Size(180, 22);
+			this.pneumaticoToolStripSubMenu.Text = "Pneumatico";
+			// 
+			// resistoreToolStripMenuItem
+			// 
+			this.resistoreToolStripMenuItem.Name = "resistoreToolStripMenuItem";
+			this.resistoreToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+			this.resistoreToolStripMenuItem.Text = "Resistore";
+			// 
+			// generatoreDiTensioneToolStripMenuItem
+			// 
+			this.generatoreDiTensioneToolStripMenuItem.Name = "generatoreDiTensioneToolStripMenuItem";
+			this.generatoreDiTensioneToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+			this.generatoreDiTensioneToolStripMenuItem.Text = "Generatore di tensione";
+			// 
+			// generatoreDiCorrenteToolStripMenuItem
+			// 
+			this.generatoreDiCorrenteToolStripMenuItem.Name = "generatoreDiCorrenteToolStripMenuItem";
+			this.generatoreDiCorrenteToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+			this.generatoreDiCorrenteToolStripMenuItem.Text = "Generatore di corrente";
+			// 
+			// tuboToolStripMenuItem
+			// 
+			this.tuboToolStripMenuItem.Name = "tuboToolStripMenuItem";
+			this.tuboToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.tuboToolStripMenuItem.Text = "Tubo (liquido)";
+			// 
+			// pompaToolStripMenuItem
+			// 
+			this.pompaToolStripMenuItem.Name = "pompaToolStripMenuItem";
+			this.pompaToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.pompaToolStripMenuItem.Text = "Pompa (liquido)";
+			// 
+			// pressioneliquidoToolStripMenuItem
+			// 
+			this.pressioneliquidoToolStripMenuItem.Name = "pressioneliquidoToolStripMenuItem";
+			this.pressioneliquidoToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.pressioneliquidoToolStripMenuItem.Text = "Pressione (liquido)";
+			// 
+			// nonRitornoliquidoToolStripMenuItem
+			// 
+			this.nonRitornoliquidoToolStripMenuItem.Name = "nonRitornoliquidoToolStripMenuItem";
+			this.nonRitornoliquidoToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.nonRitornoliquidoToolStripMenuItem.Text = "Non ritorno (liquido)";
+			// 
+			// scaricoliquidoToolStripMenuItem
+			// 
+			this.scaricoliquidoToolStripMenuItem.Name = "scaricoliquidoToolStripMenuItem";
+			this.scaricoliquidoToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.scaricoliquidoToolStripMenuItem.Text = "Scarico (liquido)";
+			// 
+			// tuboToolStripMenuItem1
+			// 
+			this.tuboToolStripMenuItem1.Name = "tuboToolStripMenuItem1";
+			this.tuboToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.tuboToolStripMenuItem1.Text = "Tubo (gas)";
+			// 
+			// pompaToolStripMenuItem1
+			// 
+			this.pompaToolStripMenuItem1.Name = "pompaToolStripMenuItem1";
+			this.pompaToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.pompaToolStripMenuItem1.Text = "Pompa (gas)";
+			// 
+			// pressionegasToolStripMenuItem
+			// 
+			this.pressionegasToolStripMenuItem.Name = "pressionegasToolStripMenuItem";
+			this.pressionegasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.pressionegasToolStripMenuItem.Text = "Pressione (gas)";
+			// 
+			// nonRitornogasToolStripMenuItem
+			// 
+			this.nonRitornogasToolStripMenuItem.Name = "nonRitornogasToolStripMenuItem";
+			this.nonRitornogasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.nonRitornogasToolStripMenuItem.Text = "Non ritorno (gas)";
+			// 
+			// scaicogasToolStripMenuItem
+			// 
+			this.scaicogasToolStripMenuItem.Name = "scaicogasToolStripMenuItem";
+			this.scaicogasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.scaicogasToolStripMenuItem.Text = "Scarico (gas)";
+			// 
+			// diodoToolStripMenuItem
+			// 
+			this.diodoToolStripMenuItem.Name = "diodoToolStripMenuItem";
+			this.diodoToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+			this.diodoToolStripMenuItem.Text = "Diodo";
+			// 
+			// terraToolStripMenuItem
+			// 
+			this.terraToolStripMenuItem.Name = "terraToolStripMenuItem";
+			this.terraToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+			this.terraToolStripMenuItem.Text = "Terra";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1103,6 +1295,29 @@ namespace Circ
 		private System.Windows.Forms.ToolStripButton compattaToolStrip;
 		private System.Windows.Forms.ToolStripButton nodiIsolatiToolStrip;
 		private System.Windows.Forms.ToolStripMenuItem rinumeraToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem componentiToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem tipoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem elettricoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem idraulicoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pneumaticoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem elettricoToolStripSubMenu;
+		private System.Windows.Forms.ToolStripMenuItem resistoreToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem generatoreDiTensioneToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem generatoreDiCorrenteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem diodoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem terraToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem idraulicoToolStripSubMenu;
+		private System.Windows.Forms.ToolStripMenuItem tuboToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pompaToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pressioneliquidoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem nonRitornoliquidoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem scaricoliquidoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pneumaticoToolStripSubMenu;
+		private System.Windows.Forms.ToolStripMenuItem tuboToolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem pompaToolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem pressionegasToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem nonRitornogasToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem scaicogasToolStripMenuItem;
 		}
 	}
 

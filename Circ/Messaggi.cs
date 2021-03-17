@@ -64,9 +64,10 @@ namespace Fred68.Tools.Messaggi
 			public static string SELEZIONARE_UN_SOLO_NODO = "Selezionare un solo nodo";
 			public static string SELEZIONARE_UN_ELEMENTO = "Selezionare un elemento";
 			public static string SELEZIONARE_UN_SOLO_ELEMENTO = "Selezionare un solo elemento";
-			public static string ELIMINARE_ELEMENTI = "Eliminare:\n{0} nodi\n{1} rami\nselezionati ?";
+			public static string ELIMINARE_ELEMENTI = "Eliminare:\n{0} nod{2}\n{1} ram{3}\nselezionat{4} ?";
 			public static string SALVARE_FILE = @"Salvare il documento {0} ?";
 			public static string EXIT = "Uscire dal programma ?";
+			public static string CAMBIO_TIPO = "Attenzione: tutti i dati degli elementi verranno azzerati.\nCambiare tipo di circuito ?";
 			}
 
 		/// <summary>

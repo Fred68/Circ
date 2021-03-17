@@ -13,6 +13,8 @@ namespace Circ
 		Point pc;                   // Centro, cordinata di schermo, scalata
 		double rotation;            // angolo di rotazione
 
+		Phys.PhRamo phRamo;			// Dati fisici del ramo
+
 		/// <summary>
 		/// Costruttore
 		/// </summary>
@@ -29,6 +31,8 @@ namespace Circ
 
 		public uint N1 { get { return n[0]; } set { n[0] = value; } }
 		public uint N2 { get { return n[1]; } set { n[1] = value; } }
+
+		public Phys.PhRamo PhRamo { get { return phRamo; } set { phRamo = value; } }
 
 		[JsonIgnore]
 		public Nodo Nd1 { get { return nd[0]; } set { nd[0] = value; } }

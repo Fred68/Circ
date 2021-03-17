@@ -28,6 +28,8 @@ namespace Circ
 		bool maxIDerror;                    // Errore se raggiunto max ID. Necessaria rinumerazione
 		double passoGriglia;                // Temporaneo per salvataggio / caricamento, dato usato nella vista
 
+		Def.TipoCircuito tipoCirc;			// Tipo di circuito
+
 #warning Aggiunta stato Disattivo (in futuro) agli elementi
 
 		/// <summary>
@@ -86,6 +88,13 @@ namespace Circ
 			get { return viewFilter; }
 			set { viewFilter = value; }
 			}
+
+		public Def.TipoCircuito TipoCirc
+			{
+			get {return tipoCirc;}
+			set {tipoCirc = value;}
+			}
+
 		#endregion
 
 		/// <summary>
